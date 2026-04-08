@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>R.NARINDRA - Portfolio</title>
+  <link rel="icon" type="image/gif" href="https://www.freeiconspng.com/uploads/love-icon-1.gif">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF5722',
+            dark: '#0A0D1A',
+            darker: '#080B14',
+            card: '#171C35',
+            text: '#8A94B5'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="min-h-screen bg-dark text-text selection:bg-primary/30 selection:text-white">
+
+  <!-- Navigation -->
+  <nav id="navbar" class="fixed top-4 left-1/2 -translate-x-1/2 z-40 transition-all duration-500 w-[90%] max-w-4xl">
+    <div id="nav-container" class="rounded-full flex items-center justify-between px-4 py-2">
+      <!-- Mobile Burger -->
+      <button id="burger" class="md:hidden w-10 h-10 flex items-center justify-center text-white">
+        <i class="fa-solid fa-bars-staggered text-xl"></i>
+      </button>
+
+      <!-- Left Links (Desktop) -->
+      <div class="hidden md:flex items-center justify-start gap-1 flex-1">
+        <a href="#a-propos" class="nav-link px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide text-white/70 hover:text-primary hover:bg-white/5 transition-all duration-300">À Propos</a>
+        <a href="#expertise" class="nav-link px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide text-white/70 hover:text-primary hover:bg-white/5 transition-all duration-300">Expertise</a>
+      </div>
+
+      <!-- Spacer for floating logo -->
+      <div id="nav-spacer" class="shrink-0 w-0 md:w-0 transition-all duration-700"></div>
+
+      <!-- Right Links (Desktop) -->
+      <div class="hidden md:flex items-center justify-end gap-1 flex-1">
+        <a href="#projets" class="nav-link px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide text-white/70 hover:text-primary hover:bg-white/5 transition-all duration-300">Projets</a>
+        <a href="#parcours" class="nav-link px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide text-white/70 hover:text-primary hover:bg-white/5 transition-all duration-300">Parcours</a>
+      </div>
+
+      <!-- Small Contact Icon (Mobile only) -->
+      <a href="mailto:Narindraranjal4hy@gmail.com" class="md:hidden w-10 h-10 flex items-center justify-center text-primary">
+        <i class="fa-solid fa-paper-plane"></i>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Mobile Fullscreen Menu -->
+  <div id="mobile-menu">
+    <button id="close-menu" class="absolute top-8 right-8 w-12 h-12 flex items-center justify-center rounded-full bg-white/5 text-white text-2xl transition-all hover:bg-primary hover:scale-110">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    
+    <div class="mt-12 space-y-8">
+      <a href="#a-propos" class="mobile-nav-link"><span>01.</span> À Propos</a>
+      <a href="#expertise" class="mobile-nav-link"><span>02.</span> Expertise</a>
+      <a href="#projets" class="mobile-nav-link"><span>03.</span> Projets</a>
+      <a href="#parcours" class="mobile-nav-link"><span>04.</span> Parcours</a>
+      <a href="#contact" class="mobile-nav-link"><span>05.</span> Contact</a>
+      <a href="assets/files/Narindra Ranjalahy CV.pdf" download class="mt-4 px-6 py-3 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center gap-2">
+        <i class="fa-solid fa-download"></i>
+        Mon CV
+      </a>
+    </div>
+
+    <div class="mt-auto w-full pt-8 border-t border-white/5">
+      <p class="text-[10px] font-mono tracking-widest text-white/30 uppercase mb-4">Suivez-moi</p>
+      <div class="flex gap-6">
+        <a href="https://github.com/Narindra0" target="_blank" class="!text-sm !font-mono !gap-2 hover:text-primary transition-colors">GitHub</a>
+        <a href="mailto:Narindraranjal4hy@gmail.com" class="!text-sm !font-mono !gap-2 hover:text-primary transition-colors">Email</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Logo with Shrink and Move Effect -->
+  <div id="hero-logo" class="fixed z-50 transition-all duration-700 ease-out pointer-events-none">
+    <img src="assets/img/LogoNarindra.png" alt="R.NARINDRA Logo" class="h-full w-auto brightness-0 invert">
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+    <div class="absolute inset-0 z-0">
+      <div class="absolute inset-0 bg-gradient-to-b from-dark/60 via-transparent to-dark z-10"></div>
+      <img src="https://i.pinimg.com/originals/7d/07/a2/7d07a255678962d30d8717dcf5dbd266.gif" alt="Hero Background" class="w-full h-full object-cover opacity-60">
+    </div>
+
+    <!-- Hero Text Content -->
+    <div class="relative z-10 w-full max-w-6xl mx-auto px-6 flex flex-col items-center justify-center text-center mt-20 md:mt-32">
+      <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight mb-10 leading-tight" style="text-shadow: 0 4px 30px rgba(0,0,0,0.5);">
+        Concevoir <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400 block sm:inline">l'exceptionnel.</span>
+      </h1>
+      
+      <div class="flex flex-col sm:flex-row gap-5">
+        <a href="#a-propos" class="group relative px-10 py-4 rounded-full bg-white text-dark font-bold hover:bg-primary hover:text-white transition-all duration-500 overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
+          <span class="relative z-10 flex items-center gap-2">
+            Découvrir l'univers
+            <i class="fa-solid fa-arrow-down text-sm group-hover:translate-y-1 transition-transform"></i>
+          </span>
+          <div class="absolute inset-0 bg-primary -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
+        </a>
+        <a href="mailto:Narindraranjal4hy@gmail.com" class="hidden sm:inline-flex px-8 py-3.5 rounded-full border border-white/20 text-white font-medium hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 backdrop-blur-md">
+          Me contacter
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- A PROPOS SECTION -->
+  <section id="a-propos" class="relative py-20 px-8 overflow-hidden bg-dark">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- Left Column: Qui suis-je (Span 4) -->
+        <div class="lg:col-span-4 space-y-4 order-2 lg:order-1">
+          <h2 class="text-3xl font-serif text-white tracking-tight leading-none mb-4">Qui <span class="italic text-white/40">suis-je</span> ?</h2>
+          <p class="text-text text-base md:text-lg font-light leading-relaxed">
+            Moi c'est <span class="text-white font-medium">Narindra Ranjalahy</span>, un passionné d'informatique actuellement en M1. Ma détermination n'a d'égale que ma soif d'apprendre et de bâtir l'exceptionnel.
+          </p>
+          <div class="h-[1px] w-8 bg-primary/60"></div>
+          <p class="text-text text-sm font-light italic opacity-70 mb-6">
+            Explorer les limites du code, un projet à la fois.
+          </p>
+          <a href="assets/files/Narindra Ranjalahy CV.pdf" download class="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-primary/30 text-primary text-sm font-bold hover:bg-primary hover:text-white transition-all duration-300">
+            <i class="fa-solid fa-file-pdf"></i>
+            Télécharger mon CV
+          </a>
+        </div>
+
+        <!-- Center Column: Portrait (Span 4) -->
+        <div class="lg:col-span-4 order-1 lg:order-2 flex justify-center items-center px-4">
+          <div class="relative w-56 h-72 md:w-72 md:h-96 overflow-hidden rounded-2xl group">
+            <img src="assets/img/portrait.png" alt="Narindra Portrait" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000">
+            <!-- Bottom Fade to avoid sharp cut -->
+            <div class="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-dark to-transparent opacity-80"></div>
+            <!-- Pedestal Line -->
+            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-primary/30 blur-[1px]"></div>
+          </div>
+        </div>
+
+        <!-- Right Column: Pourquoi moi (Span 4) -->
+        <div class="lg:col-span-4 space-y-4 order-3 text-left lg:text-right">
+          <h2 class="text-3xl font-serif text-white tracking-tight leading-none mb-4">Pourquoi <span class="italic text-white/40">moi</span> ?</h2>
+          <div class="space-y-4">
+            <p class="text-text text-base font-light leading-relaxed">
+              <span class="text-white font-medium">Hybride :</span> Fusion naturelle entre l'IA, le code et le design premium.
+            </p>
+            <p class="text-text text-base font-light leading-relaxed">
+              <span class="text-white font-medium">Résilient :</span> Capacité à transformer chaque défi en innovation concrète.
+            </p>
+            <p class="text-text text-base font-light leading-relaxed">
+              <span class="text-white font-medium">Exigence :</span> Une obsession du détail pour des solutions sans compromis.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERTISE SECTION -->
+  <section id="expertise" class="py-20 px-8 max-w-7xl mx-auto overflow-hidden">
+    <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-8 mb-16 gap-8">
+      <div class="relative">
+        <span class="text-primary font-mono text-xs tracking-[0.3em] uppercase mb-4 block">/// Expertise Tactique</span>
+        <h2 class="text-4xl md:text-5xl font-serif leading-none tracking-tight text-white m-0">Savoir-faire <span class="italic text-white/40">&</span> Outils</h2>
+      </div>
+      <p class="text-text max-w-xs text-xs font-mono tracking-widest uppercase text-right leading-relaxed opacity-60">
+        01 / Profil <br> Multidisciplinaire
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">
+      <!-- Card 1: Développement (Large) -->
+      <div class="lg:col-span-7 group relative p-8 md:p-10 rounded-[32px] bg-white/5 border border-white/10 overflow-hidden transition-all duration-700 hover:bg-white/[0.08] hover:-translate-y-1">
+        <div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 blur-[80px] rounded-full group-hover:bg-primary/20 transition-all duration-700"></div>
+        
+        <div class="relative z-10 flex flex-col h-full">
+          <div class="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+            <i class="fa-solid fa-code text-2xl text-primary"></i>
+          </div>
+          
+          <h3 class="text-3xl font-serif mb-4 text-white group-hover:text-primary transition-colors">Développement <br><span class="italic">Fullstack</span></h3>
+          <p class="text-text text-lg font-light leading-relaxed mb-8 max-w-xl">
+            Conception d'architectures scalables et robustes. Du backend complexe aux interfaces réactives, je maîtrise l'intégralité de la chaîne de valeur numérique.
+          </p>
+          
+          <div class="mt-auto grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="p-4 rounded-2xl bg-black/30 border border-white/5 text-center">
+              <span class="block text-primary font-mono text-xs mb-1">Backend</span>
+              <span class="text-white/80 font-bold text-sm">Symfony</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-black/30 border border-white/5 text-center">
+              <span class="block text-primary font-mono text-xs mb-1">Logic</span>
+              <span class="text-white/80 font-bold text-sm">Python</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-black/30 border border-white/5 text-center">
+              <span class="block text-primary font-mono text-xs mb-1">Frontend</span>
+              <span class="text-white/80 font-bold text-sm">JavaScript</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-black/30 border border-white/5 text-center">
+              <span class="block text-primary font-mono text-xs mb-1">Systems</span>
+              <span class="text-white/80 font-bold text-sm">Linux</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: IA (Small) -->
+      <div class="lg:col-span-5 group relative p-8 md:p-10 rounded-[32px] bg-white/5 border border-white/10 overflow-hidden transition-all duration-700 hover:bg-white/[0.08] hover:-translate-y-1">
+        <div class="relative z-10 flex flex-col h-full">
+          <div class="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mb-8">
+            <i class="fa-solid fa-brain text-2xl text-primary"></i>
+          </div>
+          <h3 class="text-3xl font-serif mb-4 text-white">L'IA au service <br><span class="italic text-white/40">du concret</span></h3>
+          <p class="text-text text-base font-light leading-relaxed mb-8">
+            Intégration de modèles d'apprentissage automatique pour l'analyse prédictive et l'automatisation intelligente, comme illustré par le projet RAVINA.
+          </p>
+          <div class="flex flex-wrap gap-3 mt-auto">
+            <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-white/60">Machine Learning</span>
+            <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-white/60">Predictive Data</span>
+            <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-white/60">Reinforcement</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Design (Small) -->
+      <div class="lg:col-span-5 group relative p-8 md:p-10 rounded-[32px] bg-white/5 border border-white/10 overflow-hidden transition-all duration-700 hover:bg-white/[0.08] hover:-translate-y-1">
+        <div class="relative z-10 flex flex-col h-full">
+          <div class="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mb-8">
+            <i class="fa-solid fa-pen-nib text-2xl text-primary"></i>
+          </div>
+          <h3 class="text-3xl font-serif mb-4 text-white">Design & <br><span class="italic text-white/40">Direction Artistique</span></h3>
+          <p class="text-text text-base font-light leading-relaxed mb-8">
+            Création d'identités visuelles puissantes et d'interfaces intuitives sous Figma. Un design qui ne se contente pas d'être beau, mais qui sert l'usage.
+          </p>
+          <div class="flex flex-wrap gap-3 mt-auto">
+            <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-white/60">Figma</span>
+            <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-white/60">UI/UX Strategy</span>
+            <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-white/60">Branding</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Soft Skills (Large) -->
+      <div class="lg:col-span-7 group relative p-8 md:p-10 rounded-[32px] bg-primary text-white overflow-hidden transition-all duration-700 hover:-translate-y-1 shadow-[0_30px_60px_-15px_rgba(255,87,34,0.3)]">
+        <div class="absolute right-0 bottom-0 w-full h-full bg-black/10"></div>
+        <div class="relative z-10">
+          <h3 class="text-3xl font-serif mb-6 text-white">Par-delà le code</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-4">
+              <h4 class="font-bold text-xl flex items-center gap-3">
+                <i class="fa-solid fa-bolt-lightning text-white"></i> Agilité & Vitesse
+              </h4>
+              <p class="text-white/80 font-light leading-relaxed">Capacité à prototyper et livrer des solutions fonctionnelles sous forte contrainte de temps (Hackathons).</p>
+            </div>
+            <div class="space-y-4">
+              <h4 class="font-bold text-xl flex items-center gap-3">
+                <i class="fa-solid fa-puzzle-piece text-white"></i> Problem Solver
+              </h4>
+              <p class="text-white/80 font-light leading-relaxed">Une approche analytique systématique pour transformer chaque obstacle technique en opportunité d'innovation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJETS SECTION -->
+  <section id="projets" class="py-24 bg-darker">
+    <div class="max-w-7xl mx-auto px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-8 mb-16 gap-8">
+        <div class="relative">
+          <span class="text-primary font-mono text-xs tracking-[0.3em] uppercase mb-4 block">/// Portfolio Sélectionné</span>
+          <h2 class="text-4xl md:text-5xl font-serif text-white tracking-tight leading-none">Réalisations <span class="italic text-white/40">Majeures</span></h2>
+        </div>
+        <p class="text-text max-w-xs text-xs font-mono tracking-widest uppercase text-right leading-relaxed opacity-60">
+          02 / Études <br> de cas
+        </p>
+      </div>
+
+      <!-- Liste Interactive des Projets -->
+      <div class="project-list flex flex-col mt-8">
+
+        <!-- 01 Ravina -->
+        <a href="https://ravina-nethost.vercel.app/login" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+            <div class="flex items-baseline gap-6 lg:w-5/12">
+                <span class="project-number text-white/40 font-mono text-sm">01</span>
+                <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">Ravina</h3>
+            </div>
+            <div class="lg:w-4/12">
+                <p class="text-white/60 text-base font-light leading-relaxed transition-colors group-hover:text-white/90">
+                    Application d'assistance technologique pour l'optimisation et la gestion intelligente des plantations.
+                </p>
+            </div>
+            <div class="lg:w-3/12 flex items-center justify-between lg:justify-end gap-6 text-sm uppercase tracking-widest font-mono text-white/40">
+                <span>AgriTech</span>
+                <svg class="arrow-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </div>
+        </a>
+
+        <!-- 02 Noovy -->
+        <a href="https://noovy-boky.netlify.app/" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+            <div class="flex items-baseline gap-6 lg:w-5/12">
+                <span class="project-number text-white/40 font-mono text-sm">02</span>
+                <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">Noovy</h3>
+            </div>
+            <div class="lg:w-4/12">
+                <p class="text-white/60 text-base font-light leading-relaxed transition-colors group-hover:text-white/90">
+                    Bibliothèque numérique immersive. Plus de 2000 romans et livres audio pour redéfinir la lecture nomade.
+                </p>
+            </div>
+            <div class="lg:w-3/12 flex items-center justify-between lg:justify-end gap-6 text-sm uppercase tracking-widest font-mono text-white/40">
+                <span>Mobile & Culture</span>
+                <svg class="arrow-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </div>
+        </a>
+
+        <!-- 03 DigiKaratra -->
+        <a href="https://digikaratra.alwaysdata.net/auth/login" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+            <div class="flex items-baseline gap-6 lg:w-5/12">
+                <span class="project-number text-white/40 font-mono text-sm">03</span>
+                <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">DigiKaratra</h3>
+            </div>
+            <div class="lg:w-4/12">
+                <p class="text-white/60 text-base font-light leading-relaxed transition-colors group-hover:text-white/90">
+                    Système moderne d'archivage, de recherche et de gestion dématérialisée des Cartes d'Identité Nationales.
+                </p>
+            </div>
+            <div class="lg:w-3/12 flex items-center justify-between lg:justify-end gap-6 text-sm uppercase tracking-widest font-mono text-white/40">
+                <span>E-Gov Web</span>
+                <svg class="arrow-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </div>
+        </a>
+
+        <!-- 04 Yas USSD -->
+        <div onclick="openYasModal()" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+            <div class="flex items-baseline gap-6 lg:w-5/12">
+                <span class="project-number text-white/40 font-mono text-sm">04</span>
+                <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">Yas USSD</h3>
+            </div>
+            <div class="lg:w-4/12">
+                <p class="text-white/60 text-base font-light leading-relaxed transition-colors group-hover:text-white/90">
+                    Écosystème de simulation haute fidélité reproduisant les flux financiers MVola de l'opérateur YAS.
+                </p>
+            </div>
+            <div class="lg:w-3/12 flex items-center justify-between lg:justify-end gap-6 text-sm uppercase tracking-widest font-mono text-white/40">
+                <span>Fintech & Sim</span>
+                <svg class="arrow-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 05 BusNaka -->
+        <a href="https://narindra.pythonanywhere.com/" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+            <div class="flex items-baseline gap-6 lg:w-5/12">
+                <span class="project-number text-white/40 font-mono text-sm">05</span>
+                <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">BusNaka</h3>
+            </div>
+            <div class="lg:w-4/12">
+                <p class="text-white/60 text-base font-light leading-relaxed transition-colors group-hover:text-white/90">
+                    Solution intuitive et rapide conçue pour explorer et gérer le réseau de transport urbain.
+                </p>
+            </div>
+            <div class="lg:w-3/12 flex items-center justify-between lg:justify-end gap-6 text-sm uppercase tracking-widest font-mono text-white/40">
+                <span>Mobilité</span>
+                <svg class="arrow-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </div>
+        </a>
+
+        <!-- 06 GodMod -->
+        <a href="https://github.com/Narindra0" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+            <div class="flex items-baseline gap-6 lg:w-5/12">
+                <span class="project-number text-white/40 font-mono text-sm">06</span>
+                <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">GodMod</h3>
+            </div>
+            <div class="lg:w-4/12">
+                <p class="text-white/60 text-base font-light leading-relaxed transition-colors group-hover:text-white/90">
+                    Programme d'intelligence artificielle par apprentissage par renforcement pour l'analyse prédictive de masse.
+                </p>
+            </div>
+            <div class="lg:w-3/12 flex items-center justify-between lg:justify-end gap-6 text-sm uppercase tracking-widest font-mono text-white/40">
+                <span>IA & Data</span>
+                <svg class="arrow-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </div>
+        </a>
+
+        <!-- 07 Talenta -->
+        <a href="https://github.com/Narindra0" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+            <div class="flex items-baseline gap-6 lg:w-5/12">
+                <span class="project-number text-white/40 font-mono text-sm">07</span>
+                <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">Talenta</h3>
+            </div>
+            <div class="lg:w-4/12">
+                <p class="text-white/60 text-base font-light leading-relaxed transition-colors group-hover:text-white/90">
+                    Plateforme stratégique de recrutement croisant des profils ciblés avec les besoins spécifiques des recruteurs.
+                </p>
+            </div>
+            <div class="lg:w-3/12 flex items-center justify-between lg:justify-end gap-6 text-sm uppercase tracking-widest font-mono text-white/40">
+                <span>HR Tech</span>
+                <svg class="arrow-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </div>
+        </a>
+
+        <!-- 08 BOA Manager -->
+        <a href="https://github.com/Narindra0" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+            <div class="flex items-baseline gap-6 lg:w-5/12">
+                <span class="project-number text-white/40 font-mono text-sm">08</span>
+                <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">BOA Manager</h3>
+            </div>
+            <div class="lg:w-4/12">
+                <p class="text-white/60 text-base font-light leading-relaxed transition-colors group-hover:text-white/90">
+                    Outil sur-mesure de gestion de tâches et de flux de projets pour le département informatique bancaire.
+                </p>
+            </div>
+            <div class="lg:w-3/12 flex items-center justify-between lg:justify-end gap-6 text-sm uppercase tracking-widest font-mono text-white/40">
+                <span>Logiciel Interne</span>
+                <svg class="arrow-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PARCOURS SECTION -->
+  <section id="parcours" class="max-w-7xl mx-auto px-8 py-24 text-white overflow-hidden">
+    <!-- Header Section -->
+    <div class="mb-32 flex flex-col md:flex-row md:items-end justify-between gap-12 border-b border-white/10 pb-6">
+      <div class="relative">
+        <span class="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">03 / Expériences</span>
+        <h2 class="text-5xl md:text-7xl font-serif leading-none tracking-tight">Mon <span class="italic text-white/40">Parcours</span></h2>
+        <div class="absolute -bottom-6 left-0 w-24 h-[2px] bg-primary"></div>
+      </div>
+      <p class="text-text max-w-sm text-lg font-light leading-relaxed border-l border-white/10 pl-8">
+        Une trajectoire forgée par la création de solutions concrètes, de l'optimisation agricole à l'innovation bancaire.
+      </p>
+    </div>
+
+    <!-- Timeline Layout -->
+    <div class="relative mt-20">
+      <!-- Ligne verticale (centrée sur desktop, gauche sur mobile) -->
+      <div class="absolute left-0 lg:left-1/2 top-0 bottom-0 w-[1px] bg-white/10 lg:-translate-x-1/2"></div>
+
+      <div class="space-y-32">
+          
+        <!-- Expérience 1: Zanova -->
+        <div class="experience-card relative flex flex-col lg:flex-row items-center group">
+          <div class="lg:w-1/2 w-full lg:pr-24 lg:text-right mb-8 lg:mb-0">
+            <span class="font-mono text-primary text-sm mb-3 block tracking-tighter">Décembre 2025 — Février 2026</span>
+            <h3 class="experience-title text-4xl lg:text-5xl font-serif mb-4 transition-all duration-300">Zanova</h3>
+            <div class="flex flex-wrap lg:justify-end gap-2">
+              <span class="text-[10px] font-mono border border-primary/30 bg-primary/20 px-3 py-1 uppercase text-primary rounded-sm">CDD</span>
+            </div>
+          </div>
+
+          <!-- Point central interactif -->
+          <div class="timeline-dot absolute left-[-8px] lg:left-1/2 w-4 h-4 bg-primary rounded-full lg:-translate-x-1/2 z-10 hidden lg:block border-[3px] border-dark"></div>
+          
+          <div class="lg:w-1/2 w-full lg:pl-24 border-l lg:border-none border-white/10 pl-8">
+            <h4 class="text-2xl font-medium text-white/90 mb-4">Développeur Frontend</h4>
+            <p class="text-text font-light leading-relaxed mb-6 text-lg">
+              Conception et développement intégral d'un <span class="text-white font-medium italic">CRM</span> métier pour un call center. Optimisation des flux de données en temps réel et création d'une interface de gestion dynamique.
+            </p>
+            <div class="flex flex-wrap gap-4 font-mono text-[11px] text-white/40 tracking-widest uppercase">
+              <span class="hover:text-primary cursor-default transition-colors">#Frontend_Architecture</span>
+              <span class="hover:text-primary cursor-default transition-colors">#CRM_Solutions</span>
+              <span class="hover:text-primary cursor-default transition-colors">#UX_Design</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expérience 2: ApiNess -->
+        <div class="experience-card relative flex flex-col lg:flex-row items-center group">
+          <!-- Inversion visuelle -->
+          <div class="lg:w-1/2 w-full lg:pr-24 order-2 lg:order-1 border-l lg:border-none border-white/10 pl-8 lg:pl-0 lg:text-right">
+            <h4 class="text-2xl font-medium text-white/90 mb-4">Développeur & Designer</h4>
+            <p class="text-text font-light leading-relaxed mb-6 text-lg">
+              Architecture complète de <span class="text-white font-medium italic">RAVINA</span>. Un écosystème mêlant IA et agronomie pour optimiser le rendement des cultures via des données prédictives.
+            </p>
+            <div class="flex flex-wrap gap-4 font-mono text-[11px] text-white/40 lg:justify-end tracking-widest uppercase">
+              <span class="hover:text-primary cursor-default transition-colors">#Intelligence_Artificielle</span>
+              <span class="hover:text-primary cursor-default transition-colors">#Cloud_Compute</span>
+            </div>
+          </div>
+
+          <!-- Point central -->
+          <div class="timeline-dot absolute left-[-8px] lg:left-1/2 w-4 h-4 bg-white/20 rounded-full lg:-translate-x-1/2 z-10 hidden lg:block border-[3px] border-dark group-hover:bg-primary transition-colors duration-500"></div>
+
+          <div class="lg:w-1/2 w-full lg:pl-24 order-1 lg:order-2 mb-8 lg:mb-0">
+            <span class="font-mono text-white/50 text-sm mb-3 block tracking-tighter">Septembre — Décembre 2025</span>
+            <h3 class="experience-title text-4xl lg:text-5xl font-serif mb-4 transition-all duration-300">ApiNess</h3>
+            <div class="flex flex-wrap gap-2 lg:justify-start">
+              <span class="text-[10px] font-mono border border-white/20 px-3 py-1 uppercase text-white/50 rounded-sm">Stagiaire</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expérience 3: Hackathon -->
+        <div class="experience-card relative flex flex-col lg:flex-row items-center group">
+          <div class="lg:w-1/2 w-full lg:pr-24 lg:text-right mb-8 lg:mb-0">
+            <span class="font-mono text-white/50 text-sm mb-3 block tracking-tighter">Octobre 2024</span>
+            <h3 class="experience-title text-4xl lg:text-5xl font-serif mb-4 transition-all duration-300">Hackathon</h3>
+            <div class="flex flex-wrap lg:justify-end gap-2">
+              <span class="text-[10px] font-mono border border-white/20 px-3 py-1 uppercase text-white/50 rounded-sm">Participant</span>
+            </div>
+          </div>
+
+          <!-- Point central -->
+          <div class="timeline-dot absolute left-[-8px] lg:left-1/2 w-4 h-4 bg-white/20 rounded-full lg:-translate-x-1/2 z-10 hidden lg:block border-[3px] border-dark group-hover:bg-primary transition-colors duration-500"></div>
+          
+          <div class="lg:w-1/2 w-full lg:pl-24 border-l lg:border-none border-white/10 pl-8">
+            <h4 class="text-2xl font-medium text-white/90 mb-4">Représentant Universitaire</h4>
+            <p class="text-text font-light leading-relaxed mb-6 text-lg">
+              Développement d'une solution numérique innovante sous contrainte de temps. Focus sur l'accessibilité et le prototypage rapide.
+            </p>
+            <div class="flex flex-wrap gap-4 font-mono text-[11px] text-white/40 tracking-widest uppercase">
+              <span class="hover:text-primary cursor-default transition-colors">#Innovation</span>
+              <span class="hover:text-primary cursor-default transition-colors">#Social_Impact</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expérience 4: BOA Madagascar -->
+        <div class="experience-card relative flex flex-col lg:flex-row items-center group">
+          <!-- Inversion visuelle -->
+          <div class="lg:w-1/2 w-full lg:pr-24 order-2 lg:order-1 border-l lg:border-none border-white/10 pl-8 lg:pl-0 lg:text-right">
+            <h4 class="text-2xl font-medium text-white/90 mb-4">Développeur Web</h4>
+            <p class="text-text font-light leading-relaxed mb-6 text-lg">
+              Modernisation des processus internes. Conception d'un programme de suivi de projets centralisé pour le département informatique.
+            </p>
+            <div class="flex flex-wrap gap-4 font-mono text-[11px] text-white/40 lg:justify-end tracking-widest uppercase">
+              <span class="hover:text-primary cursor-default transition-colors">#Symfony</span>
+              <span class="hover:text-primary cursor-default transition-colors">#SEO_Strategy</span>
+            </div>
+          </div>
+
+          <!-- Point central -->
+          <div class="timeline-dot absolute left-[-8px] lg:left-1/2 w-4 h-4 bg-white/20 rounded-full lg:-translate-x-1/2 z-10 hidden lg:block border-[3px] border-dark group-hover:bg-primary transition-colors duration-500"></div>
+
+          <div class="lg:w-1/2 w-full lg:pl-24 order-1 lg:order-2 mb-8 lg:mb-0">
+            <span class="font-mono text-white/50 text-sm mb-3 block tracking-tighter">Août — Octobre 2024</span>
+            <h3 class="experience-title text-4xl lg:text-5xl font-serif mb-4 transition-all duration-300">BOA Madagascar</h3>
+            <div class="flex flex-wrap gap-2 lg:justify-start">
+              <span class="text-[10px] font-mono border border-white/20 px-3 py-1 uppercase text-white/50 rounded-sm">Stage Technique</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT SECTION -->
+  <section id="contact" class="bg-dark py-24 md:pt-32 md:pb-48 px-8 overflow-hidden">
+    <div class="max-w-7xl mx-auto text-center">
+      <div class="mb-16 md:mb-20">
+        <span class="text-primary font-mono text-sm tracking-widest uppercase mb-6 block">/// Me Contacter</span>
+        <h2 class="text-4xl sm:text-5xl md:text-9xl font-serif leading-none tracking-tight text-white mb-10 md:mb-12">
+          Prêt à créer <br>
+          <span class="italic text-white/40">l'exceptionnel</span> ?
+        </h2>
+        <p class="text-text text-lg md:text-2xl font-light max-w-2xl mx-auto leading-relaxed">
+          Actuellement disponible pour de nouvelles collaborations et des projets ambitieux.
+        </p>
+      </div>
+
+      <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
+        <a href="mailto:Narindraranjal4hy@gmail.com" class="group relative px-8 py-4 md:px-12 md:py-6 rounded-full bg-primary text-white text-lg md:text-xl font-bold transition-all duration-500 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,87,34,0.4)] overflow-hidden">
+          <span class="relative z-10 flex items-center gap-3">
+            Démarrer la discussion
+            <i class="fa-solid fa-paper-plane text-base group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
+          </span>
+          <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+        </a>
+
+        <div class="flex items-center gap-6 md:gap-8 mt-10 md:mt-0">
+          <a href="https://wa.me/261328814081" target="_blank" class="w-14 h-14 md:w-16 md:h-16 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-primary hover:border-primary transition-all duration-300 bg-white/5">
+            <i class="fa-brands fa-whatsapp text-2xl"></i>
+          </a>
+          <a href="https://github.com/Narindra0" target="_blank" class="w-14 h-14 md:w-16 md:h-16 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-primary hover:border-primary transition-all duration-300">
+            <i class="fa-brands fa-github text-2xl"></i>
+          </a>
+          <a href="mailto:Narindraranjal4hy@gmail.com" class="w-14 h-14 md:w-16 md:h-16 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-primary hover:border-primary transition-all duration-300">
+            <i class="fa-solid fa-envelope text-2xl"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-darker py-16 px-8 border-t border-white/5">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-12">
+        <div class="flex flex-col items-center md:items-start gap-4">
+          <img src="assets/img/LogoNarindra.png" alt="R.NARINDRA Logo" class="h-10 w-auto brightness-0 invert opacity-80">
+          <p class="text-white/30 text-xs font-mono tracking-widest uppercase mt-2">Concevoir pour demain, aujourd'hui.</p>
+        </div>
+        
+        <div class="flex flex-wrap justify-center gap-8 text-xs font-mono tracking-widest uppercase text-white/40">
+          <a href="#a-propos" class="hover:text-primary transition-colors">À Propos</a>
+          <a href="#projets" class="hover:text-primary transition-colors">Projets</a>
+          <a href="#parcours" class="hover:text-primary transition-colors">Parcours</a>
+        </div>
+
+        <div class="text-right">
+          <p class="text-white/20 text-xs tracking-widest uppercase">© 2026 R.NARINDRA. <br> Tous droits réservés.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- YAS USSD Modal -->
+  <div id="yasModal" class="modal-overlay" onclick="closeYasModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeYasModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      
+      <div class="modal-icon">
+        <i class="fa-solid fa-mobile-screen"></i>
+      </div>
+      
+      <h3 class="modal-title">YAS USSD - Version Locale</h3>
+      
+      <p class="modal-text">
+        Ce projet est uniquement disponible en version locale et nécessite un téléphone pour la simulation USSD.
+      </p>
+      
+      <div class="modal-steps">
+        <div class="modal-step">
+          <span class="modal-step-number">1</span>
+          <span>Cloner le repository depuis GitHub</span>
+        </div>
+        <div class="modal-step">
+          <span class="modal-step-number">2</span>
+          <span>Lancer le serveur local (CLI ou GUI)</span>
+        </div>
+        <div class="modal-step">
+          <span class="modal-step-number">3</span>
+          <span>Tester avec un téléphone via l'interface</span>
+        </div>
+      </div>
+      
+      <a href="https://github.com/Narindra0/YAS.git" target="_blank" class="modal-github-btn">
+        <i class="fa-brands fa-github"></i>
+        Télécharger sur GitHub
+      </a>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/scripts.js" defer></script>
+</body>
+</body>
+</html>
