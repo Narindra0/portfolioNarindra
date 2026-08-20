@@ -1,5 +1,63 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono&display=swap');
 
+/* --- SCROLL REVEAL ANIMATIONS --- */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-up.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-left.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-right.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-scale.revealed {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* --- BACK TO TOP --- */
+#backToTop.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* --- CURSOR GLOW (subtle) --- */
+.cursor-glow {
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,87,34,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  transform: translate(-50%, -50%);
+  transition: left 0.3s ease-out, top 0.3s ease-out;
+}
+
 /* --- TYPOGRAPHY HARMONIZATION --- */
 body { font-family: 'Inter', sans-serif; }
 .font-serif { font-family: 'Playfair Display', serif; }
@@ -296,4 +354,168 @@ body { font-family: 'Inter', sans-serif; }
 .modal-github-btn:hover {
   background: #FF5722;
   color: white;
+}
+
+/* --- PASS'IO PROJECT MODAL --- */
+.passio-modal {
+  max-width: 600px;
+  padding: 0;
+  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.passio-modal::-webkit-scrollbar {
+  width: 6px;
+}
+.passio-modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+.passio-modal::-webkit-scrollbar-thumb {
+  background: rgba(255,87,34,0.3);
+  border-radius: 3px;
+}
+.passio-modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,87,34,0.5);
+}
+.passio-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 2rem 0;
+}
+.passio-logo-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #FF5722 0%, #FF8A50 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.passio-logo-icon i {
+  font-size: 24px;
+  color: white;
+}
+.passio-founder-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.25rem 2rem 0;
+  padding: 0.4rem 1rem;
+  background: linear-gradient(135deg, rgba(255,87,34,0.15) 0%, rgba(255,138,80,0.1) 100%);
+  border: 1px solid rgba(255,87,34,0.3);
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #FF5722;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.passio-founder-badge i {
+  font-size: 0.65rem;
+}
+.passio-modal .modal-text {
+  padding: 1.25rem 2rem 0;
+  font-size: 0.9rem;
+}
+.passio-mission {
+  margin: 1.25rem 2rem;
+  padding: 1rem 1.25rem;
+  background: rgba(0,0,0,0.25);
+  border-radius: 12px;
+  border-left: 3px solid #FF5722;
+}
+.passio-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+.passio-section-title i {
+  color: #FF5722;
+  font-size: 0.7rem;
+}
+.passio-features {
+  margin: 0 2rem 1.25rem;
+}
+.passio-feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.passio-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+.passio-feature-item:hover {
+  background: rgba(255,87,34,0.06);
+  border-color: rgba(255,87,34,0.2);
+}
+.passio-feature-item i {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.passio-feature-item div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.passio-skills {
+  margin: 0 2rem 1.25rem;
+}
+.passio-skill-tag {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  background: rgba(255,87,34,0.08);
+  border: 1px solid rgba(255,87,34,0.2);
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-family: 'Space Mono', monospace;
+  color: #FF8A50;
+  letter-spacing: 0.02em;
+  transition: all 0.3s ease;
+}
+.passio-skill-tag:hover {
+  background: rgba(255,87,34,0.15);
+  color: #FF5722;
+}
+.passio-cta {
+  padding: 0 2rem 2rem;
+}
+.passio-visit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: center;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #FF5722 0%, #FF8A50 100%);
+  color: white;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(255,87,34,0.3);
+}
+.passio-visit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(255,87,34,0.4);
+}
+@media (max-width: 480px) {
+  .passio-feature-grid {
+    grid-template-columns: 1fr;
+  }
 }

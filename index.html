@@ -5,25 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- Primary Meta Tags -->
-  <title>Narindra Ranjalahy | Développeur Fullstack & IA | Portfolio</title>
-  <meta name="title" content="Narindra Ranjalahy | Développeur Fullstack & IA | Portfolio">
-  <meta name="description" content="Découvrez le portfolio de Narindra Ranjalahy, développeur Fullstack et passionné d'IA. Projets innovants en AgriTech (Ravina), Culture (Noovy) et Fintech.">
-  <meta name="keywords" content="Narindra, Narindra Ranjalahy, Portfolio, Développeur, Fullstack, IA, Intelligence Artificielle, Madagascar, Ravina, Noovy, DigiKaratra, Symfony, Python, React">
+  <title>Narindra Ranjalahy | Fondateur Pass'io & Développeur Fullstack | Portfolio</title>
+  <meta name="title" content="Narindra Ranjalahy | Fondateur Pass'io & Développeur Fullstack | Portfolio">
+  <meta name="description" content="Découvrez le portfolio de Narindra Ranjalahy, Fondateur & CEO de Pass'io, développeur Fullstack et passionné d'IA. Projets innovants en Streaming (Pass'io), AgriTech (Ravina), Culture (Noovy) et Fintech.">
+  <meta name="keywords" content="Narindra, Narindra Ranjalahy, Portfolio, Fondateur, CEO, Pass'io, Développeur, Fullstack, IA, Intelligence Artificielle, Madagascar, Streaming, Ravina, Noovy, DigiKaratra, Symfony, Python, React">
   <meta name="author" content="Narindra Ranjalahy">
   <link rel="canonical" href="https://narindraportfolio.netlify.app/">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://narindraportfolio.netlify.app/">
-  <meta property="og:title" content="Narindra Ranjalahy | Développeur Fullstack & IA">
-  <meta property="og:description" content="Architecte de solutions numériques mêlant IA, Code et Design Premium. Découvrez mes réalisations.">
+  <meta property="og:title" content="Narindra Ranjalahy | Fondateur Pass'io, Développeur Fullstack & IA">
+  <meta property="og:description" content="Fondateur & CEO de Pass'io. Architecte de solutions numériques mêlant IA, Code et Design Premium. Découvrez mes réalisations.">
   <meta property="og:image" content="https://narindraportfolio.netlify.app/assets/img/seo-preview.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://narindraportfolio.netlify.app/">
-  <meta property="twitter:title" content="Narindra Ranjalahy | Développeur Fullstack & IA">
-  <meta property="twitter:description" content="Architecte de solutions numériques mêlant IA, Code et Design Premium. Découvrez mes réalisations.">
+  <meta property="twitter:title" content="Narindra Ranjalahy | Fondateur Pass'io, Développeur Fullstack & IA">
+  <meta property="twitter:description" content="Fondateur & CEO de Pass'io. Architecte de solutions numériques mêlant IA, Code et Design Premium. Découvrez mes réalisations.">
   <meta property="twitter:image" content="https://narindraportfolio.netlify.app/assets/img/seo-preview.png">
 
   <link rel="icon" type="image/gif" href="https://www.freeiconspng.com/uploads/love-icon-1.gif">
@@ -45,6 +45,51 @@
     }
   </script>
   <link rel="stylesheet" href="assets/css/styles.css">
+  <!-- Inline critical modal CSS for immediate rendering -->
+  <style>
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: linear-gradient(145deg, #171C35 0%, #0A0D1A 100%); border: 1px solid rgba(255,87,34,0.3); border-radius: 20px; max-width: 500px; width: 100%; padding: 2rem; position: relative; animation: modalSlideIn 0.3s ease-out; }
+    @keyframes modalSlideIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .modal-close { position: absolute; top: 1rem; right: 1rem; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; }
+    .modal-close:hover { background: #FF5722; }
+    .modal-icon { width: 60px; height: 60px; background: rgba(255,87,34,0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
+    .modal-icon i { font-size: 28px; color: #FF5722; }
+    .modal-title { font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 0.75rem; }
+    .modal-text { color: #8A94B5; line-height: 1.7; margin-bottom: 1.5rem; }
+    .modal-steps { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+    .modal-step { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.75rem; color: #8A94B5; font-size: 0.9rem; }
+    .modal-step:last-child { margin-bottom: 0; }
+    .modal-step-number { width: 20px; height: 20px; background: #FF5722; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: white; flex-shrink: 0; }
+    .modal-github-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: white; color: #0A0D1A; padding: 0.875rem 1.5rem; border-radius: 12px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+    .modal-github-btn:hover { background: #FF5722; color: white; }
+    /* Pass'io Modal */
+    .passio-modal { max-width: 600px; padding: 0; overflow: hidden; max-height: 90vh; overflow-y: auto; }
+    .passio-modal::-webkit-scrollbar { width: 6px; }
+    .passio-modal::-webkit-scrollbar-track { background: transparent; }
+    .passio-modal::-webkit-scrollbar-thumb { background: rgba(255,87,34,0.3); border-radius: 3px; }
+    .passio-modal::-webkit-scrollbar-thumb:hover { background: rgba(255,87,34,0.5); }
+    .passio-header { display: flex; align-items: center; gap: 1rem; padding: 2rem 2rem 0; }
+    .passio-logo-icon { width: 56px; height: 56px; background: linear-gradient(135deg, #FF5722 0%, #FF8A50 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .passio-logo-icon i { font-size: 24px; color: white; }
+    .passio-founder-badge { display: inline-flex; align-items: center; gap: 0.5rem; margin: 1.25rem 2rem 0; padding: 0.4rem 1rem; background: linear-gradient(135deg, rgba(255,87,34,0.15) 0%, rgba(255,138,80,0.1) 100%); border: 1px solid rgba(255,87,34,0.3); border-radius: 50px; font-size: 0.75rem; font-weight: 700; color: #FF5722; text-transform: uppercase; letter-spacing: 0.05em; }
+    .passio-founder-badge i { font-size: 0.65rem; }
+    .passio-mission { margin: 1.25rem 2rem; padding: 1rem 1.25rem; background: rgba(0,0,0,0.25); border-radius: 12px; border-left: 3px solid #FF5722; }
+    .passio-section-title { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+    .passio-section-title i { color: #FF5722; font-size: 0.7rem; }
+    .passio-features { margin: 0 2rem 1.25rem; }
+    .passio-feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .passio-feature-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; transition: all 0.3s ease; }
+    .passio-feature-item:hover { background: rgba(255,87,34,0.06); border-color: rgba(255,87,34,0.2); }
+    .passio-feature-item i { font-size: 1rem; flex-shrink: 0; }
+    .passio-feature-item div { display: flex; flex-direction: column; gap: 0.1rem; }
+    .passio-skills { margin: 0 2rem 1.25rem; }
+    .passio-skill-tag { display: inline-block; padding: 0.35rem 0.75rem; background: rgba(255,87,34,0.08); border: 1px solid rgba(255,87,34,0.2); border-radius: 50px; font-size: 0.7rem; font-family: 'Space Mono', monospace; color: #FF8A50; letter-spacing: 0.02em; transition: all 0.3s ease; }
+    .passio-skill-tag:hover { background: rgba(255,87,34,0.15); color: #FF5722; }
+    .passio-cta { padding: 0 2rem 2rem; }
+    .passio-visit-btn { display: inline-flex; align-items: center; gap: 0.5rem; width: 100%; justify-content: center; padding: 0.875rem 1.5rem; background: linear-gradient(135deg, #FF5722 0%, #FF8A50 100%); color: white; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(255,87,34,0.3); }
+    .passio-visit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(255,87,34,0.4); }
+  </style>
 
   <!-- JSON-LD Structured Data for SEO -->
   <script type="application/ld+json">
@@ -52,17 +97,41 @@
     "@context": "https://schema.org",
     "@type": "Person",
     "name": "Narindra Ranjalahy",
-    "jobTitle": "Développeur Fullstack & Spécialiste IA",
+    "jobTitle": "Fondateur & CEO de Pass'io, Développeur Fullstack & Spécialiste IA",
     "url": "https://narindraportfolio.netlify.app/",
     "sameAs": [
-      "https://github.com/Narindra0"
+      "https://github.com/Narindra0",
+      "https://wa.me/261328814081"
     ],
     "image": "https://narindraportfolio.netlify.app/assets/img/portrait.png",
-    "description": "Développeur Fullstack et passionné d'IA à Madagascar, créateur des projets Ravina, Noovy et DigiKaratra.",
-    "knowsAbout": ["Web Development", "Artificial Intelligence", "UI/UX Design", "Symfony", "Python"],
+    "description": "Fondateur & CEO de Pass'io, développeur Fullstack et passionné d'IA à Madagascar. Créateur de Pass'io, Ravina, Noovy, DigiKaratra et plus.",
+    "knowsAbout": ["Web Development", "Artificial Intelligence", "UI/UX Design", "Symfony", "Python", "JavaScript", "React", "Linux"],
     "alumniOf": {
       "@type": "EducationalOrganization",
       "name": "Université à Madagascar"
+    },
+    "hasOccupation": [
+      {
+        "@type": "Occupation",
+        "name": "Fondateur & CEO",
+        "occupationLocation": {
+          "@type": "Country",
+          "name": "Madagascar"
+        }
+      },
+      {
+        "@type": "Occupation",
+        "name": "Développeur FullStack",
+        "occupationLocation": {
+          "@type": "Country",
+          "name": "Madagascar"
+        }
+      }
+    ],
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Pass'io",
+      "url": "https://passiio.shop"
     }
   }
   </script>
@@ -161,14 +230,14 @@
   
   <!-- A PROPOS SECTION -->
   <section id="a-propos" class="relative py-20 px-8 overflow-hidden bg-dark">
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-6xl mx-auto reveal-up">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         
         <!-- Left Column: Qui suis-je (Span 4) -->
         <div class="lg:col-span-4 space-y-4 order-2 lg:order-1">
           <h2 class="text-3xl font-serif text-white tracking-tight leading-none mb-4">Qui <span class="italic text-white/40">suis-je</span> ?</h2>
           <p class="text-text text-base md:text-lg font-light leading-relaxed">
-            Moi c'est <span class="text-white font-medium">Narindra Ranjalahy</span>, un passionné d'informatique actuellement en M1. Ma détermination n'a d'égale que ma soif d'apprendre et de bâtir l'exceptionnel.
+            Moi c'est <span class="text-white font-medium">Narindra Ranjalahy</span>, <span class="text-white font-medium">Fondateur & CEO de Pass'io</span>, passionné d'informatique et entrepreneur. Ma détermination n'a d'égale que ma soif d'apprendre et de bâtir l'exceptionnel.
           </p>
           <div class="h-[1px] w-8 bg-primary/60"></div>
           <p class="text-text text-sm font-light italic opacity-70 mb-6">
@@ -211,8 +280,31 @@
     </div>
   </section>
 
+  <!-- STATS SECTION -->
+  <section class="py-16 px-8 bg-darker border-y border-white/5">
+    <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div class="text-center reveal-up">
+        <div class="text-4xl md:text-5xl font-black text-primary mb-2" data-count="9">0</div>
+        <div class="text-xs font-mono text-white/40 tracking-widest uppercase">Projets Livrés</div>
+      </div>
+      <div class="text-center reveal-up" style="animation-delay: 0.1s">
+        <div class="text-4xl md:text-5xl font-black text-primary mb-2" data-count="3">0</div>
+        <div class="text-xs font-mono text-white/40 tracking-widest uppercase">Années Exp.</div>
+      </div>
+      <div class="text-center reveal-up" style="animation-delay: 0.2s">
+        <div class="text-4xl md:text-5xl font-black text-primary mb-2" data-count="6">0</div>
+        <div class="text-xs font-mono text-white/40 tracking-widest uppercase">Clients Satisfaits</div>
+      </div>
+      <div class="text-center reveal-up" style="animation-delay: 0.3s">
+        <div class="text-4xl md:text-5xl font-black text-primary mb-2" data-count="2000">0</div>
+        <div class="text-xs font-mono text-white/40 tracking-widest uppercase">Coffees Bûés ☕</div>
+      </div>
+    </div>
+  </section>
+
   <!-- EXPERTISE SECTION -->
   <section id="expertise" class="py-20 px-8 max-w-7xl mx-auto overflow-hidden">
+    <div class="reveal-up">
     <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-8 mb-16 gap-8">
       <div class="relative">
         <span class="text-primary font-mono text-xs tracking-[0.3em] uppercase mb-4 block">/// Expertise Tactique</span>
@@ -315,12 +407,14 @@
             </div>
           </div>
         </div>
-      </div>
+      </div>    </div>
     </div>
   </section>
 
+
   <!-- PROJETS SECTION -->
   <section id="projets" class="py-24 bg-darker">
+    <div class="reveal-up">
     <div class="max-w-7xl mx-auto px-8">
       <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-8 mb-16 gap-8">
         <div class="relative">
@@ -335,10 +429,29 @@
       <!-- Liste Interactive des Projets -->
       <div class="project-list flex flex-col mt-8">
 
-        <!-- 01 Ravina -->
-        <a href="https://ravina-nethost.vercel.app/login" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+        <!-- 01 Pass'io -->
+        <div onclick="openPassioModal()" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
             <div class="flex items-baseline gap-6 lg:w-5/12">
                 <span class="project-number text-white/40 font-mono text-sm">01</span>
+                <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">Pass'io</h3>
+            </div>
+            <div class="lg:w-4/12">
+                <p class="text-white/60 text-base font-light leading-relaxed transition-colors group-hover:text-white/90">
+                    Plateforme de streaming audio et de vente dédiée à l'écosystème musical — streaming haute qualité, sorties événementielles et produits dérivés pour les artistes.
+                </p>
+            </div>
+            <div class="lg:w-3/12 flex items-center justify-between lg:justify-end gap-6 text-sm uppercase tracking-widest font-mono text-white/40">
+                <span class="text-primary font-semibold">Fondateur & CEO</span>
+                <svg class="arrow-icon w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 02 Ravina -->
+        <div onclick="openRavinaModal()" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+            <div class="flex items-baseline gap-6 lg:w-5/12">
+                <span class="project-number text-white/40 font-mono text-sm">02</span>
                 <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">Ravina</h3>
             </div>
             <div class="lg:w-4/12">
@@ -352,12 +465,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                 </svg>
             </div>
-        </a>
+        </div>
 
-        <!-- 02 Noovy -->
-        <a href="https://noovy-boky.netlify.app/" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+        <!-- 03 Noovy -->
+        <div onclick="openNoovyModal()" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
             <div class="flex items-baseline gap-6 lg:w-5/12">
-                <span class="project-number text-white/40 font-mono text-sm">02</span>
+                <span class="project-number text-white/40 font-mono text-sm">03</span>
                 <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">Noovy</h3>
             </div>
             <div class="lg:w-4/12">
@@ -371,12 +484,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                 </svg>
             </div>
-        </a>
+        </div>
 
-        <!-- 03 DigiKaratra -->
-        <a href="https://digikaratra.alwaysdata.net/auth/login" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+        <!-- 04 DigiKaratra -->
+        <div onclick="openDigiKaratraModal()" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
             <div class="flex items-baseline gap-6 lg:w-5/12">
-                <span class="project-number text-white/40 font-mono text-sm">03</span>
+                <span class="project-number text-white/40 font-mono text-sm">04</span>
                 <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">DigiKaratra</h3>
             </div>
             <div class="lg:w-4/12">
@@ -390,12 +503,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                 </svg>
             </div>
-        </a>
+        </div>
 
-        <!-- 04 Yas USSD -->
+        <!-- 05 Yas USSD -->
         <div onclick="openYasModal()" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
             <div class="flex items-baseline gap-6 lg:w-5/12">
-                <span class="project-number text-white/40 font-mono text-sm">04</span>
+                <span class="project-number text-white/40 font-mono text-sm">05</span>
                 <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">Yas USSD</h3>
             </div>
             <div class="lg:w-4/12">
@@ -411,10 +524,10 @@
             </div>
         </div>
 
-        <!-- 05 BusNaka -->
-        <a href="https://narindra.pythonanywhere.com/" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+        <!-- 06 BusNaka -->
+        <div onclick="openBusNakaModal()" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
             <div class="flex items-baseline gap-6 lg:w-5/12">
-                <span class="project-number text-white/40 font-mono text-sm">05</span>
+                <span class="project-number text-white/40 font-mono text-sm">06</span>
                 <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">BusNaka</h3>
             </div>
             <div class="lg:w-4/12">
@@ -428,12 +541,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                 </svg>
             </div>
-        </a>
+        </div>
 
-        <!-- 06 GodMod -->
-        <a href="https://github.com/Narindra0" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+        <!-- 07 GodMod -->
+        <div onclick="openGodModModal()" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
             <div class="flex items-baseline gap-6 lg:w-5/12">
-                <span class="project-number text-white/40 font-mono text-sm">06</span>
+                <span class="project-number text-white/40 font-mono text-sm">07</span>
                 <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">GodMod</h3>
             </div>
             <div class="lg:w-4/12">
@@ -447,12 +560,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                 </svg>
             </div>
-        </a>
+        </div>
 
-        <!-- 07 Talenta -->
-        <a href="https://github.com/Narindra0" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+        <!-- 08 Talenta -->
+        <div onclick="openTalentaModal()" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
             <div class="flex items-baseline gap-6 lg:w-5/12">
-                <span class="project-number text-white/40 font-mono text-sm">07</span>
+                <span class="project-number text-white/40 font-mono text-sm">08</span>
                 <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">Talenta</h3>
             </div>
             <div class="lg:w-4/12">
@@ -466,12 +579,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                 </svg>
             </div>
-        </a>
+        </div>
 
-        <!-- 08 BOA Manager -->
-        <a href="https://github.com/Narindra0" target="_blank" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+        <!-- 09 BOA Manager -->
+        <div onclick="openBOAManagerModal()" class="project-row group py-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
             <div class="flex items-baseline gap-6 lg:w-5/12">
-                <span class="project-number text-white/40 font-mono text-sm">08</span>
+                <span class="project-number text-white/40 font-mono text-sm">09</span>
                 <h3 class="project-title text-4xl lg:text-5xl font-bold m-0 text-white tracking-tight">BOA Manager</h3>
             </div>
             <div class="lg:w-4/12">
@@ -485,14 +598,16 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                 </svg>
             </div>
-        </a>
+        </div>
 
       </div>
+    </div>
     </div>
   </section>
 
   <!-- PARCOURS SECTION -->
   <section id="parcours" class="max-w-7xl mx-auto px-8 py-24 text-white overflow-hidden">
+    <div class="reveal-up">
     <!-- Header Section -->
     <div class="mb-32 flex flex-col md:flex-row md:items-end justify-between gap-12 border-b border-white/10 pb-6">
       <div class="relative">
@@ -511,11 +626,37 @@
       <div class="absolute left-0 lg:left-1/2 top-0 bottom-0 w-[1px] bg-white/10 lg:-translate-x-1/2"></div>
 
       <div class="space-y-32">
+
+        <!-- Expérience 0: Pass'io (Fondateur & CEO) -->
+        <div class="experience-card relative flex flex-col lg:flex-row items-center group">
+          <div class="lg:w-1/2 w-full lg:pr-24 lg:text-right mb-8 lg:mb-0">
+            <span class="font-mono text-primary text-sm mb-3 block tracking-tighter">Depuis 2025 — Présent</span>
+            <h3 class="experience-title text-4xl lg:text-5xl font-serif mb-4 transition-all duration-300">Pass'io</h3>
+            <div class="flex flex-wrap lg:justify-end gap-2">
+              <span class="text-[10px] font-mono border border-primary/30 bg-primary/20 px-3 py-1 uppercase text-primary rounded-sm">Fondateur & CEO</span>
+            </div>
+          </div>
+
+          <!-- Point central interactif -->
+          <div class="timeline-dot absolute left-[-8px] lg:left-1/2 w-4 h-4 bg-primary rounded-full lg:-translate-x-1/2 z-10 hidden lg:block border-[3px] border-dark group-hover:shadow-[0_0_15px_rgba(255,87,34,0.5)] transition-all duration-500"></div>
           
+          <div class="lg:w-1/2 w-full lg:pl-24 border-l lg:border-none border-white/10 pl-8">
+            <h4 class="text-2xl font-medium text-white/90 mb-4">Plateforme de Streaming & Culture</h4>
+            <p class="text-text font-light leading-relaxed mb-6 text-lg">
+              <span class="text-white font-medium italic">Pass'io</span> est une plateforme numérique innovante dédiée à l'écosystème musical et culturel. Streaming haute qualité, sorties événementielles, produits dérivés et expériences live pour moderniser la diffusion musicale et offrir aux artistes des leviers d'engagement direct avec leur public.
+            </p>
+            <div class="flex flex-wrap gap-4 font-mono text-[11px] text-white/40 tracking-widest uppercase">
+              <span class="hover:text-primary cursor-default transition-colors">#Streaming</span>
+              <span class="hover:text-primary cursor-default transition-colors">#Startup_Founder</span>
+              <span class="hover:text-primary cursor-default transition-colors">#Music_Tech</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Expérience 1: Zanova -->
         <div class="experience-card relative flex flex-col lg:flex-row items-center group">
           <div class="lg:w-1/2 w-full lg:pr-24 lg:text-right mb-8 lg:mb-0">
-            <span class="font-mono text-primary text-sm mb-3 block tracking-tighter">Décembre 2025 — Février 2026</span>
+            <span class="font-mono text-primary text-sm mb-3 block tracking-tighter">Janvier 2026 — Juillet 2026</span>
             <h3 class="experience-title text-4xl lg:text-5xl font-serif mb-4 transition-all duration-300">Zanova</h3>
             <div class="flex flex-wrap lg:justify-end gap-2">
               <span class="text-[10px] font-mono border border-primary/30 bg-primary/20 px-3 py-1 uppercase text-primary rounded-sm">CDD</span>
@@ -526,14 +667,14 @@
           <div class="timeline-dot absolute left-[-8px] lg:left-1/2 w-4 h-4 bg-primary rounded-full lg:-translate-x-1/2 z-10 hidden lg:block border-[3px] border-dark"></div>
           
           <div class="lg:w-1/2 w-full lg:pl-24 border-l lg:border-none border-white/10 pl-8">
-            <h4 class="text-2xl font-medium text-white/90 mb-4">Développeur Frontend</h4>
+            <h4 class="text-2xl font-medium text-white/90 mb-4">Développeur FullStack</h4>
             <p class="text-text font-light leading-relaxed mb-6 text-lg">
-              Conception et développement intégral d'un <span class="text-white font-medium italic">CRM</span> métier pour un call center. Optimisation des flux de données en temps réel et création d'une interface de gestion dynamique.
+              Conception et développement intégral d'un <span class="text-white font-medium italic">CRM</span> métier pour un call center. Développement backend avec API REST, gestion de la base de données et création d'une interface utilisateur dynamique et réactive.
             </p>
             <div class="flex flex-wrap gap-4 font-mono text-[11px] text-white/40 tracking-widest uppercase">
-              <span class="hover:text-primary cursor-default transition-colors">#Frontend_Architecture</span>
+              <span class="hover:text-primary cursor-default transition-colors">#FullStack_Dev</span>
               <span class="hover:text-primary cursor-default transition-colors">#CRM_Solutions</span>
-              <span class="hover:text-primary cursor-default transition-colors">#UX_Design</span>
+              <span class="hover:text-primary cursor-default transition-colors">#API_REST</span>
             </div>
           </div>
         </div>
@@ -617,7 +758,13 @@
 
       </div>
     </div>
+    </div>
   </section>
+
+  <!-- BACK TO TOP BUTTON -->
+  <button id="backToTop" class="fixed bottom-8 right-8 z-40 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-[0_10px_30px_rgba(255,87,34,0.4)] opacity-0 translate-y-4 pointer-events-none transition-all duration-500 hover:scale-110 hover:shadow-[0_0_40px_rgba(255,87,34,0.5)]">
+    <i class="fa-solid fa-arrow-up text-sm"></i>
+  </button>
 
   <!-- CONTACT SECTION -->
   <section id="contact" class="bg-dark py-24 md:pt-32 md:pb-48 px-8 overflow-hidden">
@@ -718,8 +865,248 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- PASS'IO PROJECT MODAL -->
+  <div id="passioModal" class="modal-overlay" onclick="closePassioModal(event)">
+    <div class="modal-content passio-modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closePassioModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+n      <!-- Header -->
+      <div class="passio-header">
+        <div class="passio-logo-icon">
+          <i class="fa-solid fa-headphones"></i>
+        </div>
+        <div>
+          <h3 class="modal-title text-2xl">Pass'io</h3>
+          <span class="text-xs font-mono text-primary tracking-widest uppercase">Streaming & Culture Musicale</span>
+        </div>
+      </div>
+n      <!-- Badge Fondateur -->
+      <div class="passio-founder-badge">
+        <i class="fa-solid fa-crown"></i>
+        <span>Fondateur & CEO</span>
+      </div>
+n      <!-- Description -->
+      <p class="modal-text">
+        Plateforme numérique innovante dédiée à l'écosystème musical et culturel. Nous rapprochons les artistes, les créateurs et leurs communautés grâce à une expérience d'écoute enrichie, du contenu exclusif et des fonctionnalités d'engagement interactives.
+      </p>
+n      <!-- Mission -->
+      <div class="passio-mission">
+        <h4 class="passio-section-title"><i class="fa-solid fa-bullseye"></i> Notre Mission</h4>
+        <p class="text-text text-sm leading-relaxed">
+          Moderniser la diffusion musicale tout en offrant aux artistes des leviers d'engagement direct avec leur public : streaming haute qualité, sorties événementielles, produits dérivés et expériences live.
+        </p>
+      </div>
+n      <!-- Features -->
+      <div class="passio-features">
+        <h4 class="passio-section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Ce que nous développons</h4>
+        <div class="passio-feature-grid">
+          <div class="passio-feature-item">
+            <i class="fa-solid fa-music text-primary"></i>
+            <div>
+              <span class="text-white text-sm font-semibold">Streaming HQ</span>
+              <span class="text-text text-xs">Écoute en haute qualité</span>
+            </div>
+          </div>
+          <div class="passio-feature-item">
+            <i class="fa-solid fa-calendar-days text-primary"></i>
+            <div>
+              <span class="text-white text-sm font-semibold">Événements Live</span>
+              <span class="text-text text-xs">Sorties & expériences live</span>
+            </div>
+          </div>
+          <div class="passio-feature-item">
+            <i class="fa-solid fa-shirt text-primary"></i>
+            <div>
+              <span class="text-white text-sm font-semibold">Produits Dérivés</span>
+              <span class="text-text text-xs">Vente de merchandising</span>
+            </div>
+          </div>
+          <div class="passio-feature-item">
+            <i class="fa-solid fa-comments text-primary"></i>
+            <div>
+              <span class="text-white text-sm font-semibold">Engagement Fan</span>
+              <span class="text-text text-xs">Outils interactifs communautaires</span>
+            </div>
+          </div>
+        </div>
+      </div>
+n      <!-- Compétences mises en valeur -->
+      <div class="passio-skills">
+        <h4 class="passio-section-title"><i class="fa-solid fa-code"></i> Compétences mobilisées</h4>
+        <div class="flex flex-wrap gap-2">
+          <span class="passio-skill-tag">Fullstack Dev</span>
+          <span class="passio-skill-tag">Product Strategy</span>
+          <span class="passio-skill-tag">UI/UX Design</span>
+          <span class="passio-skill-tag">Entrepreneurship</span>
+          <span class="passio-skill-tag">Streaming Tech</span>
+          <span class="passio-skill-tag">Community Building</span>
+        </div>
+      </div>
+n      <!-- CTA -->
+      <div class="passio-cta">
+        <a href="https://passiio.shop" target="_blank" class="passio-visit-btn">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          Visiter Pass'io
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- RAVINA MODAL -->
+  <div id="ravinaModal" class="modal-overlay" onclick="closeRavinaModal(event)">
+    <div class="modal-content passio-modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeRavinaModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="passio-header">
+        <div class="passio-logo-icon" style="background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);"><i class="fa-solid fa-seedling"></i></div>
+        <div><h3 class="modal-title text-2xl">Ravina</h3><span class="text-xs font-mono tracking-widest uppercase" style="color:#4CAF50;">AgriTech & Intelligence Artificielle</span></div>
+      </div>
+      <div class="passio-founder-badge" style="border-color: rgba(76,175,80,0.3); color:#4CAF50; background: rgba(76,175,80,0.1);"><i class="fa-solid fa-robot"></i><span>Projet d'IA Agricole</span></div>
+      <p class="modal-text">Application d'assistance technologique pour l'optimisation et la gestion intelligente des plantations. Un écosystème mêlant IA et agronomie pour optimiser le rendement des cultures via des données prédictives.</p>
+      <div class="passio-mission"><h4 class="passio-section-title" style="color:#4CAF50;"><i class="fa-solid fa-bullseye" style="color:#4CAF50;"></i> Notre Mission</h4><p class="text-text text-sm leading-relaxed">Aider les agriculteurs à maximiser leur rendement grâce à l'analyse prédictive, la surveillance des cultures et l'automatisation intelligente des processus agricoles.</p></div>
+      <div class="passio-features"><h4 class="passio-section-title" style="color:#4CAF50;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#4CAF50;"></i> Fonctionnalités</h4><div class="passio-feature-grid"><div class="passio-feature-item"><i class="fa-solid fa-chart-line" style="color:#4CAF50;"></i><div><span class="text-white text-sm font-semibold">Analyse Prédictive</span><span class="text-text text-xs">Données ML sur les cultures</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-cloud-sun" style="color:#4CAF50;"></i><div><span class="text-white text-sm font-semibold">Surveillance Météo</span><span class="text-text text-xs">Alertes et prévisions</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-leaf" style="color:#4CAF50;"></i><div><span class="text-white text-sm font-semibold">Gestion Plantation</span><span class="text-text text-xs">Suivi intelligent des cultures</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-database" style="color:#4CAF50;"></i><div><span class="text-white text-sm font-semibold">Cloud Compute</span><span class="text-text text-xs">Infrastructure scalable</span></div></div></div></div>
+      <div class="passio-skills"><h4 class="passio-section-title" style="color:#4CAF50;"><i class="fa-solid fa-code" style="color:#4CAF50;"></i> Compétences</h4><div class="flex flex-wrap gap-2"><span class="passio-skill-tag" style="border-color:rgba(76,175,80,0.2); color:#66BB6A; background:rgba(76,175,80,0.08);">Python</span><span class="passio-skill-tag" style="border-color:rgba(76,175,80,0.2); color:#66BB6A; background:rgba(76,175,80,0.08);">Machine Learning</span><span class="passio-skill-tag" style="border-color:rgba(76,175,80,0.2); color:#66BB6A; background:rgba(76,175,80,0.08);">UI/UX Design</span><span class="passio-skill-tag" style="border-color:rgba(76,175,80,0.2); color:#66BB6A; background:rgba(76,175,80,0.08);">Cloud</span></div></div>
+      <div class="passio-cta"><a href="https://ravina-nethost.vercel.app/login" target="_blank" class="passio-visit-btn" style="background:linear-gradient(135deg,#4CAF50,#66BB6A);"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter Ravina</a></div>
+    </div>
+  </div>
+
+  <!-- NOOVY MODAL -->
+  <div id="noovyModal" class="modal-overlay" onclick="closeNoovyModal(event)">
+    <div class="modal-content passio-modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeNoovyModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="passio-header">
+        <div class="passio-logo-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 100%);"><i class="fa-solid fa-book-open"></i></div>
+        <div><h3 class="modal-title text-2xl">Noovy</h3><span class="text-xs font-mono tracking-widest uppercase" style="color:#BA68C8;">Bibliothèque Numérique</span></div>
+      </div>
+      <div class="passio-founder-badge" style="border-color:rgba(156,39,176,0.3); color:#BA68C8; background:rgba(156,39,176,0.1);"><i class="fa-solid fa-book"></i><span>Culture & Lecture</span></div>
+      <p class="modal-text">Bibliothèque numérique immersive. Plus de 2000 romans et livres audio pour redéfinir la lecture nomade. Une expérience d'enrichie centrée sur la culture et l'accessibilité.</p>
+      <div class="passio-mission"><h4 class="passio-section-title" style="color:#BA68C8;"><i class="fa-solid fa-bullseye" style="color:#BA68C8;"></i> Notre Mission</h4><p class="text-text text-sm leading-relaxed">Démocratiser l'accès à la culture et à la lecture grâce au numérique, en offrant une expérience immersive et accessible à tous, partout et à tout moment.</p></div>
+      <div class="passio-features"><h4 class="passio-section-title" style="color:#BA68C8;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#BA68C8;"></i> Fonctionnalités</h4><div class="passio-feature-grid"><div class="passio-feature-item"><i class="fa-solid fa-headphones" style="color:#BA68C8;"></i><div><span class="text-white text-sm font-semibold">Livres Audio</span><span class="text-text text-xs">Écoute nomade HD</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-book" style="color:#BA68C8;"></i><div><span class="text-white text-sm font-semibold">2000+ Romans</span><span class="text-text text-xs">Catalogue vaste</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-mobile-screen" style="color:#BA68C8;"></i><div><span class="text-white text-sm font-semibold">Mobile First</span><span class="text-text text-xs">Lecture sur tous les devices</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-moon" style="color:#BA68C8;"></i><div><span class="text-white text-sm font-semibold">Mode Hors-Ligne</span><span class="text-text text-xs">Lecture sans connexion</span></div></div></div></div>
+      <div class="passio-skills"><h4 class="passio-section-title" style="color:#BA68C8;"><i class="fa-solid fa-code" style="color:#BA68C8;"></i> Compétences</h4><div class="flex flex-wrap gap-2"><span class="passio-skill-tag" style="border-color:rgba(156,39,176,0.2); color:#BA68C8; background:rgba(156,39,176,0.08);">Mobile Dev</span><span class="passio-skill-tag" style="border-color:rgba(156,39,176,0.2); color:#BA68C8; background:rgba(156,39,176,0.08);">UI/UX</span><span class="passio-skill-tag" style="border-color:rgba(156,39,176,0.2); color:#BA68C8; background:rgba(156,39,176,0.08);">Content Strategy</span><span class="passio-skill-tag" style="border-color:rgba(156,39,176,0.2); color:#BA68C8; background:rgba(156,39,176,0.08);">Audio Streaming</span></div></div>
+      <div class="passio-cta"><a href="https://noovy-boky.netlify.app/" target="_blank" class="passio-visit-btn" style="background:linear-gradient(135deg,#9C27B0,#BA68C8);"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter Noovy</a></div>
+    </div>
+  </div>
+
+  <!-- DIGIKARATRA MODAL -->
+  <div id="digiKaratraModal" class="modal-overlay" onclick="closeDigiKaratraModal(event)">
+    <div class="modal-content passio-modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeDigiKaratraModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="passio-header">
+        <div class="passio-logo-icon" style="background: linear-gradient(135deg, #2196F3 0%, #64B5F6 100%);"><i class="fa-solid fa-id-card"></i></div>
+        <div><h3 class="modal-title text-2xl">DigiKaratra</h3><span class="text-xs font-mono tracking-widest uppercase" style="color:#64B5F6;">E-Gov & Identité Numérique</span></div>
+      </div>
+      <div class="passio-founder-badge" style="border-color:rgba(33,150,243,0.3); color:#64B5F6; background:rgba(33,150,243,0.1);"><i class="fa-solid fa-landmark"></i><span>Système Gouvernemental</span></div>
+      <p class="modal-text">Système moderne d'archivage, de recherche et de gestion dématérialisée des Cartes d'Identité Nationales. Une solution e-gov complète pour moderniser l'administration publique.</p>
+      <div class="passio-mission"><h4 class="passio-section-title" style="color:#64B5F6;"><i class="fa-solid fa-bullseye" style="color:#64B5F6;"></i> Notre Mission</h4><p class="text-text text-sm leading-relaxed">Moderniser la gestion des documents d'identité nationaux grâce à la dématérialisation, l'archivage intelligent et la recherche rapide pour une administration efficace.</p></div>
+      <div class="passio-features"><h4 class="passio-section-title" style="color:#64B5F6;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#64B5F6;"></i> Fonctionnalités</h4><div class="passio-feature-grid"><div class="passio-feature-item"><i class="fa-solid fa-magnifying-glass" style="color:#64B5F6;"></i><div><span class="text-white text-sm font-semibold">Recherche Avancée</span><span class="text-text text-xs">Recherche multi-critères</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-folder-open" style="color:#64B5F6;"></i><div><span class="text-white text-sm font-semibold">Archivage Cloud</span><span class="text-text text-xs">Stockage sécurisé</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-shield-halved" style="color:#64B5F6;"></i><div><span class="text-white text-sm font-semibold">Sécurité RGPD</span><span class="text-text text-xs">Données protégées</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-chart-bar" style="color:#64B5F6;"></i><div><span class="text-white text-sm font-semibold">Tableau de Bord</span><span class="text-text text-xs">Stats et rapports</span></div></div></div></div>
+      <div class="passio-skills"><h4 class="passio-section-title" style="color:#64B5F6;"><i class="fa-solid fa-code" style="color:#64B5F6;"></i> Compétences</h4><div class="flex flex-wrap gap-2"><span class="passio-skill-tag" style="border-color:rgba(33,150,243,0.2); color:#64B5F6; background:rgba(33,150,243,0.08);">Symfony</span><span class="passio-skill-tag" style="border-color:rgba(33,150,243,0.2); color:#64B5F6; background:rgba(33,150,243,0.08);">PHP</span><span class="passio-skill-tag" style="border-color:rgba(33,150,243,0.2); color:#64B5F6; background:rgba(33,150,243,0.08);">Database Design</span><span class="passio-skill-tag" style="border-color:rgba(33,150,243,0.2); color:#64B5F6; background:rgba(33,150,243,0.08);">E-Gov</span></div></div>
+      <div class="passio-cta"><a href="https://digikaratra.alwaysdata.net/auth/login" target="_blank" class="passio-visit-btn" style="background:linear-gradient(135deg,#2196F3,#64B5F6);"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter DigiKaratra</a></div>
+    </div>
+  </div>
+
+  <!-- BUSNAKA MODAL -->
+  <div id="busNakaModal" class="modal-overlay" onclick="closeBusNakaModal(event)">
+    <div class="modal-content passio-modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeBusNakaModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="passio-header">
+        <div class="passio-logo-icon" style="background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);"><i class="fa-solid fa-bus"></i></div>
+        <div><h3 class="modal-title text-2xl">BusNaka</h3><span class="text-xs font-mono tracking-widest uppercase" style="color:#FFB74D;">Mobilité Urbaine</span></div>
+      </div>
+      <div class="passio-founder-badge" style="border-color:rgba(255,152,0,0.3); color:#FFB74D; background:rgba(255,152,0,0.1);"><i class="fa-solid fa-route"></i><span>Transport Intelligent</span></div>
+      <p class="modal-text">Solution intuitive et rapide conçue pour explorer et gérer le réseau de transport urbain. Planification d'itinéraires et suivi en temps réel pour une mobilité simplifiée.</p>
+      <div class="passio-mission"><h4 class="passio-section-title" style="color:#FFB74D;"><i class="fa-solid fa-bullseye" style="color:#FFB74D;"></i> Notre Mission</h4><p class="text-text text-sm leading-relaxed">Simplifier la navigation dans les réseaux de transport urbain en offrant des outils intuitifs de planification, suivi et gestion pour les usagers et opérateurs.</p></div>
+      <div class="passio-features"><h4 class="passio-section-title" style="color:#FFB74D;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#FFB74D;"></i> Fonctionnalités</h4><div class="passio-feature-grid"><div class="passio-feature-item"><i class="fa-solid fa-map-location-dot" style="color:#FFB74D;"></i><div><span class="text-white text-sm font-semibold">Carte Interactive</span><span class="text-text text-xs">Navigation temps réel</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-clock" style="color:#FFB74D;"></i><div><span class="text-white text-sm font-semibold">Horaires Live</span><span class="text-text text-xs">Données actualisées</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-route" style="color:#FFB74D;"></i><div><span class="text-white text-sm font-semibold">Itinéraires</span><span class="text-text text-xs">Planification optimisée</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-mobile-screen" style="color:#FFB74D;"></i><div><span class="text-white text-sm font-semibold">Mobile Ready</span><span class="text-text text-xs">Interface responsive</span></div></div></div></div>
+      <div class="passio-skills"><h4 class="passio-section-title" style="color:#FFB74D;"><i class="fa-solid fa-code" style="color:#FFB74D;"></i> Compétences</h4><div class="flex flex-wrap gap-2"><span class="passio-skill-tag" style="border-color:rgba(255,152,0,0.2); color:#FFB74D; background:rgba(255,152,0,0.08);">Python</span><span class="passio-skill-tag" style="border-color:rgba(255,152,0,0.2); color:#FFB74D; background:rgba(255,152,0,0.08);">Flask</span><span class="passio-skill-tag" style="border-color:rgba(255,152,0,0.2); color:#FFB74D; background:rgba(255,152,0,0.08);">GIS/Maps</span><span class="passio-skill-tag" style="border-color:rgba(255,152,0,0.2); color:#FFB74D; background:rgba(255,152,0,0.08);">REST API</span></div></div>
+      <div class="passio-cta"><a href="https://narindra.pythonanywhere.com/" target="_blank" class="passio-visit-btn" style="background:linear-gradient(135deg,#FF9800,#FFB74D);"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visiter BusNaka</a></div>
+    </div>
+  </div>
+
+  <!-- GODMOD MODAL -->
+  <div id="godModModal" class="modal-overlay" onclick="closeGodModModal(event)">
+    <div class="modal-content passio-modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeGodModModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="passio-header">
+        <div class="passio-logo-icon" style="background: linear-gradient(135deg, #E91E63 0%, #F06292 100%);"><i class="fa-solid fa-brain"></i></div>
+        <div><h3 class="modal-title text-2xl">GodMod</h3><span class="text-xs font-mono tracking-widest uppercase" style="color:#F06292;">IA & Data Science</span></div>
+      </div>
+      <div class="passio-founder-badge" style="border-color:rgba(233,30,99,0.3); color:#F06292; background:rgba(233,30,99,0.1);"><i class="fa-solid fa-microchip"></i><span>Apprentissage par Renforcement</span></div>
+      <p class="modal-text">Programme d'intelligence artificielle par apprentissage par renforcement pour l'analyse prédictive de masse. Un modèle capable d'apprendre et de s'améliorer par l'expérience.</p>
+      <div class="passio-mission"><h4 class="passio-section-title" style="color:#F06292;"><i class="fa-solid fa-bullseye" style="color:#F06292;"></i> Notre Mission</h4><p class="text-text text-sm leading-relaxed">Pousser les frontières de l'IA en développant des modèles d'apprentissage par renforcement capables de résoudre des problèmes complexes d'optimisation et de prédiction.</p></div>
+      <div class="passio-features"><h4 class="passio-section-title" style="color:#F06292;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#F06292;"></i> Fonctionnalités</h4><div class="passio-feature-grid"><div class="passio-feature-item"><i class="fa-solid fa-robot" style="color:#F06292;"></i><div><span class="text-white text-sm font-semibold">RL Agents</span><span class="text-text text-xs">Agents autonomes</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-chart-line" style="color:#F06292;"></i><div><span class="text-white text-sm font-semibold">Prédiction</span><span class="text-text text-xs">Analyse prédictive</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-database" style="color:#F06292;"></i><div><span class="text-white text-sm font-semibold">Big Data</span><span class="text-text text-xs">Traitement masse</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-gears" style="color:#F06292;"></i><div><span class="text-white text-sm font-semibold">Auto-optimisation</span><span class="text-text text-xs">Apprentissage continu</span></div></div></div></div>
+      <div class="passio-skills"><h4 class="passio-section-title" style="color:#F06292;"><i class="fa-solid fa-code" style="color:#F06292;"></i> Compétences</h4><div class="flex flex-wrap gap-2"><span class="passio-skill-tag" style="border-color:rgba(233,30,99,0.2); color:#F06292; background:rgba(233,30,99,0.08);">Python</span><span class="passio-skill-tag" style="border-color:rgba(233,30,99,0.2); color:#F06292; background:rgba(233,30,99,0.08);">TensorFlow</span><span class="passio-skill-tag" style="border-color:rgba(233,30,99,0.2); color:#F06292; background:rgba(233,30,99,0.08);">Reinforcement Learning</span><span class="passio-skill-tag" style="border-color:rgba(233,30,99,0.2); color:#F06292; background:rgba(233,30,99,0.08);">Data Science</span></div></div>
+      <div class="passio-cta"><a href="https://github.com/Narindra0" target="_blank" class="passio-visit-btn" style="background:linear-gradient(135deg,#E91E63,#F06292);"><i class="fa-brands fa-github"></i> Voir sur GitHub</a></div>
+    </div>
+  </div>
+
+  <!-- TALENTA MODAL -->
+  <div id="talentaModal" class="modal-overlay" onclick="closeTalentaModal(event)">
+    <div class="modal-content passio-modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeTalentaModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="passio-header">
+        <div class="passio-logo-icon" style="background: linear-gradient(135deg, #00BCD4 0%, #4DD0E1 100%);"><i class="fa-solid fa-users-gear"></i></div>
+        <div><h3 class="modal-title text-2xl">Talenta</h3><span class="text-xs font-mono tracking-widest uppercase" style="color:#4DD0E1;">HR Tech</span></div>
+      </div>
+      <div class="passio-founder-badge" style="border-color:rgba(0,188,212,0.3); color:#4DD0E1; background:rgba(0,188,212,0.1);"><i class="fa-solid fa-handshake"></i><span>Recrutement Intelligente</span></div>
+      <p class="modal-text">Plateforme stratégique de recrutement croisant des profils ciblés avec les besoins spécifiques des recruteurs. Matching intelligent et gestion du pipeline RH.</p>
+      <div class="passio-mission"><h4 class="passio-section-title" style="color:#4DD0E1;"><i class="fa-solid fa-bullseye" style="color:#4DD0E1;"></i> Notre Mission</h4><p class="text-text text-sm leading-relaxed">Révolutionner le recrutement en connectant les talents aux opportunités grâce à des algorithmes intelligents et une expérience candidat fluide.</p></div>
+      <div class="passio-features"><h4 class="passio-section-title" style="color:#4DD0E1;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#4DD0E1;"></i> Fonctionnalités</h4><div class="passio-feature-grid"><div class="passio-feature-item"><i class="fa-solid fa-user-check" style="color:#4DD0E1;"></i><div><span class="text-white text-sm font-semibold">Matching IA</span><span class="text-text text-xs">Profils ↔ Offres</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-chart-simple" style="color:#4DD0E1;"></i><div><span class="text-white text-sm font-semibold">Pipeline RH</span><span class="text-text text-xs">Suivi complet</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-file-lines" style="color:#4DD0E1;"></i><div><span class="text-white text-sm font-semibold">CV Parsing</span><span class="text-text text-xs">Analyse auto</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-comments" style="color:#4DD0E1;"></i><div><span class="text-white text-sm font-semibold">Messagerie</span><span class="text-text text-xs">Communication intégrée</span></div></div></div></div>
+      <div class="passio-skills"><h4 class="passio-section-title" style="color:#4DD0E1;"><i class="fa-solid fa-code" style="color:#4DD0E1;"></i> Compétences</h4><div class="flex flex-wrap gap-2"><span class="passio-skill-tag" style="border-color:rgba(0,188,212,0.2); color:#4DD0E1; background:rgba(0,188,212,0.08);">Fullstack</span><span class="passio-skill-tag" style="border-color:rgba(0,188,212,0.2); color:#4DD0E1; background:rgba(0,188,212,0.08);">Matching Algorithm</span><span class="passio-skill-tag" style="border-color:rgba(0,188,212,0.2); color:#4DD0E1; background:rgba(0,188,212,0.08);">HR Strategy</span><span class="passio-skill-tag" style="border-color:rgba(0,188,212,0.2); color:#4DD0E1; background:rgba(0,188,212,0.08);">Product Design</span></div></div>
+      <div class="passio-cta"><a href="https://github.com/Narindra0" target="_blank" class="passio-visit-btn" style="background:linear-gradient(135deg,#00BCD4,#4DD0E1);"><i class="fa-brands fa-github"></i> Voir sur GitHub</a></div>
+    </div>
+  </div>
+
+  <!-- BOA MANAGER MODAL -->
+  <div id="boaManagerModal" class="modal-overlay" onclick="closeBOAManagerModal(event)">
+    <div class="modal-content passio-modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeBOAManagerModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="passio-header">
+        <div class="passio-logo-icon" style="background: linear-gradient(135deg, #607D8B 0%, #90A4AE 100%);"><i class="fa-solid fa-building-columns"></i></div>
+        <div><h3 class="modal-title text-2xl">BOA Manager</h3><span class="text-xs font-mono tracking-widest uppercase" style="color:#90A4AE;">Logiciel Interne Bancaire</span></div>
+      </div>
+      <div class="passio-founder-badge" style="border-color:rgba(96,125,139,0.3); color:#90A4AE; background:rgba(96,125,139,0.1);"><i class="fa-solid fa-building"></i><span>BOA Madagascar</span></div>
+      <p class="modal-text">Outil sur-mesure de gestion de tâches et de flux de projets pour le département informatique bancaire. Un logiciel interne pour moderniser les processus d'équipe.</p>
+      <div class="passio-mission"><h4 class="passio-section-title" style="color:#90A4AE;"><i class="fa-solid fa-bullseye" style="color:#90A4AE;"></i> Notre Mission</h4><p class="text-text text-sm leading-relaxed">Moderniser les processus internes du département informatique de BOA Madagascar en centralisant la gestion de projets, le suivi des tâches et la collaboration d'équipe.</p></div>
+      <div class="passio-features"><h4 class="passio-section-title" style="color:#90A4AE;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#90A4AE;"></i> Fonctionnalités</h4><div class="passio-feature-grid"><div class="passio-feature-item"><i class="fa-solid fa-list-check" style="color:#90A4AE;"></i><div><span class="text-white text-sm font-semibold">Gestion Tâches</span><span class="text-text text-xs">Kanban & workflow</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-people-group" style="color:#90A4AE;"></i><div><span class="text-white text-sm font-semibold">Collaboration</span><span class="text-text text-xs">Travail d'équipe</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-chart-gantt" style="color:#90A4AE;"></i><div><span class="text-white text-sm font-semibold">Planning</span><span class="text-text text-xs">Gantt & échéances</span></div></div><div class="passio-feature-item"><i class="fa-solid fa-bell" style="color:#90A4AE;"></i><div><span class="text-white text-sm font-semibold">Notifications</span><span class="text-text text-xs">Alertes temps réel</span></div></div></div></div>
+      <div class="passio-skills"><h4 class="passio-section-title" style="color:#90A4AE;"><i class="fa-solid fa-code" style="color:#90A4AE;"></i> Compétences</h4><div class="flex flex-wrap gap-2"><span class="passio-skill-tag" style="border-color:rgba(96,125,139,0.2); color:#90A4AE; background:rgba(96,125,139,0.08);">Symfony</span><span class="passio-skill-tag" style="border-color:rgba(96,125,139,0.2); color:#90A4AE; background:rgba(96,125,139,0.08);">PHP</span><span class="passio-skill-tag" style="border-color:rgba(96,125,139,0.2); color:#90A4AE; background:rgba(96,125,139,0.08);">Project Management</span><span class="passio-skill-tag" style="border-color:rgba(96,125,139,0.2); color:#90A4AE; background:rgba(96,125,139,0.08);">Enterprise Software</span></div></div>
+      <div class="passio-cta"><a href="https://github.com/Narindra0" target="_blank" class="passio-visit-btn" style="background:linear-gradient(135deg,#607D8B,#90A4AE);"><i class="fa-brands fa-github"></i> Voir sur GitHub</a></div>
+    </div>
+  </div>
+
+  <!-- Inline Modal Functions for immediate availability -->
+  <script>
+    function openModal(id) {
+      var m = document.getElementById(id);
+      if (m) { m.classList.add('active'); document.body.style.overflow = 'hidden'; }
+    }
+    function closeModal(id, e) {
+      var m = document.getElementById(id);
+      if (!e || e.target.id === id || e.target.closest('.modal-close')) {
+        if (m) { m.classList.remove('active'); document.body.style.overflow = ''; }
+      }
+    }
+    window.openPassioModal = function() { openModal('passioModal'); };
+    window.closePassioModal = function(e) { closeModal('passioModal', e); };
+    window.openRavinaModal = function() { openModal('ravinaModal'); };
+    window.closeRavinaModal = function(e) { closeModal('ravinaModal', e); };
+    window.openNoovyModal = function() { openModal('noovyModal'); };
+    window.closeNoovyModal = function(e) { closeModal('noovyModal', e); };
+    window.openDigiKaratraModal = function() { openModal('digiKaratraModal'); };
+    window.closeDigiKaratraModal = function(e) { closeModal('digiKaratraModal', e); };
+    window.openYasModal = function() { openModal('yasModal'); };
+    window.closeYasModal = function(e) { closeModal('yasModal', e); };
+    window.openBusNakaModal = function() { openModal('busNakaModal'); };
+    window.closeBusNakaModal = function(e) { closeModal('busNakaModal', e); };
+    window.openGodModModal = function() { openModal('godModModal'); };
+    window.closeGodModModal = function(e) { closeModal('godModModal', e); };
+    window.openTalentaModal = function() { openModal('talentaModal'); };
+    window.closeTalentaModal = function(e) { closeModal('talentaModal', e); };
+    window.openBOAManagerModal = function() { openModal('boaManagerModal'); };
+    window.closeBOAManagerModal = function(e) { closeModal('boaManagerModal', e); };
+    var allCloseFns = [closePassioModal, closeRavinaModal, closeNoovyModal, closeDigiKaratraModal, closeYasModal, closeBusNakaModal, closeGodModModal, closeTalentaModal, closeBOAManagerModal];
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { allCloseFns.forEach(function(fn) { fn(); }); }
+    });
+  </script>
   <script src="assets/js/scripts.js" defer></script>
-</body>
 </body>
 </html>
