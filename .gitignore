@@ -1,0 +1,6 @@
+# Outils de dev locaux (serveur de previsualisation)
+.dev/
+
+# Systeme
+.DS_Store
+Thumbs.db

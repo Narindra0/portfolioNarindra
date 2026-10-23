@@ -1,0 +1,452 @@
+[
+  {
+    "id": "402b224c-cfa6-811e-b5e1-f4986714b4e3",
+    "nom": "Pass'io",
+    "categorie": "Streaming & Culture",
+    "accroche": "Plateforme de streaming audio et de vente dédiée à l'écosystème musical — streaming haute qualité, sorties événementielles et produits dérivés pour les artistes.",
+    "label_court": "Fondateur & CEO",
+    "sous_titre": "Streaming & Culture Musicale",
+    "role": "Fondateur & CEO",
+    "mission": "Moderniser la diffusion musicale tout en offrant aux artistes des leviers d'engagement direct avec leur public : streaming haute qualité, sorties événementielles, produits dérivés et expériences live.",
+    "description": "Plateforme numérique innovante dédiée à l'écosystème musical et culturel. Nous rapprochons les artistes, les créateurs et leurs communautés grâce à une expérience d'écoute enrichie, du contenu exclusif et des fonctionnalités d'engagement interactives.",
+    "badge": "Fondateur & CEO",
+    "badge_icone": "fa-crown",
+    "titre_section_fonctionnalites": "Ce que nous développons",
+    "titre_section_competences": "Compétences mobilisées",
+    "fonctionnalites": [
+      {
+        "nom": "Streaming HQ",
+        "description": "Écoute en haute qualité",
+        "icone": "fa-music"
+      },
+      {
+        "nom": "Événements Live",
+        "description": "Sorties & expériences live",
+        "icone": "fa-calendar-days"
+      },
+      {
+        "nom": "Produits Dérivés",
+        "description": "Vente de merchandising",
+        "icone": "fa-shirt"
+      },
+      {
+        "nom": "Engagement Fan",
+        "description": "Outils interactifs communautaires",
+        "icone": "fa-comments"
+      }
+    ],
+    "technologies": [
+      "Fullstack Dev",
+      "Product Strategy",
+      "UI/UX Design",
+      "Entrepreneurship",
+      "Streaming Tech",
+      "Community Building"
+    ],
+    "couleur": "#FF5722",
+    "couleur_secondaire": "#FF8A50",
+    "icone": "fa-headphones",
+    "lien": {
+      "type": "Visiter",
+      "url": "https://passiio.shop",
+      "libelle": "Visiter Pass'io"
+    },
+    "date": "2025-01-01"
+  },
+  {
+    "id": "402b224c-cfa6-8188-8cb2-c95f93cc41d9",
+    "nom": "Ravina",
+    "categorie": "AgriTech",
+    "accroche": "Application d'assistance technologique pour l'optimisation et la gestion intelligente des plantations.",
+    "label_court": "AgriTech",
+    "sous_titre": "AgriTech & Intelligence Artificielle",
+    "role": "Développeur & Designer",
+    "mission": "Aider les agriculteurs à maximiser leur rendement grâce à l'analyse prédictive, la surveillance des cultures et l'automatisation intelligente des processus agricoles.",
+    "description": "Application d'assistance technologique pour l'optimisation et la gestion intelligente des plantations. Un écosystème mêlant IA et agronomie pour optimiser le rendement des cultures via des données prédictives.",
+    "badge": "Projet d'IA Agricole",
+    "badge_icone": "fa-robot",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "fonctionnalites": [
+      {
+        "nom": "Analyse Prédictive",
+        "description": "Données ML sur les cultures",
+        "icone": "fa-chart-line"
+      },
+      {
+        "nom": "Surveillance Météo",
+        "description": "Alertes et prévisions",
+        "icone": "fa-cloud-sun"
+      },
+      {
+        "nom": "Gestion Plantation",
+        "description": "Suivi intelligent des cultures",
+        "icone": "fa-leaf"
+      },
+      {
+        "nom": "Cloud Compute",
+        "description": "Infrastructure scalable",
+        "icone": "fa-database"
+      }
+    ],
+    "technologies": [
+      "Python",
+      "Machine Learning",
+      "UI/UX Design",
+      "Cloud"
+    ],
+    "couleur": "#4CAF50",
+    "couleur_secondaire": "#66BB6A",
+    "icone": "fa-seedling",
+    "lien": {
+      "type": "Visiter",
+      "url": "https://ravina-nethost.vercel.app/login",
+      "libelle": "Visiter Ravina"
+    },
+    "date": "2025-09-01"
+  },
+  {
+    "id": "402b224c-cfa6-816a-ad42-cea5db714b0a",
+    "nom": "Noovy",
+    "categorie": "Mobile & Culture",
+    "accroche": "Bibliothèque numérique immersive. Plus de 2000 romans et livres audio pour redéfinir la lecture nomade.",
+    "label_court": "Mobile & Culture",
+    "sous_titre": "Bibliothèque Numérique",
+    "role": "Développeur & Designer",
+    "mission": "Démocratiser l'accès à la culture et à la lecture grâce au numérique, en offrant une expérience immersive et accessible à tous, partout et à tout moment.",
+    "description": "Bibliothèque numérique immersive. Plus de 2000 romans et livres audio pour redéfinir la lecture nomade. Une expérience d'écoute centrée sur la culture et l'accessibilité.",
+    "badge": "Culture & Lecture",
+    "badge_icone": "fa-book",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "fonctionnalites": [
+      {
+        "nom": "Livres Audio",
+        "description": "Écoute nomade HD",
+        "icone": "fa-headphones"
+      },
+      {
+        "nom": "2000+ Romans",
+        "description": "Catalogue vaste",
+        "icone": "fa-book"
+      },
+      {
+        "nom": "Mobile First",
+        "description": "Lecture sur tous les devices",
+        "icone": "fa-mobile-screen"
+      },
+      {
+        "nom": "Mode Hors-Ligne",
+        "description": "Lecture sans connexion",
+        "icone": "fa-moon"
+      }
+    ],
+    "technologies": [
+      "Mobile Dev",
+      "UI/UX",
+      "Content Strategy",
+      "Audio Streaming"
+    ],
+    "couleur": "#9C27B0",
+    "couleur_secondaire": "#BA68C8",
+    "icone": "fa-book-open",
+    "lien": {
+      "type": "Visiter",
+      "url": "https://noovy-boky.netlify.app/",
+      "libelle": "Visiter Noovy"
+    },
+    "date": "2026-03-04"
+  },
+  {
+    "id": "402b224c-cfa6-8123-993b-f31eaaa004eb",
+    "nom": "DigiKaratra",
+    "categorie": "E-Gov Web",
+    "accroche": "Système moderne d'archivage, de recherche et de gestion dématérialisée des Cartes d'Identité Nationales.",
+    "label_court": "E-Gov Web",
+    "sous_titre": "E-Gov & Identité Numérique",
+    "role": "Développeur Fullstack",
+    "mission": "Moderniser la gestion des documents d'identité nationaux grâce à la dématérialisation, l'archivage intelligent et la recherche rapide pour une administration efficace.",
+    "description": "Système moderne d'archivage, de recherche et de gestion dématérialisée des Cartes d'Identité Nationales. Une solution e-gov complète pour moderniser l'administration publique.",
+    "badge": "Système Gouvernemental",
+    "badge_icone": "fa-landmark",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "fonctionnalites": [
+      {
+        "nom": "Recherche Avancée",
+        "description": "Recherche multi-critères",
+        "icone": "fa-magnifying-glass"
+      },
+      {
+        "nom": "Archivage Cloud",
+        "description": "Stockage sécurisé",
+        "icone": "fa-folder-open"
+      },
+      {
+        "nom": "Sécurité RGPD",
+        "description": "Données protégées",
+        "icone": "fa-shield-halved"
+      },
+      {
+        "nom": "Tableau de Bord",
+        "description": "Stats et rapports",
+        "icone": "fa-chart-bar"
+      }
+    ],
+    "technologies": [
+      "Symfony",
+      "PHP",
+      "Database Design",
+      "E-Gov"
+    ],
+    "couleur": "#2196F3",
+    "couleur_secondaire": "#64B5F6",
+    "icone": "fa-id-card",
+    "lien": {
+      "type": "Visiter",
+      "url": "https://digikaratra.alwaysdata.net/auth/login",
+      "libelle": "Visiter DigiKaratra"
+    },
+    "date": "2026-01-23"
+  },
+  {
+    "id": "402b224c-cfa6-81b3-b585-e201a317a4ef",
+    "nom": "Yas USSD",
+    "categorie": "Fintech & Sim",
+    "accroche": "Écosystème de simulation haute fidélité reproduisant les flux financiers MVola de l'opérateur YAS.",
+    "label_court": "Fintech & Sim",
+    "sous_titre": "",
+    "role": "Développeur Fullstack",
+    "mission": "",
+    "description": "Ce projet est uniquement disponible en version locale et nécessite un téléphone pour la simulation USSD.",
+    "badge": "",
+    "badge_icone": "fa-mobile-screen",
+    "titre_section_fonctionnalites": "Mise en œuvre locale",
+    "titre_section_competences": "Compétences",
+    "etapes": [
+      "Cloner le repository depuis GitHub",
+      "Lancer le serveur local (CLI ou GUI)",
+      "Tester avec un téléphone via l'interface"
+    ],
+    "fonctionnalites": [],
+    "technologies": [],
+    "couleur": "#607D8B",
+    "couleur_secondaire": "#90A4AE",
+    "icone": "fa-mobile-screen",
+    "lien": {
+      "type": "GitHub",
+      "url": "https://github.com/Narindra0/YAS.git",
+      "libelle": "Télécharger sur GitHub"
+    },
+    "date": "2026-01-21"
+  },
+  {
+    "id": "402b224c-cfa6-8123-bdc3-e9663e5fa712",
+    "nom": "BusNaka",
+    "categorie": "Mobilité",
+    "accroche": "Solution intuitive et rapide conçue pour explorer et gérer le réseau de transport urbain.",
+    "label_court": "Mobilité",
+    "sous_titre": "Mobilité Urbaine",
+    "role": "Développeur Fullstack",
+    "mission": "Simplifier la navigation dans les réseaux de transport urbain en offrant des outils intuitifs de planification, suivi et gestion pour les usagers et opérateurs.",
+    "description": "Solution intuitive et rapide conçue pour explorer et gérer le réseau de transport urbain. Planification d'itinéraires et suivi en temps réel pour une mobilité simplifiée.",
+    "badge": "Transport Intelligent",
+    "badge_icone": "fa-route",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "fonctionnalites": [
+      {
+        "nom": "Carte Interactive",
+        "description": "Navigation temps réel",
+        "icone": "fa-map-location-dot"
+      },
+      {
+        "nom": "Horaires Live",
+        "description": "Données actualisées",
+        "icone": "fa-clock"
+      },
+      {
+        "nom": "Itinéraires",
+        "description": "Planification optimisée",
+        "icone": "fa-route"
+      },
+      {
+        "nom": "Mobile Ready",
+        "description": "Interface responsive",
+        "icone": "fa-mobile-screen"
+      }
+    ],
+    "technologies": [
+      "Python",
+      "Flask",
+      "GIS/Maps",
+      "REST API"
+    ],
+    "couleur": "#FF9800",
+    "couleur_secondaire": "#FFB74D",
+    "icone": "fa-bus",
+    "lien": {
+      "type": "Visiter",
+      "url": "https://narindra.pythonanywhere.com/",
+      "libelle": "Visiter BusNaka"
+    },
+    "date": "2026-03-31"
+  },
+  {
+    "id": "402b224c-cfa6-8180-aca0-fa6b937ca963",
+    "nom": "GodMod",
+    "categorie": "IA & Data",
+    "accroche": "Programme d'intelligence artificielle par apprentissage par renforcement pour l'analyse prédictive de masse.",
+    "label_court": "IA & Data",
+    "sous_titre": "IA & Data Science",
+    "role": "Développeur & Chercheur",
+    "mission": "Pousser les frontières de l'IA en développant des modèles d'apprentissage par renforcement capables de résoudre des problèmes complexes d'optimisation et de prédiction.",
+    "description": "Programme d'intelligence artificielle par apprentissage par renforcement pour l'analyse prédictive de masse. Un modèle capable d'apprendre et de s'améliorer par l'expérience.",
+    "badge": "Apprentissage par Renforcement",
+    "badge_icone": "fa-microchip",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "fonctionnalites": [
+      {
+        "nom": "RL Agents",
+        "description": "Agents autonomes",
+        "icone": "fa-robot"
+      },
+      {
+        "nom": "Prédiction",
+        "description": "Analyse prédictive",
+        "icone": "fa-chart-line"
+      },
+      {
+        "nom": "Big Data",
+        "description": "Traitement masse",
+        "icone": "fa-database"
+      },
+      {
+        "nom": "Auto-optimisation",
+        "description": "Apprentissage continu",
+        "icone": "fa-gears"
+      }
+    ],
+    "technologies": [
+      "Python",
+      "TensorFlow",
+      "Reinforcement Learning",
+      "Data Science"
+    ],
+    "couleur": "#E91E63",
+    "couleur_secondaire": "#F06292",
+    "icone": "fa-brain",
+    "lien": {
+      "type": "GitHub",
+      "url": "https://github.com/Narindra0/GodMod",
+      "libelle": "Voir sur GitHub"
+    },
+    "date": "2026-01-16"
+  },
+  {
+    "id": "402b224c-cfa6-81fe-81b4-c874faf0e1db",
+    "nom": "Talenta",
+    "categorie": "HR Tech",
+    "accroche": "Plateforme stratégique de recrutement croisant des profils ciblés avec les besoins spécifiques des recruteurs.",
+    "label_court": "HR Tech",
+    "sous_titre": "HR Tech",
+    "role": "Développeur Fullstack",
+    "mission": "Révolutionner le recrutement en connectant les talents aux opportunités grâce à des algorithmes intelligents et une expérience candidat fluide.",
+    "description": "Plateforme stratégique de recrutement croisant des profils ciblés avec les besoins spécifiques des recruteurs. Matching intelligent et gestion du pipeline RH.",
+    "badge": "Recrutement Intelligent",
+    "badge_icone": "fa-handshake",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "fonctionnalites": [
+      {
+        "nom": "Matching IA",
+        "description": "Profils ↔ Offres",
+        "icone": "fa-user-check"
+      },
+      {
+        "nom": "Pipeline RH",
+        "description": "Suivi complet",
+        "icone": "fa-chart-simple"
+      },
+      {
+        "nom": "CV Parsing",
+        "description": "Analyse auto",
+        "icone": "fa-file-lines"
+      },
+      {
+        "nom": "Messagerie",
+        "description": "Communication intégrée",
+        "icone": "fa-comments"
+      }
+    ],
+    "technologies": [
+      "Fullstack",
+      "Matching Algorithm",
+      "HR Strategy",
+      "Product Design"
+    ],
+    "couleur": "#00BCD4",
+    "couleur_secondaire": "#4DD0E1",
+    "icone": "fa-users-gear",
+    "lien": {
+      "type": "GitHub",
+      "url": "https://github.com/Narindra0/Zavona-TalentaRH",
+      "libelle": "Voir sur GitHub"
+    },
+    "date": "2026-03-02"
+  },
+  {
+    "id": "402b224c-cfa6-8168-952d-cfce1b598868",
+    "nom": "BOA Manager",
+    "categorie": "Logiciel Interne",
+    "accroche": "Outil sur-mesure de gestion de tâches et de flux de projets pour le département informatique bancaire.",
+    "label_court": "Logiciel Interne",
+    "sous_titre": "Logiciel Interne Bancaire",
+    "role": "Développeur Web",
+    "mission": "Moderniser les processus internes du département informatique de BOA Madagascar en centralisant la gestion de projets, le suivi des tâches et la collaboration d'équipe.",
+    "description": "Outil sur-mesure de gestion de tâches et de flux de projets pour le département informatique bancaire. Un logiciel interne pour moderniser les processus d'équipe.",
+    "badge": "BOA Madagascar",
+    "badge_icone": "fa-building",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "fonctionnalites": [
+      {
+        "nom": "Gestion Tâches",
+        "description": "Kanban & workflow",
+        "icone": "fa-list-check"
+      },
+      {
+        "nom": "Collaboration",
+        "description": "Travail d'équipe",
+        "icone": "fa-people-group"
+      },
+      {
+        "nom": "Planning",
+        "description": "Gantt & échéances",
+        "icone": "fa-chart-gantt"
+      },
+      {
+        "nom": "Notifications",
+        "description": "Alertes temps réel",
+        "icone": "fa-bell"
+      }
+    ],
+    "technologies": [
+      "Symfony",
+      "PHP",
+      "Project Management",
+      "Enterprise Software"
+    ],
+    "couleur": "#607D8B",
+    "couleur_secondaire": "#90A4AE",
+    "icone": "fa-building-columns",
+    "lien": {
+      "type": "Aucun",
+      "url": "",
+      "libelle": "",
+      "note": "Projet réalisé pour BOA Madagascar : code la propriété du client, non publiable."
+    },
+    "date": "2024-10-01"
+  }
+]

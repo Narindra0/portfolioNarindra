@@ -519,3 +519,27 @@ body { font-family: 'Inter', sans-serif; }
     grid-template-columns: 1fr;
   }
 }
+
+/* --- PROJETS GENERES (data/projects.json) --- */
+#project-list:not(.loaded) { min-height: 320px; }
+.project-row:focus-visible {
+  outline: 2px solid #FF5722;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+/* Le modal est partage : l'accent de chaque projet arrive par variables CSS.
+   applyAccent() complete en style inline ce que les variables ne couvrent pas
+   (degrades, bordures et fonds colors). */
+#project-modal {
+  --accent: #FF5722;
+  --accent-rgb: 255 87 34;
+  --accent-2: #FF8A50;
+}
+#project-modal .modal-icon i { color: rgb(var(--accent-rgb)); }
+#project-modal .modal-github-btn:hover { background: rgb(var(--accent-rgb)); }
+#project-modal .passio-mission { border-left-color: rgb(var(--accent-rgb)); }
+#project-modal .passio-section-title i { color: rgb(var(--accent-rgb)); }
+#project-modal .passio-feature-item:hover { border-color: rgba(var(--accent-rgb), 0.2); }
+#project-modal .passio-skill-tag:hover { color: rgb(var(--accent-rgb)); }
+#project-modal .modal-close:hover { background: rgb(var(--accent-rgb)); }

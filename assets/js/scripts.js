@@ -169,11 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- ESCAPE KEY FOR MODALS ---
+    // --- ESCAPE KEY FOR MOBILE MENU ---
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            closeYasModal();
-            closePassioModal();
+        if (e.key === 'Escape' && mobileMenu) {
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
         }
     });
 });
