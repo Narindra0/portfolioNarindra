@@ -1,0 +1,102 @@
+# Flux B — le portfolio se régénère depuis Notion sans intervention.
+# Découverte : les dépôts portant le topic « portfolio » arrivent en Brouillon dans Notion.
+# Synthèse : data/projects.json est recalculé ; s'il change, le commit fait redéployer Netlify.
+# Ni push: ni pull_request: en déclencheur -> un commit du bot ne relance jamais ce workflow.
+#
+# Réglage obligatoire une fois : Settings -> Secrets and variables -> Actions ->
+#   New repository secret  ->  NOTION_TOKEN  (le ntn_… de l'intégration Notion)
+# Et dans Settings -> Actions -> General -> Workflow permissions : « Read and write ».
+name: Portfolio — synchro Notion
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # 03:00 UTC = 05:00 Antananarivo, tous les jours
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Découverte + synthèse (--publish) ou comparaison seule (--check)'
+        required: true
+        default: publier
+        type: choice
+        options:
+          - publier
+          - verifier
+
+permissions:
+  contents: write
+
+concurrency:
+  group: portfolio-sync
+  cancel-in-progress: false
+
+jobs:
+  decouverte:
+    name: Nouveaux dépôts GitHub vers fiches Brouillon
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Vérifier la présence du secret
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          if [ -z "${NOTION_TOKEN}" ]; then
+            echo "::error::Secret NOTION_TOKEN absent : Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+
+      # --create : les fiches naissent en Brouillon, « Prêt à publier » décoché.
+      # Ni le portfolio ni le flux LinkedIn ne les voient tant que la fiche n'est pas
+      # complétée et passée à « À ajouter » -> rien n'est publié sans validation humaine.
+      - name: Lister les dépôts « portfolio » inconnus de Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ vars.GITHUB_OWNER }}
+          GITHUB_TOPIC: ${{ vars.GITHUB_TOPIC }}
+          NOTION_DS: ${{ vars.NOTION_DS }}
+        run: node scripts/github-discovery.mjs --create
+
+  sync:
+    name: Notion vers data/projects.json puis Netlify
+    runs-on: ubuntu-latest
+    needs: decouverte
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Régénérer data/projects.json depuis Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DS: ${{ vars.NOTION_DS }}
+        run: node scripts/notion-to-projects.mjs ${{ github.event.inputs.mode == 'verifier' && '--check' || '--publish' }}
+
+      # Garde-fou : une base Notion mal lue ne doit pas vider le portfolio en ligne.
+      - name: Refuser un résultat vide ou tronqué
+        run: |
+          node -e '
+            const j = JSON.parse(require("fs").readFileSync("data/projects.json", "utf8"));
+            if (!Array.isArray(j) || j.length === 0) { console.error("projects.json vide -> abandon"); process.exit(1); }
+            console.log("projets publiés :", j.length);
+          '
+          git diff --stat -- data/projects.json
+
+      - name: Pousser le changement (redéploie Netlify)
+        if: ${{ github.event.inputs.mode != 'verifier' }}
+        run: |
+          if git diff --quiet -- data/projects.json; then
+            echo "data/projects.json inchangé : rien à pousser."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/projects.json
+          git commit -m "sync(portfolio) : projets régénérés depuis Notion"
+          git push

@@ -1,0 +1,172 @@
+{
+  "402b224c-cfa6-811e-b5e1-f4986714b4e3": {
+    "ordre": 1,
+    "label_court": "Fondateur & CEO",
+    "sous_titre": "Streaming & Culture Musicale",
+    "badge": "Fondateur & CEO",
+    "badge_icone": "fa-crown",
+    "couleur": "#FF5722",
+    "couleur_secondaire": "#FF8A50",
+    "icone": "fa-headphones",
+    "titre_section_fonctionnalites": "Ce que nous développons",
+    "titre_section_competences": "Compétences mobilisées",
+    "lien_libelle": "Visiter Pass'io",
+    "fonctionnalites_icone": {
+      "Streaming HQ": "fa-music",
+      "Événements Live": "fa-calendar-days",
+      "Produits Dérivés": "fa-shirt",
+      "Engagement Fan": "fa-comments"
+    }
+  },
+  "402b224c-cfa6-8188-8cb2-c95f93cc41d9": {
+    "ordre": 2,
+    "label_court": "AgriTech",
+    "sous_titre": "AgriTech & Intelligence Artificielle",
+    "badge": "Projet d'IA Agricole",
+    "badge_icone": "fa-robot",
+    "couleur": "#4CAF50",
+    "couleur_secondaire": "#66BB6A",
+    "icone": "fa-seedling",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "lien_libelle": "Visiter Ravina",
+    "fonctionnalites_icone": {
+      "Analyse Prédictive": "fa-chart-line",
+      "Surveillance Météo": "fa-cloud-sun",
+      "Gestion Plantation": "fa-leaf",
+      "Cloud Compute": "fa-database"
+    }
+  },
+  "402b224c-cfa6-816a-ad42-cea5db714b0a": {
+    "ordre": 3,
+    "label_court": "Mobile & Culture",
+    "sous_titre": "Bibliothèque Numérique",
+    "badge": "Culture & Lecture",
+    "badge_icone": "fa-book",
+    "couleur": "#9C27B0",
+    "couleur_secondaire": "#BA68C8",
+    "icone": "fa-book-open",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "lien_libelle": "Visiter Noovy",
+    "fonctionnalites_icone": {
+      "Livres Audio": "fa-headphones",
+      "2000+ Romans": "fa-book",
+      "Mobile First": "fa-mobile-screen",
+      "Mode Hors-Ligne": "fa-moon"
+    }
+  },
+  "402b224c-cfa6-8123-993b-f31eaaa004eb": {
+    "ordre": 4,
+    "label_court": "E-Gov Web",
+    "sous_titre": "E-Gov & Identité Numérique",
+    "badge": "Système Gouvernemental",
+    "badge_icone": "fa-landmark",
+    "couleur": "#2196F3",
+    "couleur_secondaire": "#64B5F6",
+    "icone": "fa-id-card",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "lien_libelle": "Visiter DigiKaratra",
+    "fonctionnalites_icone": {
+      "Recherche Avancée": "fa-magnifying-glass",
+      "Archivage Cloud": "fa-folder-open",
+      "Sécurité RGPD": "fa-shield-halved",
+      "Tableau de Bord": "fa-chart-bar"
+    }
+  },
+  "402b224c-cfa6-81b3-b585-e201a317a4ef": {
+    "ordre": 5,
+    "label_court": "Fintech & Sim",
+    "sous_titre": "",
+    "badge": "",
+    "badge_icone": "fa-mobile-screen",
+    "couleur": "#607D8B",
+    "couleur_secondaire": "#90A4AE",
+    "icone": "fa-mobile-screen",
+    "titre_section_fonctionnalites": "Mise en œuvre locale",
+    "titre_section_competences": "Compétences",
+    "etapes": [
+      "Cloner le repository depuis GitHub",
+      "Lancer le serveur local (CLI ou GUI)",
+      "Tester avec un téléphone via l'interface"
+    ],
+    "lien_libelle": "Télécharger sur GitHub"
+  },
+  "402b224c-cfa6-8123-bdc3-e9663e5fa712": {
+    "ordre": 6,
+    "label_court": "Mobilité",
+    "sous_titre": "Mobilité Urbaine",
+    "badge": "Transport Intelligent",
+    "badge_icone": "fa-route",
+    "couleur": "#FF9800",
+    "couleur_secondaire": "#FFB74D",
+    "icone": "fa-bus",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "lien_libelle": "Visiter BusNaka",
+    "fonctionnalites_icone": {
+      "Carte Interactive": "fa-map-location-dot",
+      "Horaires Live": "fa-clock",
+      "Itinéraires": "fa-route",
+      "Mobile Ready": "fa-mobile-screen"
+    }
+  },
+  "402b224c-cfa6-8180-aca0-fa6b937ca963": {
+    "ordre": 7,
+    "label_court": "IA & Data",
+    "sous_titre": "IA & Data Science",
+    "badge": "Apprentissage par Renforcement",
+    "badge_icone": "fa-microchip",
+    "couleur": "#E91E63",
+    "couleur_secondaire": "#F06292",
+    "icone": "fa-brain",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "lien_libelle": "Voir sur GitHub",
+    "fonctionnalites_icone": {
+      "RL Agents": "fa-robot",
+      "Prédiction": "fa-chart-line",
+      "Big Data": "fa-database",
+      "Auto-optimisation": "fa-gears"
+    }
+  },
+  "402b224c-cfa6-81fe-81b4-c874faf0e1db": {
+    "ordre": 8,
+    "label_court": "HR Tech",
+    "sous_titre": "HR Tech",
+    "badge": "Recrutement Intelligent",
+    "badge_icone": "fa-handshake",
+    "couleur": "#00BCD4",
+    "couleur_secondaire": "#4DD0E1",
+    "icone": "fa-users-gear",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "lien_libelle": "Voir sur GitHub",
+    "fonctionnalites_icone": {
+      "Matching IA": "fa-user-check",
+      "Pipeline RH": "fa-chart-simple",
+      "CV Parsing": "fa-file-lines",
+      "Messagerie": "fa-comments"
+    }
+  },
+  "402b224c-cfa6-8168-952d-cfce1b598868": {
+    "ordre": 9,
+    "label_court": "Logiciel Interne",
+    "sous_titre": "Logiciel Interne Bancaire",
+    "badge": "BOA Madagascar",
+    "badge_icone": "fa-building",
+    "couleur": "#607D8B",
+    "couleur_secondaire": "#90A4AE",
+    "icone": "fa-building-columns",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences",
+    "lien_libelle": "",
+    "fonctionnalites_icone": {
+      "Gestion Tâches": "fa-list-check",
+      "Collaboration": "fa-people-group",
+      "Planning": "fa-chart-gantt",
+      "Notifications": "fa-bell"
+    }
+  }
+}
