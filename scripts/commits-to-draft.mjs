@@ -100,8 +100,15 @@ async function commits(owner, repo, depuisIso) {
   u.searchParams.set('per_page', '100');
   if (depuisIso) u.searchParams.set('since', depuisIso);
   const r = await fetch(u, { headers: GH });
-  if (r.status === 404) return { erreur: 'dépôt introuvable ou inaccessible' };
-  if (!r.ok) return { erreur: `HTTP ${r.status}` };
+  if (r.status === 404) return { erreur: 'dépôt introuvable (jeton limité à certains dépôts ?)' };
+  /* 403 sur un dépôt privé = le jeton n'a que « Metadata : read-only ». Les commits
+     demandent « Contents : read-only ». Le watermark n'est pas poussé dans ce cas :
+     la période reste entière et sera reprise dès que la permission est accordée. */
+  if (!r.ok) {
+    return { erreur: r.status === 403
+      ? 'HTTP 403 — commits illisibles : accorder « Contents : read-only » à REPO_SCAN_TOKEN'
+      : `HTTP ${r.status}` };
+  }
   const liste = await r.json();
   /* « since » est inclusif côté GitHub : on re-filtre strictement après le watermark
      pour ne jamais resservir le commit déjà publié la fois précédente. */
