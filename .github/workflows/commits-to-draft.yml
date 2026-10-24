@@ -1,0 +1,74 @@
+# Flux C — les commits de la semaine deviennent un brouillon de post LinkedIn.
+# Une fois par semaine, pour chaque fiche Notion qui porte un dépôt GitHub : on lit les
+# commits parus depuis le watermark « Dernier commit vu », Gemini les condense en post,
+# et le texte est écrit dans « Brouillon de la semaine ».
+#
+# Ce workflow n'écrit JAMAIS dans le dépôt et ne publie rien : il ne touche ni
+# « Texte du post », ni « Statut LinkedIn », ni « Prêt à publier ». Le scan est
+# automatique, la publication ne l'est pas — c'est lui qui arme une fiche pour le flux A.
+# Comme il ne pousse aucun commit, il ne déclenche ni le flux B ni Netlify : pas de boucle.
+#
+# Réglages obligatoires une fois, dans Settings -> Secrets and variables -> Actions -> Secrets :
+#   NOTION_TOKEN    = le ntn_… de l'intégration Notion (partagé avec le flux B)
+#   REPO_SCAN_TOKEN = jeton fine-grained « Metadata : Read-only », All repositories (partagé)
+#   GEMINI_API_KEY  = la clé AI Studio (à ne pas confondre avec la connexion Make du flux A)
+name: Portfolio — brouillon de post depuis les commits
+
+on:
+  schedule:
+    - cron: '0 15 * * 0'   # dimanche 15:00 UTC = dimanche 18:00 Antananarivo, veille de la semaine
+  workflow_dispatch:
+    inputs:
+      projet:
+        description: 'Nom exact de la fiche à traiter (vide = toutes celles qui ont des commits nouveaux)'
+        required: false
+        type: string
+      mode:
+        description: 'Écrire dans Notion ou comparer seulement'
+        required: true
+        default: ecrire
+        type: choice
+        options:
+          - ecrire
+          - verifier
+
+concurrency:
+  group: commits-to-draft
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  brouillons:
+    name: Commits -> brouillon Notion
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Vérifier les secrets
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          REPO_SCAN_TOKEN: ${{ secrets.REPO_SCAN_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          test -n "$NOTION_TOKEN"   || { echo "::error::NOTION_TOKEN absent du dépôt"; exit 1; }
+          test -n "$GEMINI_API_KEY" || { echo "::error::GEMINI_API_KEY absent du dépôt"; exit 1; }
+          echo "REPO_SCAN_TOKEN : $(test -n "$REPO_SCAN_TOKEN" && echo présent || echo absent — seuls les dépôts publics seront lus)"
+
+      - name: Générer les brouillons
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          REPO_SCAN_TOKEN: ${{ secrets.REPO_SCAN_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Pas de FLUX_C_SHOW ici : le dépôt est public, le script masque donc de lui-même
+          # noms de projet, dépôts et texte des brouillons dans le journal du run.
+          # La matière rédigée se lit dans la fiche Notion « Brouillon de la semaine ».
+        run: |
+          MODE=--dry
+          [ "${{ inputs.mode }}" = "ecrire" ] && MODE=""
+          node scripts/commits-to-draft.mjs $MODE "${{ inputs.projet }}"
