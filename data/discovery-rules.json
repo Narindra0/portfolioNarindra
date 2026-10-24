@@ -1,0 +1,14 @@
+{
+  "_comment": "Règles du scanner de dépôts (flux B). ignore = noms de dépôts jamais importés dans Notion. categorieParDefault = vide => la fiche attend une Catégorie dans Notion avant de sortir sur le site (la porte de complétude de notion-to-projects.mjs la retient). Mettre par exemple \"Web App\" pour publier sans aucune intervention.",
+  "ignore": [
+    "portfolioNarindra",
+    "pass-teny-content",
+    "Passiio-Player",
+    "GodMod-MobileApp",
+    "Godmod-x-zeus",
+    "Ravina-nethost",
+    "Zavona-TalentaRH"
+  ],
+  "categorieParDefault": "",
+  "maxFichesParRun": 5
+}

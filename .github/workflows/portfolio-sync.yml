@@ -1,20 +1,25 @@
 # Flux B — le portfolio se régénère depuis Notion sans intervention.
-# Découverte : les dépôts portant le topic « portfolio » arrivent en Brouillon dans Notion.
+# Scanner : tous les dépôts GitHub (publics, + privés si GITHUB_PAT) entrent en fiche Notion.
 # Synthèse : data/projects.json est recalculé ; s'il change, le commit fait redéployer Netlify.
-# Ni push: ni pull_request: en déclencheur -> un commit du bot ne relance jamais ce workflow.
+# Anti-boucle : le commit du bot porte « [skip ci] » et tout push dont le message contient
+# « [skip ci] » est ignoré — le dépôt part en Brouillon.
 #
-# Réglage obligatoire une fois : Settings -> Secrets and variables -> Actions ->
-#   New repository secret  ->  NOTION_TOKEN  (le ntn_… de l'intégration Notion)
-# Et dans Settings -> Actions -> General -> Workflow permissions : « Read and write ».
+# Réglages obligatoires une fois, dans Settings -> Secrets and variables -> Actions -> Secrets :
+#   NOTION_TOKEN   = le ntn_… de l'intégration Notion
+#   GITHUB_PAT     = jeton fine-grained « Metadata : Read-only », All repositories, expiration 90 j
+#                    (facultatif : sans lui le scanner ne voit que les dépôts publics)
+# Et dans Settings -> Actions (pas Settings -> General) -> Workflow permissions : « Read and write ».
 name: Portfolio — synchro Notion
 
 on:
+  push:
+    branches: [main]
   schedule:
-    - cron: '0 3 * * *'   # 03:00 UTC = 05:00 Antananarivo, tous les jours
+    - cron: '0 3 * * *'   # 03:00 UTC = 05:00 Antananarivo, filet de sécurité si un push a été manqué
   workflow_dispatch:
     inputs:
       mode:
-        description: 'Découverte + synthèse (--publish) ou comparaison seule (--check)'
+        description: 'Scan + synthèse (--publish) ou comparaison seule (--check)'
         required: true
         default: publier
         type: choice
@@ -31,8 +36,10 @@ concurrency:
 
 jobs:
   decouverte:
-    name: Nouveaux dépôts GitHub vers fiches Brouillon
+    name: Scanner les dépôts GitHub vers fiches Notion
     runs-on: ubuntu-latest
+    # Anti-boucle : un push marqué [skip ci] (celui du bot) ne relance rien.
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - uses: actions/checkout@v7
 
@@ -49,15 +56,14 @@ jobs:
             exit 1
           fi
 
-      # --create : les fiches naissent en Brouillon, « Prêt à publier » décoché.
-      # Ni le portfolio ni le flux LinkedIn ne les voient tant que la fiche n'est pas
-      # complétée et passée à « À ajouter » -> rien n'est publié sans validation humaine.
-      - name: Lister les dépôts « portfolio » inconnus de Notion
+      # Un dépôt public bien décrit part en « À ajouter » ; un dépôt privé, un dépôt sans
+      # description ou un nom de la liste d'exclusion ne sortira jamais sur le site sans que
+      # Narindra le décide. Les noms privés ne sont jamais écrits dans ce log (public).
+      - name: Scanner les dépôts GitHub absents de Notion
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
           GITHUB_OWNER: ${{ vars.GITHUB_OWNER }}
-          GITHUB_TOPIC: ${{ vars.GITHUB_TOPIC }}
           NOTION_DS: ${{ vars.NOTION_DS }}
         run: node scripts/github-discovery.mjs --create
 
@@ -65,6 +71,7 @@ jobs:
     name: Notion vers data/projects.json puis Netlify
     runs-on: ubuntu-latest
     needs: decouverte
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - uses: actions/checkout@v7
 
@@ -98,5 +105,5 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/projects.json
-          git commit -m "sync(portfolio) : projets régénérés depuis Notion"
+          git commit -m "sync(portfolio) : projets régénérés depuis Notion [skip ci]"
           git push
