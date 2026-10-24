@@ -26,6 +26,8 @@ const CIBLE = process.argv.slice(2).find((a) => !a.startsWith('--'));
 const PREMIERE_FENETRE_JOURS = 7;
 const MAX_COMMITS_PAR_FICHE = 60;
 const MAX_CARACTERES_COMMITS = 3500;
+/* En dessous, la période ne justifie pas de réécrire un brouillon déjà en place. */
+const SEUIL_MATIERE = 3;
 
 if (!NOTION_TOKEN || !GH_TOKEN) {
   console.error('NOTION_TOKEN et REPO_SCAN_TOKEN sont requis');
@@ -198,7 +200,7 @@ async function ecrireFiche(pageId, brouillon, dateCommit) {
 
 /* ————————————————————————————————————————————————— principal */
 const fiches = await toutesLesFiches();
-let ecrits = 0, sauts = 0, bloques = 0;
+let ecrits = 0, sauts = 0, bloques = 0, maigres = 0;
 console.log(`${fiches.length} fiches lues | mode ${MODE === 'dry' ? 'SEC (rien n\'est écrit dans Notion)' : 'écriture'}`);
 
 for (const f of fiches) {
@@ -228,6 +230,16 @@ for (const f of fiches) {
     bloques++; continue;
   }
   if (!liste.length) { sauts++; continue; }
+
+  /* Un ou deux commits ne valent pas une matière déjà rédigée. Sans cette garde, le run
+     « 1 commit » de FJKMGestionnaire a écrasé le brouillon construit sur 21 commits
+     (vécu le 2026-10-24, run #4). Ici on conserve le texte en place et on ne pousse PAS
+     le watermark : la période suivante hérite de ces petits commits et se recharge. */
+  const dejaRedige = txt(p, 'Brouillon de la semaine').trim().length > 0;
+  if (liste.length < SEUIL_MATIERE && dejaRedige) {
+    console.log(`  ~ ${dispo(nom, f.id)} période maigre (${liste.length} commit(s)) -> brouillon conservé, watermark non poussé`);
+    maigres++; continue;
+  }
 
   const resume = resumeCommits(liste);
   const dateMax = liste.reduce((m, c) => {
@@ -262,4 +274,4 @@ for (const f of fiches) {
   ecrits++;
 }
 
-console.log(`\n${ecrits} brouillon(s) | ${sauts} fiche(s) sans commit nouveau | ${bloques} signalée(s)`);
+console.log(`\n${ecrits} brouillon(s) | ${sauts} fiche(s) sans commit nouveau | ${maigres} période(s) maigre(s), brouillon conservé | ${bloques} signalée(s)`);
