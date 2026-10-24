@@ -23,6 +23,10 @@ const GEMINI_KEY = process.env.GEMINI_API_KEY;
 const DS = process.env.NOTION_DS || '78e87c8c-4916-4d46-8cd2-00b0bcd471fa';
 const MODE = process.argv.includes('--dry') ? 'dry' : 'write';
 const CIBLE = process.argv.slice(2).find((a) => !a.startsWith('--'));
+/* --depuis=YYYY-MM-DD force le début de la période, sans toucher au watermark de la fiche :
+   sert à recharger un vieux brouillon sur une grande période, ou à tester la garde
+   « période maigre » sans écrire nulle part. */
+const DEPUIS_IMPOSE = (process.argv.find((a) => a.startsWith('--depuis=')) || '').split('=')[1] || '';
 const PREMIERE_FENETRE_JOURS = 7;
 const MAX_COMMITS_PAR_FICHE = 60;
 const MAX_CARACTERES_COMMITS = 3500;
@@ -220,7 +224,7 @@ for (const f of fiches) {
   /* Un watermark écrit « 2026-10-17 » (saisie manuelle dans Notion) est accepté :
      GitHub le lit comme le début de la journée, les commits du jour sont donc proposés
      une fois de plus — c'est ce que cherche celui qui remplit la date à la main. */
-  const depuis = watermark
+  const depuis = DEPUIS_IMPOSE || watermark
     ? watermark
     : new Date(Date.now() - PREMIERE_FENETRE_JOURS * 86400_000).toISOString();
 
