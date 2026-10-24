@@ -203,8 +203,8 @@
     "couleur_secondaire": "#64B5F6",
     "icone": "fa-id-card",
     "lien": {
-      "type": "Visiter",
-      "url": "https://digikaratra.alwaysdata.net/auth/login",
+      "type": "Aucun",
+      "url": "",
       "libelle": "Visiter DigiKaratra"
     },
     "date": "2026-01-23"
@@ -286,8 +286,8 @@
     "couleur_secondaire": "#FFB74D",
     "icone": "fa-bus",
     "lien": {
-      "type": "Visiter",
-      "url": "https://narindra.pythonanywhere.com/",
+      "type": "Aucun",
+      "url": "",
       "libelle": "Visiter BusNaka"
     },
     "date": "2026-03-31"
@@ -538,8 +538,8 @@
     "couleur_secondaire": "#90A4AE",
     "icone": "fa-cube",
     "lien": {
-      "type": "GitHub",
-      "url": "https://github.com/Narindra0/FJKMGestionnaire"
+      "type": "Visiter",
+      "url": "https://fjkmgestionnaire.onrender.com"
     },
     "date": "2026-08-26"
   }
