@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Carte sociale du projet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@700&family=Space+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 627px; overflow: hidden; }
+  body {
+    background: #0A0D1A;
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+    position: relative;
+    display: flex;
+    align-items: stretch;
+  }
+  /* Halo d'accent, couleur propre à la catégorie du projet. */
+  body::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(720px 520px at 82% 18%, var(--glow) 0%, transparent 68%),
+      radial-gradient(640px 480px at 6% 96%, var(--glow2) 0%, transparent 70%);
+  }
+  .bar { position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+         background: linear-gradient(180deg, var(--c1) 0%, var(--c2) 100%); }
+  .ghost { position: absolute; right: 54px; top: 34px; font-size: 250px; line-height: 1;
+           color: var(--c1); opacity: .12; }
+  .wrap { position: relative; padding: 64px 340px 56px 84px; display: flex;
+          flex-direction: column; justify-content: space-between; width: 100%; }
+  .kicker { font-family: 'Space Mono', monospace; font-size: 19px; letter-spacing: .22em;
+            text-transform: uppercase; color: var(--c2); }
+  h1 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 88px;
+       letter-spacing: -.02em; margin-top: 18px; }
+  .pitch { font-size: 29px; font-weight: 300; line-height: 1.42; color: rgba(255,255,255,.66);
+           margin-top: 22px; max-width: 760px;
+           /* Deux lignes maximum : au-delà, l'accroche retombe sur les briques tech. */
+           display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+           overflow: hidden; }
+  .foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; max-width: 700px; }
+  .chip { font-size: 19px; padding: 8px 16px; border-radius: 999px;
+          border: 1px solid var(--edge); background: var(--soft); color: #D8DCEC; }
+  .sig { font-family: 'Space Mono', monospace; font-size: 17px; color: rgba(255,255,255,.38);
+         text-align: right; line-height: 1.6; white-space: nowrap; }
+</style>
+</head>
+<body>
+  <div class="bar"></div>
+  <i class="ghost fa-solid" id="ghost"></i>
+  <div class="wrap">
+    <div>
+      <div class="kicker" id="kicker"></div>
+      <h1 id="nom"></h1>
+      <p class="pitch" id="pitch"></p>
+    </div>
+    <div class="foot">
+      <div class="chips" id="chips"></div>
+      <div class="sig">Narindra Ranjalahy<br>Fondateur Pass'io &middot; Fullstack &amp; IA</div>
+    </div>
+  </div>
+<script>
+  /* Carte 1200x627 alimentée par l'URL — aucun contenu n'est codé ici.
+     Le générateur local (.dev/gen-visuels.mjs) passe les champs de la fiche Notion
+     en paramètres, Chrome headless photographie la page, LinkedIn reçoit le PNG. */
+  const q = new URLSearchParams(location.search);
+  const val = (k, d) => q.get(k) || d;
+  const c1 = val('c1', '#FF5722'), c2 = val('c2', '#FF8A50');
+  const hexToRgba = (hex, a) => {
+    const n = parseInt(String(hex).replace('#', ''), 16);
+    return 'rgba(' + [(n >> 16) & 255, (n >> 8) & 255, n & 255].join(',') + ',' + a + ')';
+  };
+  const s = document.body.style;
+  s.setProperty('--c1', c1);
+  s.setProperty('--c2', c2);
+  s.setProperty('--glow', hexToRgba(c1, 0.16));
+  s.setProperty('--glow2', hexToRgba(c2, 0.10));
+  s.setProperty('--edge', hexToRgba(c1, 0.34));
+  s.setProperty('--soft', hexToRgba(c1, 0.10));
+
+  document.getElementById('kicker').textContent = val('cat', 'Projet');
+  document.getElementById('nom').textContent = val('nom', 'Projet');
+  document.getElementById('pitch').textContent = val('pitch', '');
+  const g = document.getElementById('ghost');
+  g.className = 'ghost fa-solid ' + val('icone', 'fa-cube');
+  val('techs', '').split('|').filter(Boolean).slice(0, 6).forEach((t) => {
+    const e = document.createElement('span');
+    e.className = 'chip';
+    e.textContent = t.trim();
+    document.getElementById('chips').appendChild(e);
+  });
+  /* Titre de police réduit si le nom déborde : la carte ne doit jamais rogner un mot. */
+  const h = document.getElementById('nom');
+  if (h.scrollWidth > 800) h.style.fontSize = Math.max(52, 88 * 800 / h.scrollWidth) + 'px';
+</script>
+</body>
+</html>
