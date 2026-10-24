@@ -7,6 +7,9 @@
      NOTION_TOKEN=… node scripts/notion-to-projects.mjs --write       écrit data/projects.json
      NOTION_TOKEN=… node scripts/notion-to-projects.mjs --publish     écrit + passe les fiches
                                                                   « À ajouter » à « Ajouté »
+   Porte de complétude : une fiche « À ajouter » sans nom, sans description ou sans catégorie
+   est tenue en attente (log « ! en attente ») et ne monte pas sur le site ; son statut n'est
+   pas touché, elle sera publiée au run suivant une fois remplie.
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
@@ -81,7 +84,24 @@ async function main() {
     cursor = q.has_more ? q.next_cursor : undefined;
   } while (cursor);
 
-  const retenues = pages.filter((p) => ['À ajouter', 'Ajouté'].includes(one(p.properties, 'Statut Portfolio')));
+  const candidates = pages.filter((p) => ['À ajouter', 'Ajouté'].includes(one(p.properties, 'Statut Portfolio')));
+
+  // Porte de complétude : une fiche trop légère ne sort pas sur le site, même marquée « À ajouter ».
+  // Une fiche créée par la découverte GitHub n'a ni description ni catégorie : sans cette porte,
+  // le run suivant publierait une carte vide sur le portfolio en ligne.
+  const incomplet = (p) => {
+    const manque = [];
+    if (!txt(p.properties, 'Description').trim()) manque.push('description');
+    if (!one(p.properties, 'Catégorie')) manque.push('catégorie');
+    if (!(title(p.properties) || '').trim()) manque.push('nom');
+    return manque;
+  };
+  const retenues = [];
+  const enattente = [];
+  for (const p of candidates) {
+    const m = incomplet(p);
+    if (m.length) enattente.push({ p, manque: m }); else retenues.push(p);
+  }
   const ecartees = pages.length - retenues.length;
 
   const projects = retenues.map((p) => {
@@ -134,7 +154,9 @@ async function main() {
   const out = new URL('../data/projects.json', import.meta.url);
   const current = existsSync(fileURLToPath(out)) ? readFileSync(out, 'utf8') : '';
 
-  console.log(`fiches lues: ${pages.length} | retenues (${['À ajouter', 'Ajouté']}): ${retenues.length} | écartées: ${ecartees}`);
+  console.log(`fiches lues: ${pages.length} | publiables: ${retenues.length} | écartées (hors « À ajouter/Ajouté »): ${ecartees}`);
+  enattente.forEach(({ p, manque }) => console.log(' ! en attente :', title(p.properties), '— manque', manque.join(' + '), '— la fiche reste « À ajouter », rien n\'est publié'));
+
   projects.forEach((p) => console.log(' -', p.nom, '|', p.categorie, '| lien', p.lien.type, p.lien.url || '(aucun)', '|', p.fonctionnalites.length, 'fonctionnalités'));
 
   if (json === current) {
