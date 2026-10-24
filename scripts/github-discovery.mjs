@@ -16,7 +16,7 @@
      NOTION_TOKEN=… node scripts/github-discovery.mjs --check    liste ce qui serait créé
      NOTION_TOKEN=… node scripts/github-discovery.mjs --create   crée les fiches
    Variables : GITHUB_PAT (jeton fine-grained, Metadata lecture seule — facultatif, sans lui
-               seuls les dépôts publics sont vus), GITHUB_OWNER, NOTION_DS, NOTION_TOPIC_APP.
+               seuls les dépôts publics sont vus), GITHUB_OWNER, NOTION_DS.
  */
 import { readFileSync } from 'node:fs';
 
