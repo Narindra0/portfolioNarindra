@@ -26,7 +26,12 @@ const CIBLE = process.argv.slice(2).find((a) => !a.startsWith('--'));
 /* --depuis=YYYY-MM-DD force le début de la période, sans toucher au watermark de la fiche :
    sert à recharger un vieux brouillon sur une grande période, ou à tester la garde
    « période maigre » sans écrire nulle part. */
-const DEPUIS_IMPOSE = (process.argv.find((a) => a.startsWith('--depuis=')) || '').split('=')[1] || '';
+const DEPUIS_BRUT = (process.argv.find((a) => a.startsWith('--depuis=')) || '').split('=')[1] || '';
+/* Format strict : la valeur peut venir d'un champ de saisie du workflow, elle ne part
+   jamais telle quelle dans une commande — et une date mal écrite vaudrait pire qu'une
+   période vide (le filtre Date.parse ferait NaN, donc plus aucun commit). */
+const DEPUIS_IMPOSE = /^\d{4}-\d{2}-\d{2}([T ][0-9:.]+Z?)?$/.test(DEPUIS_BRUT) ? DEPUIS_BRUT : '';
+if (DEPUIS_BRUT && !DEPUIS_IMPOSE) console.log(`! --depuis « ${DEPUIS_BRUT} » ignoré : format attendu AAAA-MM-JJ`);
 const PREMIERE_FENETRE_JOURS = 7;
 const MAX_COMMITS_PAR_FICHE = 60;
 const MAX_CARACTERES_COMMITS = 3500;
@@ -145,6 +150,20 @@ function resumeCommits(liste) {
   return { texte: lignes.join('\n'), nombre: liste.length };
 }
 
+/* Le jeton de scan voit les privés ; le visiteur LinkedIn, non. Appel **sans**
+   authorization : c'est exactement la réponse que recevra le lecteur du post.
+   En cas de doute (rate limit, réseau) on considère le dépôt comme public : mieux
+   vaut un lien de trop qu'un post muet, et le doute se lève en relisant la fiche. */
+async function accessiblePublicement(owner, repo) {
+  try {
+    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+      headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'portfolio-flux-c-lien' }
+    });
+    if (r.status === 404) return false;
+    return true;
+  } catch { return true; }
+}
+
 /* ————————————————————————————————————————————————— Gemini */
 const SYSTEME = `Tu écris pour Narindra Ranjalahy, développeur fullstack et fondateur à Antananarivo (Madagascar), un post LinkedIn « ce que j'ai construit récemment ».
 
@@ -224,9 +243,14 @@ for (const f of fiches) {
   /* Un watermark écrit « 2026-10-17 » (saisie manuelle dans Notion) est accepté :
      GitHub le lit comme le début de la journée, les commits du jour sont donc proposés
      une fois de plus — c'est ce que cherche celui qui remplit la date à la main. */
-  const depuis = DEPUIS_IMPOSE || watermark
-    ? watermark
-    : new Date(Date.now() - PREMIERE_FENETRE_JOURS * 86400_000).toISOString();
+  /* Parenthèses inutiles en apparence mais vitales : écrite « A || B ? B : C », l'expression
+     évalue d'abord (A || B) puis choisit B — le --depuis était donc silencieusement ignoré
+     (bug démasqué le 2026-10-24 en testant la garde « période maigre »). */
+  const depuis = DEPUIS_IMPOSE
+    ? DEPUIS_IMPOSE
+    : watermark
+      ? watermark
+      : new Date(Date.now() - PREMIERE_FENETRE_JOURS * 86400_000).toISOString();
 
   const { liste, erreur } = await commits(depot.owner, depot.repo, depuis);
   if (erreur) {
@@ -251,9 +275,20 @@ for (const f of fiches) {
     return d > m ? d : m;
   }, depuis);
 
+  /* Règle « pas de lien mort », la même que sur le site : un CTA qui pointe sur un dépôt
+     privé répond 404 à tout visiteur du fil LinkedIn. On teste donc en anonyme — ce que
+     voit le reader, pas ce que voit le jeton. MoraCourses en a fait les frais le
+     2026-10-24 : le brouillon invitait à « suivre l'avancée du projet » sur une URL 404. */
+  let lien = '';
   const type = un(p, 'Type de lien') || 'Visiter';
-  const lien = type === 'GitHub' ? urlDe(p, 'Lien GitHub')
+  const annonce = type === 'GitHub' ? urlDe(p, 'Lien GitHub')
     : type === 'Aucun' ? '' : (urlDe(p, 'Lien Démo') || urlDe(p, 'Lien GitHub'));
+  if (annonce) {
+    const mGithub = DEPOT.exec(annonce);
+    const publicOuSansGithub = !mGithub || await accessiblePublicement(mGithub[1], mGithub[2].replace(/\.git$/, ''));
+    if (publicOuSansGithub) lien = annonce;
+    else console.log(`  ~ ${dispo(nom, f.id)} dépôt non visible par le public -> post sans lien`);
+  }
 
   const jours = Math.max(1, Math.round((Date.parse(dateMax) - Date.parse(depuis)) / 86400_000));
   const periode = `${depuis.slice(0, 10)} au ${dateMax.slice(0, 10)} (${jours} jour(s))`;

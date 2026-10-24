@@ -23,6 +23,10 @@ on:
         description: 'Nom exact de la fiche à traiter (vide = toutes celles qui ont des commits nouveaux)'
         required: false
         type: string
+      depuis:
+        description: 'Repartir de cette date (AAAA-MM-JJ) au lieu du watermark de la fiche — vide = suite normale'
+        required: false
+        type: string
       mode:
         description: 'Écrire dans Notion ou comparer seulement'
         required: true
@@ -71,4 +75,6 @@ jobs:
         run: |
           MODE=--dry
           [ "${{ inputs.mode }}" = "ecrire" ] && MODE=""
-          node scripts/commits-to-draft.mjs $MODE "${{ inputs.projet }}"
+          # « depuis » n'est pas injecté dans le shell : le script ne retient que le format
+          # AAAA-MM-JJ et ignore toute autre valeur.
+          node scripts/commits-to-draft.mjs $MODE --depuis="${{ inputs.depuis }}" "${{ inputs.projet }}"
