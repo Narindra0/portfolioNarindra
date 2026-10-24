@@ -48,6 +48,22 @@ function splitDescription(s) {
     : { description: s.slice(0, i).trim(), note: s.slice(i).trim() };
 }
 
+/* Accroche de la ligne de liste. Une fiche créée par le scanner n'a jamais de champ « Accroche »
+   rempli : sans repli, la colonne du milieu de la liste reste vide sur le site. On prend la
+   première phrase de la description, coupée à la fin de mot sous 110 caractères. */
+const LIMITE_ACCROCHE = 110;
+function accrocheDe(p) {
+  const ecrite = txt(p, 'Accroche').trim();
+  if (ecrite) return ecrite;
+  const source = txt(p, 'Description').replace(/\s+/g, ' ').trim();
+  if (!source) return '';
+  const phrase = (source.split(/(?<=[.!?]) /)[0] || source).trim();
+  if (phrase.length <= LIMITE_ACCROCHE) return phrase;
+  const coupe = phrase.slice(0, LIMITE_ACCROCHE);
+  const mot = coupe.lastIndexOf(' ');
+  return (mot > 40 ? coupe.slice(0, mot) : coupe).replace(/[,;:]$/, '') + '…';
+}
+
 /* « Nom : description » sur une ligne par fonctionnalité, icône reprise du calque. */
 function features(raw, icons) {
   return (raw || '')
@@ -118,7 +134,7 @@ async function main() {
       id,
       nom: title(pr),
       categorie: one(pr, 'Catégorie'),
-      accroche: txt(pr, 'Accroche'),
+      accroche: accrocheDe(pr),
       label_court: st.label_court ?? DEFAULTS.label_court,
       sous_titre: st.sous_titre ?? DEFAULTS.sous_titre,
       role: txt(pr, 'Rôle'),
