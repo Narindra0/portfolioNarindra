@@ -4,8 +4,12 @@
 # Anti-boucle : le push du bot est fait avec le GITHUB_TOKEN du workflow, et GitHub ne relance
 # jamais un run pour un push déclenché par ce jeton. Le job « sync » refuse en plus tout push
 # dont l'auteur est github-actions[bot].
-# IMPORTANT : le message du commit du bot ne doit PAS contenir « [skip ci] » — Netlify lit cette
-# marque et saute alors le build, ce qui laisse le site sur l'ancien nombre de projets.
+# IMPORTANT : le message du commit du bot ne doit PAS contenir la marque « skip ci » entre
+# crochets — Netlify ET GitHub Actions la lisent dans le message de commit et sautent alors
+# respectivement le build et le run. La règle vaut aussi pour les commits humains : un message
+# qui écrit cette marque en toutes lettres (même pour la documenter) annule le déclenchement.
+# Piège vérifié le 2026-10-24 : deux pushes de suite ignorés par Actions et Netlify pour cette
+# seule raison ; le push suivant, message neutre, a tout redéclenché.
 #
 # Réglages obligatoires une fois, dans Settings -> Secrets and variables -> Actions -> Secrets :
 #   NOTION_TOKEN   = le ntn_… de l'intégration Notion
