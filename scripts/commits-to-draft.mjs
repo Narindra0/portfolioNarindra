@@ -140,26 +140,27 @@ function resumeCommits(liste) {
 }
 
 /* ————————————————————————————————————————————————— Gemini */
-const SYSTEME = `Tu écris pour Narindra Ranjalahy, développeur fullstack et fondateur à Antananarivo (Madagascar), un post LinkedIn « ce que j'ai construit cette semaine ».
+const SYSTEME = `Tu écris pour Narindra Ranjalahy, développeur fullstack et fondateur à Antananarivo (Madagascar), un post LinkedIn « ce que j'ai construit récemment ».
 
 Règles absolues :
-1. N'utilise QUE les messages de commits fournis. N'invente aucune fonctionnalité, aucun chiffre, aucun client, aucune date, aucun résultat, aucune technologie. Un commit non conventionnel (« wip », « fix », « update ») sans information lisible doit être tu, pas deviné.
+1. N'utilise QUE les messages de commits fournis. N'invente aucune fonctionnalité, aucun chiffre, aucun client, aucune date, aucun résultat, aucune technologie. Un commit non conventionnel (« wip », « fix », « update ») sans information lisible doit être tu, pas deviné. Les hashtags aussi ne reprennent que des mots des commits ou de la fiche : pas de nom de langage ou de framework qui n'apparaît pas dans le texte fourni.
 2. Ne cite jamais un nom de fichier, un hash de commit, un nom de branche ou un terme technique obscur. Traduis le travail en ce que l'utilisateur du produit voit ou peut faire.
 3. Écris à la première personne du singulier, en français, ton concret. Narindra travaille seul : jamais « nous », « notre équipe », « l'équipe ». Le « on » de généralité (« quand on gère des milliers de références ») reste autorisé.
-4. Structure : une accroche qui donne envie (constat ou tension, pas le nom du projet suivi de sa définition), puis 2 à 3 paragraphes courts, puis un appel à l'action avec le lien fourni, puis 3 à 5 hashtags sur la dernière ligne.
-5. Maximum 1 300 caractères espaces compris, une ligne vide entre les blocs, pas de puces ni de titres, deux émojis maximum s'ils apportent quelque chose.
-6. Réponds UNIQUEMENT avec le texte final du post : pas de commentaire, pas de guillemets, pas de bloc de code, et ne dis jamais que le texte ou le projet vient d'une IA.`;
+4. La période couverte est celle annoncée dans le message. Ne dis « cette semaine » QUE si elle fait sept ou huit jours ; sinon écris « récemment » ou « sur la période ». N'invente jamais une durée.
+5. Structure : une accroche qui donne envie (constat ou tension, pas le nom du projet suivi de sa définition), puis 2 à 3 paragraphes courts, puis un appel à l'action avec le lien fourni, puis 3 à 5 hashtags sur la dernière ligne.
+6. Maximum 1 300 caractères espaces compris, une ligne vide entre les blocs, pas de puces ni de titres, deux émojis maximum s'ils apportent quelque chose.
+7. Réponds UNIQUEMENT avec le texte final du post : pas de commentaire, pas de guillemets, pas de bloc de code, et ne dis jamais que le texte ou le projet vient d'une IA.`;
 
-async function rediger({ nom, categorie, lien, resume }) {
+async function rediger({ nom, categorie, lien, resume, periode }) {
   const u = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent`;
   const corps = {
     contents: [{
       role: 'user',
       parts: [{
-        text: `Projet : ${nom}\nCatégorie : ${categorie || '(non renseignée)'}\n`
+        text: `Projet : ${nom}\nCatégorie : ${categorie || '(non renseignée)'}\nPériode couverte : ${periode}\n`
           + `Lien à mettre dans l'appel à l'action : ${lien || '(aucun lien : termine sans lien)'}\n\n`
           + `Commits de la période (${resume.nombre}) :\n${resume.texte}\n\n`
-          + `Écris le post LinkedIn de cette semaine pour ${nom}.`
+          + `Écris le post LinkedIn qui rend compte de cette période pour ${nom}.`
       }]
     }],
     systemInstruction: { parts: [{ text: SYSTEME }] },
@@ -238,18 +239,25 @@ for (const f of fiches) {
   const lien = type === 'GitHub' ? urlDe(p, 'Lien GitHub')
     : type === 'Aucun' ? '' : (urlDe(p, 'Lien Démo') || urlDe(p, 'Lien GitHub'));
 
+  const jours = Math.max(1, Math.round((Date.parse(dateMax) - Date.parse(depuis)) / 86400_000));
+  const periode = `${depuis.slice(0, 10)} au ${dateMax.slice(0, 10)} (${jours} jour(s))`;
+
   let brouillon;
   try {
-    brouillon = await rediger({ nom, categorie: un(p, 'Catégorie'), lien, resume });
+    brouillon = await rediger({ nom, categorie: un(p, 'Catégorie'), lien, resume, periode });
   } catch (e) {
     console.log(`  ! ${dispo(nom, f.id)} Gemini : ${String(e.message).slice(0, 160)}`);
     bloques++; continue;
   }
 
-  const entete = `${MASQUE ? dispo(nom, f.id) : nom} — ${resume.nombre} commit(s) du ${depuis.slice(0, 10)} au ${dateMax.slice(0, 10)}`;
+  const entete = `${MASQUE ? dispo(nom, f.id) : nom} — ${resume.nombre} commit(s), ${periode}`;
   if (MODE === 'write') await ecrireFiche(f.id, brouillon, dateMax);
   console.log(`  ${MODE === 'write' ? '+' : '•'} ${entete}`);
   console.log(`      ${brouillon.length} caractères${MODE === 'write' ? ' -> Notion écrit' : ''}${apercu(brouillon)}`);
+  /* Consigne dépassée : le texte reste utilisable (LinkedIn admet 3 000 caractères),
+     mais la coupe se fait à la relecture humaine, jamais par un troncage automatique
+     qui casserait une phrase en plein milieu. */
+  if (brouillon.length > 1300) console.log(`      ! ${brouillon.length} > 1 300 demandes : à éclaircir à la relecture`);
   if (show) console.log(brouillon.replace(/^/gm, '      | '));
   ecrits++;
 }
