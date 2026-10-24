@@ -1,6 +1,6 @@
 /* Flux B, étape « scanner » — repère dans Notion les dépôts GitHub que le portfolio ne connaît pas.
 
-   Parcourt TOUS les dépôts de Narindra0 (publics, et privés si GITHUB_PAT est fourni),
+   Parcourt TOUS les dépôts de Narindra0 (publics, et privés si REPO_SCAN_TOKEN est fourni),
    écarte les forks, les archives et les noms listés dans data/discovery-rules.json,
    puis crée une fiche par dépôt manquant, pré-remplie avec ce que GitHub sait :
    nom, description, lien, date de création.
@@ -15,13 +15,14 @@
    Usage :
      NOTION_TOKEN=… node scripts/github-discovery.mjs --check    liste ce qui serait créé
      NOTION_TOKEN=… node scripts/github-discovery.mjs --create   crée les fiches
-   Variables : GITHUB_PAT (jeton fine-grained, Metadata lecture seule — facultatif, sans lui
-               seuls les dépôts publics sont vus), GITHUB_OWNER, NOTION_DS.
+   Variables : REPO_SCAN_TOKEN (jeton fine-grained, Metadata lecture seule — facultatif, sans lui
+               seuls les dépôts publics sont vus ; nom obligatoire car GitHub interdit un secret
+               commençant par GITHUB_), GITHUB_OWNER, NOTION_DS.
  */
 import { readFileSync } from 'node:fs';
 
 const TOKEN = process.env.NOTION_TOKEN;
-const PAT = process.env.GITHUB_PAT || '';
+const PAT = process.env.REPO_SCAN_TOKEN || '';
 const OWNER = process.env.GITHUB_OWNER || 'Narindra0';
 const DS = process.env.NOTION_DS || '78e87c8c-4916-4d46-8cd2-00b0bcd471fa';
 const MODE = process.argv.includes('--create') ? 'create' : 'check';
@@ -42,14 +43,14 @@ const endpoint = PAT ? '/user/repos?per_page=100&sort=pushed&visibility=all' : `
 const repos = [];
 for (let page = 1; page <= 5; page += 1) {
   const r = await fetch(`https://api.github.com${endpoint}${endpoint.includes('?') ? '&' : '?'}page=${page}`, GH);
-  if (!r.ok) { console.error('GitHub : HTTP', r.status, r.status === 401 ? '(GITHUB_PAT invalide ou expiré)' : ''); process.exit(1); }
+  if (!r.ok) { console.error('GitHub : HTTP', r.status, r.status === 401 ? '(REPO_SCAN_TOKEN invalide ou expiré)' : ''); process.exit(1); }
   const part = await r.json();
   if (!part.length) break;
   repos.push(...part);
   if (part.length < 100) break;
 }
 const prives = repos.filter((r) => r.private).length;
-console.log(`dépôts vus : ${repos.length}${PAT ? ` (dont ${prives} privés, noms non affichés)` : ' (publics seulement — GITHUB_PAT absent)'}`);
+console.log(`dépôts vus : ${repos.length}${PAT ? ` (dont ${prives} privés, noms non affichés)` : ' (publics seulement — REPO_SCAN_TOKEN absent)'}`);
 
 const connaitre = new Set();
 const connaitreNom = new Set();

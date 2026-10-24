@@ -1,12 +1,12 @@
 # Flux B — le portfolio se régénère depuis Notion sans intervention.
-# Scanner : tous les dépôts GitHub (publics, + privés si GITHUB_PAT) entrent en fiche Notion.
+# Scanner : tous les dépôts GitHub (publics, + privés si REPO_SCAN_TOKEN) entrent en fiche Notion.
 # Synthèse : data/projects.json est recalculé ; s'il change, le commit fait redéployer Netlify.
 # Anti-boucle : le commit du bot porte « [skip ci] » et tout push dont le message contient
 # « [skip ci] » est ignoré — le dépôt part en Brouillon.
 #
 # Réglages obligatoires une fois, dans Settings -> Secrets and variables -> Actions -> Secrets :
 #   NOTION_TOKEN   = le ntn_… de l'intégration Notion
-#   GITHUB_PAT     = jeton fine-grained « Metadata : Read-only », All repositories, expiration 90 j
+#   REPO_SCAN_TOKEN   = jeton fine-grained « Metadata : Read-only », All repositories, expiration 90 j
 #                    (facultatif : sans lui le scanner ne voit que les dépôts publics)
 # Et dans Settings -> Actions (pas Settings -> General) -> Workflow permissions : « Read and write ».
 name: Portfolio — synchro Notion
@@ -62,7 +62,7 @@ jobs:
       - name: Scanner les dépôts GitHub absents de Notion
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
+          REPO_SCAN_TOKEN: ${{ secrets.REPO_SCAN_TOKEN }}
           GITHUB_OWNER: ${{ vars.GITHUB_OWNER }}
           NOTION_DS: ${{ vars.NOTION_DS }}
         run: node scripts/github-discovery.mjs --create
