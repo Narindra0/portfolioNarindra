@@ -36,7 +36,9 @@ const txt = (p, n) => (p[n]?.rich_text || []).map((t) => t.plain_text).join('');
 const title = (p) => (p['Nom du projet']?.title || []).map((t) => t.plain_text).join('');
 const one = (p, n) => p[n]?.select?.name || '';
 const many = (p, n) => (p[n]?.multi_select || []).map((o) => o.name);
-const link = (p, n) => p[n]?.url || '';
+/* Les fiches créées par le scanner portent l'URL de clonage (.git) ; la carte du portfolio
+   doit mener à la page du dépôt. Normalisée ici plutôt que fiche par fiche dans Notion. */
+const link = (p, n) => (p[n]?.url || '').replace(/\.git\/?$/, '');
 const day = (p, n) => p[n]?.date?.start || '';
 
 /* Description = 1er paragraphe ; reliquat = note (règle inverse de l'import). */

@@ -103,7 +103,8 @@ for (const r of retenus) {
   const props = {
     'Nom du projet': { title: rt(r.name) },
     'Description': description ? { rich_text: rt(description) } : { rich_text: [] },
-    'Lien GitHub': { url: r.clone_url },
+    // html_url (page du dépôt) et non clone_url : la fiche alimente un lien cliquable du portfolio.
+    'Lien GitHub': { url: r.html_url },
     'Type de lien': { select: { name: 'GitHub' } },
     'Date de création': { date: { start: (r.created_at || '').slice(0, 10) } },
     'Statut Portfolio': { select: { name: statut } },
