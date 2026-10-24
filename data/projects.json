@@ -235,7 +235,7 @@
     "icone": "fa-mobile-screen",
     "lien": {
       "type": "GitHub",
-      "url": "https://github.com/Narindra0/YAS.git",
+      "url": "https://github.com/Narindra0/YAS",
       "libelle": "Télécharger sur GitHub"
     },
     "date": "2026-01-21"
@@ -448,5 +448,99 @@
       "note": "Projet réalisé pour BOA Madagascar : code la propriété du client, non publiable."
     },
     "date": "2024-10-01"
+  },
+  {
+    "id": "403b224c-cfa6-818b-8db4-fa077202c999",
+    "nom": "Meshway",
+    "categorie": "Mobile & Culture",
+    "accroche": "",
+    "label_court": "",
+    "sous_titre": "",
+    "role": "",
+    "mission": "",
+    "description": "Hafatra permet à un quartier dense d'échanger des messages et de recevoir des alertes signées sans Internet ni serveur, en utilisant le Bluetooth Low Energy comme transport principal. La V1 livre le BLE réel, un transport simulé pour la démonstration et les tests, ainsi que les contrats nécessaires aux futurs transports.",
+    "badge": "",
+    "badge_icone": "fa-code",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences mobilisées",
+    "fonctionnalites": [
+      {
+        "nom": "Messagerie hors-ligne",
+        "description": "échanges de quartier sans Internet ni serveur"
+      },
+      {
+        "nom": "Alertes signées",
+        "description": "notifications vérifiables par le destinataire"
+      },
+      {
+        "nom": "Transport BLE réel",
+        "description": "Bluetooth Low Energy comme canal principal"
+      },
+      {
+        "nom": "Démonstration et tests",
+        "description": "transport simulé et contrats pour brancher d'autres transports"
+      }
+    ],
+    "technologies": [
+      "Dart",
+      "Bluetooth Low Energy"
+    ],
+    "couleur": "#607D8B",
+    "couleur_secondaire": "#90A4AE",
+    "icone": "fa-cube",
+    "lien": {
+      "type": "GitHub",
+      "url": "https://github.com/Narindra0/Meshway"
+    },
+    "date": "2026-10-21"
+  },
+  {
+    "id": "403b224c-cfa6-812c-8667-ec82b46f0380",
+    "nom": "FJKMGestionnaire",
+    "categorie": "Logiciel Interne",
+    "accroche": "",
+    "label_court": "",
+    "sous_titre": "",
+    "role": "",
+    "mission": "",
+    "description": "Application web de gestion des obligations financières de la paroisse FJKM Malaza Gileada : suivi des entrées et sorties, registre des fidèles, paiements communion, tableaux de bord et statistiques, rapports exportables, journal d'audit et rôles utilisateurs. Développée en PHP 8.2 orienté objet sur un MVC maison, avec MySQL / MariaDB, et utilisable en PWA.",
+    "badge": "",
+    "badge_icone": "fa-code",
+    "titre_section_fonctionnalites": "Fonctionnalités",
+    "titre_section_competences": "Compétences mobilisées",
+    "fonctionnalites": [
+      {
+        "nom": "Obligations financières",
+        "description": "suivi des engagements et des paiements"
+      },
+      {
+        "nom": "Fidèles",
+        "description": "registre et suivi des membres"
+      },
+      {
+        "nom": "Tableaux de bord",
+        "description": "statistiques et rapports exportables (PDF, CSV)"
+      },
+      {
+        "nom": "Audit et rôles",
+        "description": "ADMIN, USER, VISITEUR avec actions tracées"
+      }
+    ],
+    "technologies": [
+      "PHP 8.2",
+      "MySQL",
+      "Bootstrap 5",
+      "Tailwind CSS",
+      "Chart.js",
+      "PWA"
+    ],
+    "couleur": "#607D8B",
+    "couleur_secondaire": "#90A4AE",
+    "icone": "fa-cube",
+    "lien": {
+      "type": "GitHub",
+      "url": "https://github.com/Narindra0/FJKMGestionnaire"
+    },
+    "date": "2026-08-26"
   }
 ]
