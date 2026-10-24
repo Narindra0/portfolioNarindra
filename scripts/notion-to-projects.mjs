@@ -126,8 +126,12 @@ async function main() {
     const pr = p.properties;
     const id = p.id;
     const st = overlay[id] || {};
-    const type = one(pr, 'Type de lien') || 'Visiter';
-    const url = type === 'GitHub' ? link(pr, 'Lien GitHub') : type === 'Aucun' ? '' : (link(pr, 'Lien Démo') || link(pr, 'Lien GitHub'));
+    const typeAnnonce = one(pr, 'Type de lien') || 'Visiter';
+    const url = typeAnnonce === 'GitHub' ? link(pr, 'Lien GitHub')
+      : typeAnnonce === 'Aucun' ? '' : (link(pr, 'Lien Démo') || link(pr, 'Lien GitHub'));
+    // Une fiche qui annonce un lien sans en porter l'URL ne doit pas sortir un bouton mort :
+    // le site rend alors seulement la description, les fonctionnalités et les technologies.
+    const type = url ? typeAnnonce : 'Aucun';
     const { description, note } = splitDescription(txt(pr, 'Description'));
 
     return {
