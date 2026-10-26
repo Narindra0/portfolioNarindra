@@ -108,7 +108,11 @@ jobs:
     name: Notion vers la branche donnees (0 crédit Netlify)
     runs-on: ubuntu-latest
     needs: decouverte
-    if: ${{ github.event_name != 'push' || github.actor != 'github-actions[bot]' }}
+    # PIÈGE VÉRIFIÉ LE 2026-10-26 : un job dont le « needs » est sauté est sauté lui aussi —
+    # la conclusion « skipped » n'est pas « success ». Or le scan est volontairement réservé
+    # au créneau quotidien : sans !failure(), les 96 runs de synthèse du mois seraient tous
+    # ignorés. !cancelled() && !failure() = « le scan n'a pas planté », même s'il n'a pas tourné.
+    if: ${{ !cancelled() && !failure() && (github.event_name != 'push' || github.actor != 'github-actions[bot]') }}
     steps:
       # fetch-depth: 0 — le rebase d'un clone superficiel n'a pas de base commune avec une
       # branche qui a avancé pendant le run ; l'historique complet le rend fiable.
