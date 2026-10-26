@@ -119,7 +119,15 @@ const nettoyer = (s, max) => {
   return texte.replace(/[,;:.\-]$/, "") + "…";
 };
 const phrases = (s) => String(s || "").replace(/\s+/g, " ").trim().split(/(?<=[.!?]) /).filter(Boolean);
-const domaine = (u) => String(u || "").replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+/* Le pied de carte doit dire OÙ aller. « github.com » seul ne veut rien dire : sur les
+   plateformes qui hébergent plusieurs projets, on garde le chemin (owner/repo). Mesuré le
+   2026-10-26 sur la carte LocalSound-Share, le pied affichait « github.com ». */
+const domaine = (u) => {
+  const brut = String(u || "").replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  const [hote, ...chemin] = brut.split("/");
+  const plateforme = /^(github|gitlab|bitbucket)\.com$/i.test(hote);
+  return plateforme && chemin.length ? `${hote}/${chemin.join("/").slice(0, 44)}` : hote;
+};
 const normal = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
 
 /* Le sous-titre et le corps viennent souvent de la même phrase de la Description : affiché
