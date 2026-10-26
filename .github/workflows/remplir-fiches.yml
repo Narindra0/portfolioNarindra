@@ -1,0 +1,88 @@
+# Flux D — les fiches sans matière sont remplies depuis leur dépôt GitHub.
+# Le réservoir LinkedIn ne se vide pas faute de plomberie : il se vide faute de contenu.
+# Une fiche n'est publiable qu'avec un lien + 60 caractères de matière, et la découverte
+# GitHub laisse « Brouillon » tout dépôt dont la description fait moins de 40 caractères.
+# Une fois par semaine, pour ces fiche muettes : on lit le README et les métadonnées du
+# dépôt, Gemini rédige Accroche / Description / Mission / Rôle / Fonctionnalités / Catégorie /
+# Technologies, et le script n'écrit QUE dans les champs vides.
+#
+# Ce workflow n'arme et ne publie rien : il ne touche ni « Texte du post », ni
+# « Statut LinkedIn », ni « Prêt à publier », ni « Visuel du post », ni « ID du post LinkedIn ».
+# Il ne pousse aucun commit : ni flux B, ni Netlify ne sont déclenchés ici.
+#
+# Seule entorse aux statuts : « Brouillon » -> « À ajouter » quand la fiche est complète et
+# que le dépôt est PUBLIC (un dépôt privé sur le site = un lien 404 pour le visiteur).
+# C'est le flux B qui décide ensuite, et l'armement LinkedIn reste la main de l'Action
+# « LinkedIn — carte du prochain post ».
+#
+# Secrets obligatoires (les mêmes que le flux C, déjà en place) :
+#   NOTION_TOKEN / REPO_SCAN_TOKEN / GEMINI_API_KEY
+name: Portfolio — remplir les fiches sans matière
+
+on:
+  schedule:
+    - cron: '0 6 * * 6'   # samedi 06:00 UTC = samedi 09:00 Antananarivo : la matière est prête
+                          # avant le scan du dimanche (site) et le post du lundi 09:00
+  workflow_dispatch:
+    inputs:
+      projet:
+        description: 'Nom exact de la fiche à traiter (vide = les plus anciennes fiches muettes)'
+        required: false
+        type: string
+      max:
+        description: 'Nombre de fiches remplies au plus ce passage (1 à 12)'
+        required: true
+        default: '4'
+        type: string
+      mode:
+        description: 'Écrire dans Notion ou montrer les propositions sans écrire'
+        required: true
+        default: verifier
+        type: choice
+        options:
+          - verifier
+          - ecrire
+
+concurrency:
+  group: remplir-fiches
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  matiere:
+    name: README -> matière de fiche
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Vérifier les secrets
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          REPO_SCAN_TOKEN: ${{ secrets.REPO_SCAN_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          test -n "$NOTION_TOKEN"   || { echo "::error::NOTION_TOKEN absent du dépôt"; exit 1; }
+          test -n "$GEMINI_API_KEY" || { echo "::error::GEMINI_API_KEY absent du dépôt"; exit 1; }
+          echo "REPO_SCAN_TOKEN : $(test -n "$REPO_SCAN_TOKEN" && echo présent || echo absent — les dépôts privés sont alors illisibles, donc non remplis)"
+
+      - name: Rédiger la matière manquante
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          REPO_SCAN_TOKEN: ${{ secrets.REPO_SCAN_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Rien à masquer ici : le dépôt est public et le script masque déjà de lui-même
+          # les noms de fiche et les textes rédigés dans le journal du run (FLUX_D_MONTRER=1
+          # pour forcer, déconseillé : les README lus viennent de dépôts privés).
+          MAX_FICHES: ${{ inputs.max }}
+        run: |
+          MODE=
+          [ "${{ inputs.mode }}" = "ecrire" ] && MODE=--ecrire
+          # --max n'est pas lu depuis une variable d'environnement par le script : la valeur
+          # est re-contrôlée dedans (1 à 12), une saisie libre ne part jamais dans le shell.
+          node scripts/remplir-fiches.mjs $MODE --max="${MAX_FICHES:-4}" "${{ inputs.projet }}"
