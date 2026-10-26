@@ -94,9 +94,14 @@ jobs:
           fi
           exit $code
 
-      # Le PNG est arrive non suivi dans l'arbre de travail : on le met a l'abri avant de
-      # changer de branche (sinon « checkout -B » refuse d'ecraser un fichier deja suivi sur
+      # Le PNG est arrivé non suivi dans l'arbre de travail : on le met à l'abri avant de
+      # changer de branche (sinon « checkout -B » refuse d'écraser un fichier déjà suivi sur
       # donnees), puis on le repose une fois sur la bonne branche.
+      # PIÈGE VÉRIFIÉ LE 2026-10-26 (run #2) : la branche « donnees » ne porte PAS les scripts à
+      # jour — le flux B n'y pousse que data/projects.json, et les PNG s'ajoutent ici. Une fois
+      # sur donnees, « node scripts/notion-to-postcraft.mjs » répond MODULE_NOT_FOUND. D'où le
+      # retour explicite sur main à la fin de cette étape, sur tous les chemins (poussée faite,
+      # carte déjà présente, ou poussée refusée trois fois).
       - name: Pousser la carte sur la branche donnees
         if: env.reservoir_vide != '1' && github.event.inputs.mode != 'apercu'
         run: |
@@ -110,47 +115,60 @@ jobs:
           git checkout -B donnees FETCH_HEAD
           mkdir -p assets/visuels-postcraft
           cp /tmp/carte/*.png assets/visuels-postcraft/
-          if git diff --quiet -- assets/visuels-postcraft && [ -z "$(git ls-files --others --exclude-standard assets/visuels-postcraft)" ]; then
+          a_changer=0
+          if ! git diff --quiet -- assets/visuels-postcraft; then a_changer=1; fi
+          if [ -n "$(git ls-files --others --exclude-standard assets/visuels-postcraft)" ]; then a_changer=1; fi
+          ok=1
+          if [ "$a_changer" = "0" ]; then
             echo "La carte est deja sur donnees : rien a pousser."
-            exit 0
-          fi
-          git add assets/visuels-postcraft
-          git commit -m "visuel(linkedin) : carte portrait du prochain post"
-          ok=""
-          for tentative in 1 2 3; do
-            if git push origin HEAD:donnees; then ok=1; break; fi
-            echo "push refuse (donnees a avance) : on repart de l'etat reel, tentative $tentative"
-            git fetch --no-tags origin donnees
-            git reset --hard FETCH_HEAD
-            mkdir -p assets/visuels-postcraft
-            cp /tmp/carte/*.png assets/visuels-postcraft/
+          else
             git add assets/visuels-postcraft
-            if git diff --cached --quiet; then ok=1; break; fi
             git commit -m "visuel(linkedin) : carte portrait du prochain post"
-          done
-          if [ -z "$ok" ]; then echo "::error::3 tentatives de push sur donnees sans succes."; exit 1; fi
-          echo "Carte en ligne sur la ref donnees."
+            ok=""
+            for tentative in 1 2 3; do
+              if git push origin HEAD:donnees; then ok=1; break; fi
+              echo "push refuse (donnees a avance) : on repart de l'etat reel, tentative $tentative"
+              git fetch --no-tags origin donnees
+              git reset --hard FETCH_HEAD
+              mkdir -p assets/visuels-postcraft
+              cp /tmp/carte/*.png assets/visuels-postcraft/
+              git add assets/visuels-postcraft
+              if git diff --cached --quiet; then ok=1; break; fi
+              git commit -m "visuel(linkedin) : carte portrait du prochain post"
+            done
+            if [ -z "$ok" ]; then
+              echo "::error::3 tentatives de push sur donnees sans succes."
+              git checkout main
+              exit 1
+            fi
+            echo "Carte poussee sur la ref donnees."
+          fi
+          # --armer a besoin des scripts de main ; on y revient avant de poursuivre.
+          git checkout main
 
-      - name: Armer la fiche dans Notion
-        if: env.reservoir_vide != '1' && github.event.inputs.mode != 'apercu'
-        run: node scripts/notion-to-postcraft.mjs --armer
-
-      # Preuve finale : ce que LinkedIn va really telecharger. raw.githubusercontent peut
-      # mettre quelques secondes a servir un fichier qui vient d'etre pousse.
+      # Preuve avant écriture : ce que LinkedIn va réellement télécharger. raw.githubusercontent
+      # peut mettre quelques secondes à servir un fichier qui vient d'être poussé. Ce contrôle
+      # passe AVANT « --armer » pour que ses 5 tentatives servent vraiment : --armer ne fait
+      # qu'une requête et refuse d'armer sur un 404.
       - name: Contrôler l'URL publique de la carte
         if: env.reservoir_vide != '1' && github.event.inputs.mode != 'apercu'
         run: |
           set -e
-          url=$(node -e 'console.log(JSON.parse(require("fs").readFileSync(".visuel-etat.json","utf8")).url)')
+          url=$(node -e 'const fs=require("fs");console.log(JSON.parse(fs.readFileSync(".visuel-etat.json","utf8")).url)')
           for tentative in 1 2 3 4 5; do
             code=$(curl -s -o /dev/null -w '%{http_code}' "$url")
             type=$(curl -s -o /dev/null -w '%{content_type}' "$url")
             if [ "$code" = "200" ] && echo "$type" | grep -q png; then
-              echo "OK : $url repond $code $type ($(curl -s -o /dev/null -w '%{size_download}' "$url") octets au premier telechargement)."
+              taille=$(curl -s -o /dev/null -w '%{size_download}' "$url")
+              echo "OK : $url repond $code $type ($taille octets)."
               exit 0
             fi
             echo "pas encore en ligne ($code $type), tentative $tentative…"
             sleep 10
           done
-          echo "::error::$url ne repond pas en PNG apres 5 tentatives."
+          echo "::error::$url ne repond pas en PNG apres 5 tentatives : fiche non armee."
           exit 1
+
+      - name: Armer la fiche dans Notion
+        if: env.reservoir_vide != '1' && github.event.inputs.mode != 'apercu'
+        run: node scripts/notion-to-postcraft.mjs --armer
