@@ -149,6 +149,33 @@ function lien(p) {
   return { url: "", cta: "" };
 }
 
+/* Une adresse imprimée sur une carte ne se rattrape pas : le post reste dans le fil. Le test
+   se fait donc SANS JETON, sur la voie que le lecteur empruntera — le jeton local voit des
+   dépôts privés que le fil ne verra jamais. Si la destination ne répond pas, la carte part
+   sans adresse et sans appel à cliquer : la fiche reste publiable (l'histoire se suffit),
+   mais on ne fabrique pas un lien mort. Deux cas mesurés le 2026-10-26 : BusNaka
+   (narindra.pythonanywhere.com = HTTP 404) et DigiKaratra (digikaratra.alwaysdata.net =
+   connexion refusée). */
+const atteignables = new Map();
+async function sondeLiens(p) {
+  const { url: cible } = lien(p);
+  if (!cible || atteignables.has(cible)) return;
+  let detail = "erreur réseau";
+  try {
+    const r = await fetch(cible, { redirect: "follow", signal: AbortSignal.timeout(12000), headers: { "User-Agent": "controle-lien", Accept: "text/html,application/json" } });
+    detail = `HTTP ${r.status}`;
+    atteignables.set(cible, r.ok);
+  } catch (e) {
+    atteignables.set(cible, false);
+  }
+  console.log(`  lien ${atteignables.get(cible) ? "vivant" : `MORT (${detail})`} : ${cible}${atteignables.get(cible) ? "" : " — la carte partira sans adresse ni appel à cliquer"}`);
+}
+
+function lienSur(p) {
+  const l = lien(p);
+  return l.url && atteignables.get(l.url) === false ? { url: "", cta: "" } : l;
+}
+
 /* Les gabarits dimensionnent la typographie en cqw (liée à la LARGEUR du cadre) : en paysage,
    la même phrase déborde parce que la hauteur disponible est deux fois plus petite. Ces
    plafonds viennent des rendus réels : sur le gabarit « orbit » en portrait, un titre passe à
@@ -174,7 +201,7 @@ function contenuDe(p, auteur, lim = LIMITS.portrait) {
   const technos = multi(p, "Technologies");
   const fonctionnalites = txt(p, "Fonctionnalités").split(/\n+/).map((s) => s.replace(/^[-•*\s]+/, "").trim()).filter(Boolean);
   const annee = jour(p, "Date de création").slice(0, 4);
-  const { url: cible, cta } = lien(p);
+  const { url: cible, cta } = lienSur(p);
   const accrocheOu1erePhrase = accroche || txt0(phrases(description)[0] || mission) || nom;
   /* Une accroche plus longue que la ligne de titre ne doit pas être coupée au milieu d'une
      phrase sur la carte : on met le nom du projet en titre et l'accroche en sous-titre. */
@@ -219,7 +246,7 @@ function slidesDe(p, nombre, lim = LIMITS.portrait) {
   const categorie = sel(p, "Catégorie");
   const technos = multi(p, "Technologies");
   const liste = txt(p, "Fonctionnalités").split("\n").map((l) => l.trim()).filter(Boolean);
-  const { cta } = lien(p);
+  const { cta } = lienSur(p);
   const date = jour(p, "Date de création");
   const corps = phrases(description);
   const annee = date.slice(0, 4);
@@ -396,6 +423,7 @@ async function preparer({ pages, reglages, auteur, sec }) {
   rangs.slice(1, 5).forEach((r, i) => console.log(`  candidat ${i + 2} : « ${titre(r.p.properties)} » (${r.cat})`));
 
   const gabarits = chaine(reglagePour(reglages, nom, cat), reglages);
+  await sondeLiens(p.properties);
   /* Le log du run d'Actions doit permettre de relire « pourquoi ce gabarit » sans ouvrir le
      JSON : la chaîne d'essai complète y figure, repli de 422 compris. */
   console.log(`Gabarits essayés : ${gabarits.join(" → ")}.`);
@@ -530,6 +558,7 @@ async function main() {
   if (!cible) throw new Error(`Fiche introuvable : « ${demande} ». Lancez --liste pour voir les noms exacts.`);
 
   const cartographie = reglagePour(reglages, titre(cible.properties), sel(cible.properties, "Catégorie"));
+  await sondeLiens(cible.properties);
   const template = opt("template",
     cartographie || (flag("carousel") ? reglages.defautCarrousel : reglages.defaut) || "minimal");
 
