@@ -1,12 +1,27 @@
 /* ==========================================================================
    Rendu des projets depuis data/projects.json
-   Source de vérité : base Notion -> GitHub Action -> data/projects.json
+   Source de vérité : base Notion -> GitHub Action -> branche « donnees »
    Ce fichier ne contient AUCUN contenu projet en dur.
    ========================================================================== */
 (function () {
   'use strict';
 
-  var DATA_URL = 'data/projects.json';
+  /* Où le contenu est lu, dans cet ordre.
+
+     DATA_URL — la branche « donnees » du dépôt, lue via GitHub brut. Le flux B y
+     pousse data/projects.json sans toucher à main, donc une fiche Notion modifiée
+     ne déclenche plus de déploiement Netlify (Free = 300 crédits/mois, un déploiement
+     production = 15 crédits : la marge est de 20 déploiements par mois).
+     Réponse vérifiée : « Access-Control-Allow-Origin: * » (la lecture marchera depuis
+     narindraportfolio.netlify.app) et « Cache-Control: max-age=300 » — un projet
+     enregistré sur Notion est visible en ligne une à cinq minutes plus tard.
+
+     DATA_REPLI — la copie embarquée dans le bundle au dernier déploiement de code.
+     Elle n'est plus mise à jour, mais elle évite une page vide si GitHub est
+     injoignable (réseau, blocage, panne). Plus vieille que le contenu en ligne,
+     jamais plus fausse qu'une liste vide. */
+  var DATA_URL = 'https://raw.githubusercontent.com/Narindra0/portfolioNarindra/donnees/data/projects.json';
+  var DATA_REPLI = 'data/projects.json';
   var LIST_SELECTOR = '#project-list';
   var MODAL_ID = 'project-modal';
 
@@ -345,18 +360,28 @@
     listEl.innerHTML = '<p class="text-white/40 text-sm font-mono py-10">' + e(message) + '</p>';
   }
 
-  function wire() {
-    var listEl = document.querySelector(LIST_SELECTOR);
-    currentModal = document.getElementById(MODAL_ID);
-    if (!listEl) return;
-
-    fetch(DATA_URL, { cache: 'no-store' })
+  /* Une lecture, une vérification de forme. Rejette sur HTTP KO, JSON invalide
+     ou contenu qui n'est pas un tableau — le repli peut alors prendre le relais. */
+  function lis(url) {
+    return fetch(url, { cache: 'no-store' })
       .then(function (response) {
         if (!response.ok) throw new Error('HTTP ' + response.status);
         return response.json();
       })
       .then(function (data) {
         if (!Array.isArray(data)) throw new Error('format inattendu');
+        return data;
+      });
+  }
+
+  function wire() {
+    var listEl = document.querySelector(LIST_SELECTOR);
+    currentModal = document.getElementById(MODAL_ID);
+    if (!listEl) return;
+
+    lis(DATA_URL)
+      .catch(function () { return lis(DATA_REPLI); })
+      .then(function (data) {
         projects = data.map(function (p, i) {
           p.slug = 'p' + (i + 1);
           return p;

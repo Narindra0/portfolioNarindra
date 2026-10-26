@@ -1,9 +1,28 @@
-# Flux B — le portfolio se régénère depuis Notion sans intervention.
-# Scanner : tous les dépôts GitHub (publics, + privés si REPO_SCAN_TOKEN) entrent en fiche Notion.
-# Synthèse : data/projects.json est recalculé ; s'il change, le commit fait redéployer Netlify.
-# Anti-boucle : le push du bot est fait avec le GITHUB_TOKEN du workflow, et GitHub ne relance
-# jamais un run pour un push déclenché par ce jeton. Le job « sync » refuse en plus tout push
-# dont l'auteur est github-actions[bot].
+# Flux B — le portfolio se régénère depuis Notion sans intervention et sans déploiement.
+#
+# Architecture anti-quota (2026-10-26) : le contenu ne vit plus dans le bundle du site.
+#   « decouverte » (1 fois par jour, 03:00 UTC = 05:00 Antananarivo) — scanner tous les dépôts
+#     GitHub (publics, + privés grâce à REPO_SCAN_TOKEN) et créer les fiches Notion manquantes.
+#     Le scan est automatique, la publication reste humaine (statut Brouillon + porte de
+#     complétude dans la synthèse).
+#   « sync » (toutes les 15 minutes) — recalculer data/projects.json depuis Notion et le pousser
+#     sur la branche « donnees ». Le site le lit à l'adresse
+#     https://raw.githubusercontent.com/Narindra0/portfolioNarindra/donnees/data/projects.json
+#     (réponse vérifiée : « Access-Control-Allow-Origin: * », « Cache-Control: max-age=300 »),
+#     donc une fiche modifiée sur Notion est en ligne en 1 à 5 minutes sans build.
+#   main n'est plus touché par le bot : un changement de contenu ne déclenche plus Netlify.
+#
+# Pourquoi ce montage : Netlify Free = 300 crédits/mois et UN DÉPLOIEMENT PRODUCTION COÛTE
+# 15 CRÉDITS, qu'il vienne de Git, de la CLI ou de l'API — soit ~20 déploiements par mois.
+# Les Deploy Previews et les branch deploys ne sont pas facturés comme production. Le code,
+# lui, doit bien se déployer : chaque push humain sur main vaut 15 crédits et doit rester un
+# vrai changement de site. Le fichier data/projects.json reste dans le bundle comme REPLI si
+# GitHub est injoignable ; il vieillit volontairement, mieux qu'une liste vide.
+#
+# Anti-boucle, trois étages : le push du bot est fait avec le GITHUB_TOKEN du workflow (GitHub
+# ne relance jamais un run pour un push déclenché par ce jeton), le déclencheur push ne vise que
+# main — donc « donnees » ne peut rien relancer — et les jobs refusent tout run dont l'auteur
+# est github-actions[bot].
 # IMPORTANT : le message du commit du bot ne doit PAS contenir la marque « skip ci » entre
 # crochets — Netlify ET GitHub Actions la lisent dans le message de commit et sautent alors
 # respectivement le build et le run. La règle vaut aussi pour les commits humains : un message
@@ -13,7 +32,8 @@
 #
 # Réglages obligatoires une fois, dans Settings -> Secrets and variables -> Actions -> Secrets :
 #   NOTION_TOKEN   = le ntn_… de l'intégration Notion
-#   REPO_SCAN_TOKEN   = jeton fine-grained « Metadata : Read-only », All repositories, expiration 90 j
+#   REPO_SCAN_TOKEN   = jeton fine-grained « Metadata : Read-only » + « Contents : read-only »,
+#                    All repositories, expiration 90 j
 #                    (facultatif : sans lui le scanner ne voit que les dépôts publics)
 # Et dans Settings -> Actions (pas Settings -> General) -> Workflow permissions : « Read and write ».
 name: Portfolio — synchro Notion
@@ -22,17 +42,25 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '0 3 * * *'   # 03:00 UTC = 05:00 Antananarivo, filet de sécurité si un push a été manqué
+    # Synthèse toutes les 15 min : c'est elle qui donne l'effet « Notion fait le backend ».
+    - cron: '*/15 * * * *'
+    # Créneau quotidien qui ajoute le scan des dépôts (plus lourd, et il écrit des fiches).
+    - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
       mode:
-        description: 'Scan + synthèse (--publish) ou comparaison seule (--check)'
+        description: 'Scan + synthèse (--publish) ou comparaison seule (--check, zéro écriture)'
         required: true
         default: publier
         type: choice
         options:
           - publier
           - verifier
+      scan:
+        description: 'Inclure le scan des dépôts GitHub (sinon : synthèse seule)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -45,8 +73,10 @@ jobs:
   decouverte:
     name: Scanner les dépôts GitHub vers fiches Notion
     runs-on: ubuntu-latest
-    # Anti-boucle : un push venu du bot lui-même ne relance pas le scanner.
-    if: ${{ github.event_name != 'push' || github.actor != 'github-actions[bot]' }}
+    # Le scan ne tourne que là où il a du sens : push humain sur main, créneau quotidien,
+    # ou dispatch explicite. Pas sur les 96 runs de synthèse du mois, et pas en mode
+    # « verifier » — ce mode est promis sans écriture.
+    if: ${{ (github.event_name != 'push' || github.actor != 'github-actions[bot]') && (github.event_name != 'schedule' || github.event.schedule == '0 3 * * *') && (github.event_name != 'workflow_dispatch' || (github.event.inputs.mode != 'verifier' && github.event.inputs.scan == 'true')) }}
     steps:
       - uses: actions/checkout@v7
 
@@ -75,13 +105,13 @@ jobs:
         run: node scripts/github-discovery.mjs --create
 
   sync:
-    name: Notion vers data/projects.json puis Netlify
+    name: Notion vers la branche donnees (0 crédit Netlify)
     runs-on: ubuntu-latest
     needs: decouverte
     if: ${{ github.event_name != 'push' || github.actor != 'github-actions[bot]' }}
     steps:
-      # fetch-depth: 0 — le « git pull --rebase » d'un clone superficiel n'a pas de base commune
-      # avec un main qui a avancé pendant le run ; l'historique complet rend le rebase fiable.
+      # fetch-depth: 0 — le rebase d'un clone superficiel n'a pas de base commune avec une
+      # branche qui a avancé pendant le run ; l'historique complet le rend fiable.
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
@@ -106,18 +136,37 @@ jobs:
           '
           git diff --stat -- data/projects.json
 
-      - name: Pousser le changement (redéploie Netlify)
+      # Le bot ne pousse PLUS sur main : il repose le JSON sur « donnees », que le site lit en
+      # direct. C'est là que se joue le quota — un contenu changé coûte 0 crédit.
+      - name: Pousser le changement sur la branche donnees
         if: ${{ github.event.inputs.mode != 'verifier' }}
         run: |
+          set -e
           if git diff --quiet -- data/projects.json; then
-            echo "data/projects.json inchangé : rien à pousser."
+            echo "data/projects.json inchangé : rien à pousser, aucun build ailleurs."
             exit 0
           fi
+          cp data/projects.json /tmp/projects.json
+          # Tree vierge sur main avant de changer de branche.
+          git restore -- data/projects.json
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # On se recale sur l'état réel de donnees : c'est le filet contre la course
+          # run planifié / poussée humaine.
+          git fetch --no-tags origin donnees
+          git checkout -B donnees FETCH_HEAD
+          cp /tmp/projects.json data/projects.json
           git add data/projects.json
-          # Pas de « [skip ci] » ici : Netlify honore cette marque et ne redéploierait pas.
+          # Jamais la marque skip-ci entre crochets dans ce message (voir l'en-tête).
           git commit -m "sync(portfolio) : projets régénérés depuis Notion"
-          # Filet contre la course run planifié / push humain : on se recale sur main avant de pousser.
-          git pull --rebase origin main
-          git push
+          for tentative in 1 2 3; do
+            if git push origin HEAD:donnees; then
+              echo "donnees est à jour ($tentative tentative(s)) — le site relit le JSON, Netlify ne construit pas."
+              exit 0
+            fi
+            echo "push refusé (donnees a avancé) : rebase puis nouvelle tentative…"
+            git fetch --no-tags origin donnees
+            git rebase FETCH_HEAD
+          done
+          echo "::error::3 tentatives de push sur donnees sans succès."
+          exit 1
