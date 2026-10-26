@@ -75,16 +75,20 @@ do {
 function norm(u) { return String(u).replace(/\.git$/, '').replace(/\/$/, '').toLowerCase(); }
 function cle(s) { return String(s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
 
-const ecartes = { fork: 0, archive: 0, ignore: 0, deja: 0 };
+const ecartes = { fork: 0, archive: 0, ignore: 0, deja: 0, hote: 0 };
 const candidats = [];
 for (const r of repos) {
+  // Le jeton de scan liste les dépôts où le compte est invité, pas seulement les siens :
+  // « FleurysRova/GanovaCRM » est entré en fiche par ce trou le 2026-10-24. Un dépôt qui
+  // n'appartient pas à OWNER ne doit jamais devenir une carte du portfolio ni un post.
+  if (r.owner?.login && r.owner.login.toLowerCase() !== OWNER.toLowerCase()) { ecartes.hote++; continue; }
   if (r.fork) { ecartes.fork++; continue; }
   if (r.archived) { ecartes.archive++; continue; }
   if (IGNORE.has(r.name.toLowerCase())) { ecartes.ignore++; continue; }
   if (connaitre.has(norm(r.html_url)) || connaitre.has(norm(r.clone_url)) || connaitreNom.has(cle(r.name))) { ecartes.deja++; continue; }
   candidats.push(r);
 }
-console.log(`écartés : ${ecartes.deja} déjà en fiche, ${ecartes.ignore} sur la liste d'exclusion, ${ecartes.fork} forks, ${ecartes.archive} archivés`);
+console.log(`écartés : ${ecartes.deja} déjà en fiche, ${ecartes.ignore} sur la liste d'exclusion, ${ecartes.fork} forks, ${ecartes.archive} archivés, ${ecartes.hote} dépôts d'un autre compte`);
 console.log(`nouveaux à créer : ${candidats.length}`);
 
 const retenus = candidats.slice(0, MAX);

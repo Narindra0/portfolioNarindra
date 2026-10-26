@@ -21,6 +21,7 @@ const NOTION_TOKEN = process.env.NOTION_TOKEN;
 const GH_TOKEN = process.env.REPO_SCAN_TOKEN;
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 const DS = process.env.NOTION_DS || '78e87c8c-4916-4d46-8cd2-00b0bcd471fa';
+const PROPRIETAIRE = process.env.GITHUB_OWNER || 'Narindra0';
 const MODE = process.argv.includes('--dry') ? 'dry' : 'write';
 const CIBLE = process.argv.slice(2).find((a) => !a.startsWith('--'));
 /* --depuis=YYYY-MM-DD force le début de la période, sans toucher au watermark de la fiche :
@@ -239,8 +240,15 @@ for (const f of fiches) {
     bloques++; continue;
   }
 
-  const watermark = p['Dernier commit vu']?.date?.start || '';
-  /* Un watermark écrit « 2026-10-17 » (saisie manuelle dans Notion) est accepté :
+  /* Le dépôt d'un autre compte n'est pas notre matière : la fiche GanovaCRM pointe sur
+     FleurysRova/GanovaCRM (créée par le trou de l'ancienne découverte), et rédiger un post
+     « ce que j'ai construit » sur le travail d'un autre serait une faute, pas un raccourci. */
+  if (depot.owner.toLowerCase() !== PROPRIETAIRE.toLowerCase()) {
+    console.log(`  ~ ${dispo(nom, f.id)} dépôt d'un autre compte -> ignoré`);
+    bloques++; continue;
+  }
+
+  const watermark = p['Dernier commit vu']?.date?.start || '';  /* Un watermark écrit « 2026-10-17 » (saisie manuelle dans Notion) est accepté :
      GitHub le lit comme le début de la journée, les commits du jour sont donc proposés
      une fois de plus — c'est ce que cherche celui qui remplit la date à la main. */
   /* Parenthèses inutiles en apparence mais vitales : écrite « A || B ? B : C », l'expression
