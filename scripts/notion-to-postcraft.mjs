@@ -434,15 +434,27 @@ async function preparer({ pages, reglages, auteur, sec }) {
   mkdirSync(dirname(chemin), { recursive: true });
   writeFileSync(chemin, png);
 
-  /* Une seule fiche armée à la fois : Make prend « la première » qu'il trouve et ne trie pas.
-     Sans cette règle, deux fiches armées = un créneau publié sur la mauvaise carte. */
-  const desarmer = rangs.slice(1)
-    .filter((r) => sel(r.p.properties, "Statut LinkedIn") === "À publier")
-    .map((r) => ({ id: r.p.id, nom: titre(r.p.properties) }));
+  /* L'invariant que Make exige : UNE SEULE fiche armée à la fois. Son filtre est
+     « Statut LinkedIn = À publier » ET « Prêt à publier » ET « ID du post LinkedIn » vide, et il
+     ne trie pas — deux fiches armées, c'est un créneau publié sur une carte qui ne correspond
+     pas au texte. On balaie donc TOUTES les fiches (pas seulement les candidates : mesuré le
+     2026-10-26, Talenta portait « Prêt à publier » coché depuis un test manuel alors qu'elle est
+     en Brouillon), et on ne garde que le drapeau qui traîne.
+     Règle : « Prêt à publier » n'est qu'une porte pour Make, il ne porte aucune histoire — le
+     nettoyer sur une fiche déjà publiée ne casse rien. Le statut d'une fiche publiée ne bouge
+     jamais : on ne remet pas « Publié » en « Brouillon ». */
+  const desarmer = pages.filter((x) => x.id !== p.id && x.properties["Prêt à publier"]?.checkbox)
+    .map((x) => {
+      const nom = titre(x.properties);
+      const armee = sel(x.properties, "Statut LinkedIn") === "À publier";
+      const champs = { "Prêt à publier": enCase(false) };
+      if (armee) champs["Statut LinkedIn"] = enSelect("Brouillon");
+      return { id: x.id, nom, motif: armee ? "arme concurrente" : "drapeau reste coche (test manuel)", champs };
+    });
 
   writeFileSync(ETAT, JSON.stringify({ pageId: p.id, nom, fichier, url: publique, template: templateRetenu, desarmer }, null, 2) + "\n");
   console.log(`PNG écrit, Notion pas encore touché : --armer le fera après la poussée vérifiée sur « ${BRANCHE_VISUELS} ».`);
-  if (desarmer.length) console.log(`À désarmer au même moment : ${desarmer.map((d) => d.nom).join(", ")}`);
+  if (desarmer.length) console.log(`À désarmer au même moment : ${desarmer.map((d) => `${d.nom} (${d.motif})`).join(", ")}`);
   return 0;
 }
 
@@ -462,8 +474,8 @@ async function armer() {
   });
   console.log(`Fiche « ${e.nom} » armée (gabarit ${e.template}) : ${e.url}`);
   for (const d of e.desarmer || []) {
-    await ecrire(d.id, { "Statut LinkedIn": enSelect("Brouillon"), "Prêt à publier": enCase(false) });
-    console.log(`  désarmée (place pour « ${e.nom} ») : ${d.nom}`);
+    await ecrire(d.id, d.champs);
+    console.log(`  désarmée (${d.motif}) : ${d.nom}`);
   }
   return 0;
 }
