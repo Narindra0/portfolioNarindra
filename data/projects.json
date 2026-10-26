@@ -498,12 +498,12 @@
     "id": "403b224c-cfa6-8143-a15f-d9de745f8495",
     "nom": "LocalSound-Share",
     "categorie": "Streaming & Culture",
-    "accroche": "La musique d'un PC Windows, synchronisee sur tous les appareils du meme réseau local.",
+    "accroche": "La musique d'un PC Windows, synchronisée sur tous les appareils du même réseau local.",
     "label_court": "",
     "sous_titre": "",
     "role": "Développeur Fullstack",
-    "mission": "Transformer un salon en scene multi-appareils sans abonnement, sans cloud et sans sortir le telephone de la poche : un PC, un reseau, tout le monde ecoute.",
-    "description": "Application Windows qui diffuse le son d'un hote (YouTube integre, fichier, onglet ou son systeme) vers les appareils du meme Wi-Fi, en Opus 48 kHz, avec un lecteur leger et un QR de connexion.",
+    "mission": "Transformer un salon en scène multi-appareils sans abonnement, sans cloud et sans sortir le téléphone de la poche : un PC, un réseau, tout le monde écoute.",
+    "description": "Application Windows qui diffuse le son d'un hôte (YouTube intégré, fichier, onglet ou son système) vers les appareils du même Wi-Fi, en Opus 48 kHz, avec un lecteur léger et un QR de connexion.",
     "badge": "",
     "badge_icone": "fa-code",
     "titre_section_fonctionnalites": "Fonctionnalités",
@@ -511,7 +511,7 @@
     "fonctionnalites": [
       {
         "nom": "Sources",
-        "description": "YouTube integre, fichier, partage d'onglet, capture systeme"
+        "description": "YouTube intégré, fichier, partage d'onglet, capture système"
       },
       {
         "nom": "",
@@ -519,7 +519,7 @@
       },
       {
         "nom": "",
-        "description": "Sync a 150 ms avec reglage par auditeur"
+        "description": "Synchronisation à 150 ms avec réglage par auditeur"
       },
       {
         "nom": "",
@@ -527,11 +527,11 @@
       },
       {
         "nom": "",
-        "description": "Themes vinyle, K7, CD, bandes, MP3, radio"
+        "description": "Thèmes vinyle, K7, CD, bandes, MP3, radio"
       },
       {
         "nom": "",
-        "description": "Editions Hote, Auditeur leger (6,53 Mo), Auditeur classique, Navigateur"
+        "description": "Éditions Hôte, Auditeur léger (6,53 Mo), Auditeur classique, Navigateur"
       }
     ],
     "technologies": [
@@ -603,12 +603,12 @@
     "id": "403b224c-cfa6-8115-a88f-f880310520f3",
     "nom": "PassTeny",
     "categorie": "Streaming & Culture",
-    "accroche": "Le sens des mots : les paroles de la musique malgache, decortiquees et expliquees par ceux qui les ecoutent.",
+    "accroche": "Le sens des mots : les paroles de la musique malgache, décortiquées et expliquées par ceux qui les écoutent.",
     "label_court": "",
     "sous_titre": "",
     "role": "Développeur Fullstack",
-    "mission": "Donner aux paroles malgaches un lieu ou elles sont decortiquees mot a mot, et faire vivre ce contenu comme du code : versionne, relu, ameliore collectivement.",
-    "description": "Plateforme communautaire d'annotation des lyrics malgaches, dans l'esprit de Genius, produit independant de l'ecosysteme Pass'io. En ligne sur teny.passiio.shop.",
+    "mission": "Donner aux paroles malgaches un lieu où elles sont décortiquées mot à mot, et faire vivre ce contenu comme du code : versionné, relu, amélioré collectivement.",
+    "description": "Plateforme communautaire d'annotation des paroles malgaches, dans l'esprit de Genius, produit indépendant de l'écosystème Pass'io. En ligne sur teny.passiio.shop.",
     "badge": "",
     "badge_icone": "fa-code",
     "titre_section_fonctionnalites": "Fonctionnalités",
@@ -616,19 +616,19 @@
     "fonctionnalites": [
       {
         "nom": "",
-        "description": "Paroles annotees ligne a ligne, facon Genius"
+        "description": "Paroles annotées ligne à ligne, façon Genius"
       },
       {
         "nom": "",
-        "description": "Soumissions et votes de la communaute"
+        "description": "Soumissions et votes de la communauté"
       },
       {
         "nom": "",
-        "description": "Contenu canon versionne dans Git, relu par pull request"
+        "description": "Contenu canon versionné dans Git, relu par pull request"
       },
       {
         "nom": "",
-        "description": "Recherche et reputation dans Supabase"
+        "description": "Recherche et réputation dans Supabase"
       }
     ],
     "technologies": [
@@ -650,24 +650,24 @@
     "id": "403b224c-cfa6-81c0-927f-d8837239d7d1",
     "nom": "PortallBot",
     "categorie": "IA & Data",
-    "accroche": "Un bot Telegram qui surveille les offres d'emploi tech et ecrit la lettre de motivation a ta place.",
+    "accroche": "Un bot Telegram qui surveille les offres d'emploi tech et écrit la lettre de motivation à ta place.",
     "label_court": "",
     "sous_titre": "",
     "role": "Développeur Fullstack",
-    "mission": "Retirer la manutention de la recherche d'emploi : etre alerte, voir le detail de l'offre, repartir avec une lettre prete, depuis Telegram.",
-    "description": "Bot de veille emploi pour Madagascar : il recupere les annonces des secteurs informatique et web, les compare au CV, et genere une lettre de motivation adaptee a chaque offre.",
+    "mission": "Retirer la manutention de la recherche d'emploi : être alerté, voir le détail de l'offre, repartir avec une lettre prête, depuis Telegram.",
+    "description": "Bot de veille emploi pour Madagascar : il récupère les annonces des secteurs informatique et web, les compare au CV, et génère une lettre de motivation adaptée à chaque offre.",
     "badge": "",
     "badge_icone": "fa-code",
     "titre_section_fonctionnalites": "Fonctionnalités",
     "titre_section_competences": "Compétences mobilisées",
     "fonctionnalites": [
       {
-        "nom": "Scraping cible",
+        "nom": "Scraping ciblé",
         "description": "PortalJob, Asako, Mission-Mada"
       },
       {
         "nom": "Notifications Telegram",
-        "description": "cards interactives"
+        "description": "cartes interactives"
       },
       {
         "nom": "Lettre de motivation",
