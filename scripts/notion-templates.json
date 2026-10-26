@@ -1,0 +1,21 @@
+{
+  "_commentaire": "Quel gabarit POSTCRAFT pour quelle fiche Notion. parProjet gagne sur parCategorie, qui gagne sur defaut. Le contenu vient toujours de Notion : ce fichier ne choisit que la mise en scène. Trois gabarits seulement, tous vérifiés sur un rendu réel en portrait le 2026-10-26 (story, swiss, fieldnotes) ; minimal sert de dernier repli quand un texte déborde. La variété vient du fond et de la grille, pas d'un quatrième style non éprouvé.",
+  "defaut": "story",
+  "defautCarrousel": "story",
+  "parCategorie": {
+    "AgriTech": "fieldnotes",
+    "Fintech & Sim": "swiss",
+    "Mobilité": "story",
+    "IA & Data": "swiss",
+    "Streaming & Culture": "story",
+    "Mobile & Culture": "fieldnotes",
+    "E-Gov Web": "swiss",
+    "HR Tech": "story",
+    "Logiciel Interne": "fieldnotes"
+  },
+  "parProjet": {
+    "Pass'io": { "template": "swiss" },
+    "Meshway": { "template": "story" },
+    "Bar-Ako": { "template": "fieldnotes" }
+  }
+}

@@ -1,0 +1,156 @@
+# Flux A (suite) — la carte du prochain post LinkedIn se fabrique toute seule.
+#
+# Ce qui tourne ici, 2 h 30 avant Make :
+#   1. scripts/notion-to-postcraft.mjs --preparer  choisit LA fiche du prochain créneau
+#      (publiable, catégorie la moins publiée, puis la plus riche, puis la plus ancienne),
+#      appelle l'API POSTCRAFT en portrait 1080×1350 et écrit le PNG sous
+#      assets/visuels-postcraft/. Si le gabarit prévu refuse le texte (422), il essaie la
+#      chaîne de repli story → minimal. Aucun texte n'est inventé : tout vient de la fiche.
+#   2. Le PNG est poussé sur la branche « donnees » — donc 0 crédit Netlify, et une URL
+#      publique brute que l'API LinkedIn accepte (ShareImage en method:"link" exige une URL).
+#   3. scripts/notion-to-postcraft.mjs --armer écrit « Visuel du post », met
+#      « Statut LinkedIn = À publier » et « Prêt à publier », et désarme toute autre fiche
+#      armée. Le contrôle d'existence de l'URL se fait AVANT l'écriture : pas de fiche armée
+#      sur un visuel qui renverrait 404.
+#   4. À 09:00 Tana, le scénario Make 8137816 prend l'unique fiche armée, fait rédiger le
+#      texte par Gemini, publie le post avec sa carte et consigne l'URN dans Notion — la fiche
+#      devient donc ineligible et ne peut pas être postée deux fois.
+#
+# Pourquoi cet ordre : Make ne trie pas les résultats de sa recherche Notion. Deux fiches
+# armées = un créneau publié sur une carte qui ne correspond pas au texte. D'où « une seule
+# fiche armée à la fois », imposée ici et vérifiée par --armer.
+#
+# Anti-boucle : la poussée se fait avec le GITHUB_TOKEN du workflow (GitHub ne relance jamais
+# un run pour un push de ce jeton), le déclencheur ne vise aucun push, et « donnees » ne
+# construit rien sur Netlify. Le message du commit ne doit PAS contenir la marque « skip ci »
+# entre crochets — Netlify et Actions la lisent dans le message et sautent alors leur travail.
+#
+# Réglages une fois pour toutes :
+#   secrets.NOTION_TOKEN    (déjà posé pour le flux B)
+#   secrets.POSTCRAFT_KEY   (clé Bearer de l'API du studio, régénérée — jamais dans un fichier)
+#   Settings -> Actions -> General -> Workflow permissions : Read and write (déjà réglé)
+name: LinkedIn — carte du prochain post
+
+on:
+  schedule:
+    # 03:30 UTC = 06:30 Antananarivo, les lundi / mercredi / vendredi. Make publie à 06:00 UTC.
+    - cron: '30 3 * * 1,3,5'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Aperçu sans écriture (--sec) ou cycle complet (préparer + pousser + armer)'
+        required: true
+        default: completer
+        type: choice
+        options:
+          - completer
+          - apercu
+
+permissions:
+  contents: write
+
+concurrency:
+  group: linkedin-visuels
+  cancel-in-progress: false
+
+jobs:
+  carte:
+    name: Choisir la fiche, rendre la carte, l'héberger, armer Notion
+    runs-on: ubuntu-latest
+    env:
+      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+      POSTCRAFT_KEY: ${{ secrets.POSTCRAFT_KEY }}
+      POSTCRAFT_URL: https://postcraft-linkedin-studio.afatra.workers.dev
+    steps:
+      # fetch-depth: 0 — le rebase d'un clone superficiel n'a pas de base commune avec une
+      # branche qui a avancé pendant le run (« donnees » bouge toutes les 15 min avec le flux B).
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Vérifier les secrets
+        run: |
+          if [ -z "$NOTION_TOKEN" ]; then echo "::error::Secret NOTION_TOKEN absent."; exit 1; fi
+          if [ -z "$POSTCRAFT_KEY" ]; then echo "::error::Secret POSTCRAFT_KEY absent : Settings -> Secrets and variables -> Actions."; exit 1; fi
+
+      - name: Choisir la fiche et rendre sa carte
+        run: |
+          set -e
+          if [ "${{ github.event.inputs.mode }}" = "apercu" ]; then
+            node scripts/notion-to-postcraft.mjs --preparer --sec
+            exit 0
+          fi
+          set +e
+          node scripts/notion-to-postcraft.mjs --preparer
+          code=$?
+          if [ $code -eq 3 ]; then
+            echo "::warning::Reservoir vide : aucune fiche publiable, rien n'est arme ni publie. Completer des fiches Notion (Statut Portfolio = Ajoute + un lien + une accroche)."
+            echo "reservoir_vide=1" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          exit $code
+
+      # Le PNG est arrive non suivi dans l'arbre de travail : on le met a l'abri avant de
+      # changer de branche (sinon « checkout -B » refuse d'ecraser un fichier deja suivi sur
+      # donnees), puis on le repose une fois sur la bonne branche.
+      - name: Pousser la carte sur la branche donnees
+        if: env.reservoir_vide != '1' && github.event.inputs.mode != 'apercu'
+        run: |
+          set -e
+          mkdir -p /tmp/carte
+          mv assets/visuels-postcraft/*.png /tmp/carte/
+          rm -rf assets/visuels-postcraft
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch --no-tags origin donnees
+          git checkout -B donnees FETCH_HEAD
+          mkdir -p assets/visuels-postcraft
+          cp /tmp/carte/*.png assets/visuels-postcraft/
+          if git diff --quiet -- assets/visuels-postcraft && [ -z "$(git ls-files --others --exclude-standard assets/visuels-postcraft)" ]; then
+            echo "La carte est deja sur donnees : rien a pousser."
+            exit 0
+          fi
+          git add assets/visuels-postcraft
+          git commit -m "visuel(linkedin) : carte portrait du prochain post"
+          ok=""
+          for tentative in 1 2 3; do
+            if git push origin HEAD:donnees; then ok=1; break; fi
+            echo "push refuse (donnees a avance) : on repart de l'etat reel, tentative $tentative"
+            git fetch --no-tags origin donnees
+            git reset --hard FETCH_HEAD
+            mkdir -p assets/visuels-postcraft
+            cp /tmp/carte/*.png assets/visuels-postcraft/
+            git add assets/visuels-postcraft
+            if git diff --cached --quiet; then ok=1; break; fi
+            git commit -m "visuel(linkedin) : carte portrait du prochain post"
+          done
+          if [ -z "$ok" ]; then echo "::error::3 tentatives de push sur donnees sans succes."; exit 1; fi
+          echo "Carte en ligne sur la ref donnees."
+
+      - name: Armer la fiche dans Notion
+        if: env.reservoir_vide != '1' && github.event.inputs.mode != 'apercu'
+        run: node scripts/notion-to-postcraft.mjs --armer
+
+      # Preuve finale : ce que LinkedIn va really telecharger. raw.githubusercontent peut
+      # mettre quelques secondes a servir un fichier qui vient d'etre pousse.
+      - name: Contrôler l'URL publique de la carte
+        if: env.reservoir_vide != '1' && github.event.inputs.mode != 'apercu'
+        run: |
+          set -e
+          url=$(node -e 'console.log(JSON.parse(require("fs").readFileSync(".visuel-etat.json","utf8")).url)')
+          for tentative in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$url")
+            type=$(curl -s -o /dev/null -w '%{content_type}' "$url")
+            if [ "$code" = "200" ] && echo "$type" | grep -q png; then
+              echo "OK : $url repond $code $type ($(curl -s -o /dev/null -w '%{size_download}' "$url") octets au premier telechargement)."
+              exit 0
+            fi
+            echo "pas encore en ligne ($code $type), tentative $tentative…"
+            sleep 10
+          done
+          echo "::error::$url ne repond pas en PNG apres 5 tentatives."
+          exit 1

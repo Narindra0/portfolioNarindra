@@ -1,6 +1,10 @@
 # Outils de dev locaux (serveur de previsualisation)
 .dev/
 
+# Etat du cycle « carte du prochain post » : --preparer y depose la fiche choisie et l'URL
+# publique avant que --armer n'ecrive dans Notion. Local a un run, jamais a versionner.
+.visuel-etat.json
+
 # Systeme
 .DS_Store
 Thumbs.db
