@@ -127,6 +127,8 @@ jobs:
         run: node scripts/notion-to-projects.mjs ${{ github.event.inputs.mode == 'verifier' && '--check' || '--publish' }}
 
       # Garde-fou : une base Notion mal lue ne doit pas vider le portfolio en ligne.
+      # (Le « git diff » sur main n'a plus de valeur ici : la copie de main est gelée, celle
+      # qui compte est « donnees » — la comparaison se fait une fois la branche changée.)
       - name: Refuser un résultat vide ou tronqué
         run: |
           node -e '
@@ -134,39 +136,44 @@ jobs:
             if (!Array.isArray(j) || j.length === 0) { console.error("projects.json vide -> abandon"); process.exit(1); }
             console.log("projets publiés :", j.length);
           '
-          git diff --stat -- data/projects.json
 
       # Le bot ne pousse PLUS sur main : il repose le JSON sur « donnees », que le site lit en
       # direct. C'est là que se joue le quota — un contenu changé coûte 0 crédit.
+      # La comparaison « est-ce que ça change ? » se fait donc contre donnees, pas contre main :
+      # main porte une copie gelée qui ne représente plus le contenu en ligne.
       - name: Pousser le changement sur la branche donnees
         if: ${{ github.event.inputs.mode != 'verifier' }}
         run: |
           set -e
-          if git diff --quiet -- data/projects.json; then
-            echo "data/projects.json inchangé : rien à pousser, aucun build ailleurs."
-            exit 0
-          fi
           cp data/projects.json /tmp/projects.json
-          # Tree vierge sur main avant de changer de branche.
+          # Tree vierge sur main avant de changer de branche : le bot ne commet jamais rien là.
           git restore -- data/projects.json
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # On se recale sur l'état réel de donnees : c'est le filet contre la course
-          # run planifié / poussée humaine.
           git fetch --no-tags origin donnees
           git checkout -B donnees FETCH_HEAD
           cp /tmp/projects.json data/projects.json
+          if git diff --quiet -- data/projects.json; then
+            echo "donnees est deja a jour : rien a pousser."
+            exit 0
+          fi
+          git diff --stat -- data/projects.json
           git add data/projects.json
           # Jamais la marque skip-ci entre crochets dans ce message (voir l'en-tête).
           git commit -m "sync(portfolio) : projets régénérés depuis Notion"
+          # Filet contre la course (deux runs qui se suivent, ou poussée humaine sur donnees) :
+          # si le push est refusé, on repart de l'état réel de la branche et on repose le JSON
+          # recalculé — le JSON régénéré est la source, il n'y a donc rien à fusionner.
+          ok=""
           for tentative in 1 2 3; do
-            if git push origin HEAD:donnees; then
-              echo "donnees est à jour ($tentative tentative(s)) — le site relit le JSON, Netlify ne construit pas."
-              exit 0
-            fi
-            echo "push refusé (donnees a avancé) : rebase puis nouvelle tentative…"
+            if git push origin HEAD:donnees; then ok=1; break; fi
+            echo "push refuse (donnees a avance) : recale puis tentative $tentative…"
             git fetch --no-tags origin donnees
-            git rebase FETCH_HEAD
+            git reset --hard FETCH_HEAD
+            cp /tmp/projects.json data/projects.json
+            git add data/projects.json
+            if git diff --cached --quiet; then echo "donnees etait deja a jour apres la course."; ok=1; break; fi
+            git commit -m "sync(portfolio) : projets régénérés depuis Notion"
           done
-          echo "::error::3 tentatives de push sur donnees sans succès."
-          exit 1
+          if [ -z "$ok" ]; then echo "::error::3 tentatives de push sur donnees sans succes."; exit 1; fi
+          echo "donnees poussee — le site relit le JSON, Netlify ne construit rien."
