@@ -1,0 +1,103 @@
+# Flux F — la collecte du matin : asako.mg et portaljob-madagascar.com, garés dans Notion.
+#
+# Le script lit les deux plateformes, garde les offres qui ressemblent au profil de Narindra
+# (les mots sont dans scripts/collecte-offres.mjs, en haut du fichier, éditables), et crée une
+# ligne par offre retenue avec le statut `Nouvelle offre`. La ligne attend : ni dossier, ni envoi.
+# Ce n'est que quand le user passe lui-même une ligne en `À traiter` que le flux E rédige la lettre.
+#
+# Deux points qui exigent d'être écrits quelque part, parce qu'ils ne se devinent pas :
+#  - ce flux n'appelle PAS Gemini : un jour sans offre nouvelle coûte zéro requête sur une clé dont
+#    le quota gratuit est de 20 par jour et que se partagent déjà les flux A, C, D et E ;
+#  - portaljob est une coquille Inertia : le HTML de la liste ne contient aucune offre. Le script
+#    passe par POST /api/emploi/annonces, qui demande un referer du site (sinon 403 « Access not
+#    allowed ») et une paire session/jeton posée par GET /sanctum/csrf-cookie (sinon 419). Les
+#    en-têtes et le pot à cookies sont dans le script, mesurés le 27/10.
+#
+# Gardes réellement appliqués dans scripts/collecte-offres.mjs :
+#  - anti-doublon sur le lien ET sur l'intitulé : une même offre publiée sur les deux sites ne crée
+#    qu'une ligne (mesuré : « Développeur full-stack confirmé (PHP/Laravel…) » était sur les deux) ;
+#  - une ligne ne prend une option Format que si cette option existe dans le schéma relu ;
+#  - plafond de lignes par course (--max, 25 par défaut) : la base ne se remplit pas d'un coup ;
+#  - 1,2 s entre chaque requête, 5 pages asako et 4 pages portaljob au plus ;
+#  - en journal de CI, les intitulés, entreprises, liens et motifs sont masqués : le dépôt est public.
+#
+# Secrets : NOTION_TOKEN seulement (aucun GEMINI_API_KEY ici).
+# Variable de dépôt : NOTION_CAND_DS = identifiant de la source de données « Candidatures ».
+name: Portfolio — collecte d'offres (asako + portaljob)
+
+on:
+  schedule:
+    - cron: '30 2 * * *'   # tous les jours 02:30 UTC = 05:30 Antananarivo, avant le créneau
+                           # LinkedIn de 06:30 et celui des dossiers de 06:00.
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Les deux plateformes, ou une seule'
+        required: true
+        default: toutes
+        type: choice
+        options:
+          - toutes
+          - asako
+          - portaljob
+      max:
+        description: 'Nombre de lignes au plus ce passage (1 à 60)'
+        required: true
+        default: '25'
+        type: string
+      mode:
+        description: 'Garer les lignes dans Notion, ou montrer ce qui serait garé'
+        required: true
+        default: ecrire
+        type: choice
+        options:
+          - ecrire
+          - verifier
+
+concurrency:
+  group: collecte-offres
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  collecte:
+    name: Offres -> lignes garées dans Notion
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Vérifier les secrets
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_CAND_DS: ${{ vars.NOTION_CAND_DS }}
+        run: |
+          test -n "$NOTION_TOKEN"   || { echo "::error::NOTION_TOKEN absent du dépôt"; exit 1; }
+          test -n "$NOTION_CAND_DS" || { echo "::error::vars.NOTION_CAND_DS non renseigné : Settings → Secrets and variables → Actions → Variables"; exit 1; }
+
+      - name: Collecter et garer
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_CAND_DS: ${{ vars.NOTION_CAND_DS }}
+          SOURCE: ${{ inputs.source }}
+        run: |
+          # Le créneau quotidien gare : c'est le but du flux. Un run sans offre nouvelle
+          # n'écrit rien et n'appelle aucun modèle, donc écrire tous les jours ne coûte rien.
+          # Forme en `if` et non `[ ... ] && MODE=…` : GitHub lance ce script sous `set -e`, et un
+          # test faux en milieu de liste ferait échouer toute l'étape (mesuré sur le flux E).
+          MODE="--ecrire"
+          if [ "${{ inputs.mode }}" = "verifier" ]; then MODE=""; fi
+          SRC=""
+          if [ -n "${SOURCE}" ] && [ "${SOURCE}" != "toutes" ]; then SRC="--source=${SOURCE}"; fi
+          node scripts/collecte-offres.mjs $MODE $SRC --max="${{ inputs.max || '25' }}"
+
+      - name: Etat de la file
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_CAND_DS: ${{ vars.NOTION_CAND_DS }}
+        run: node scripts/collecte-offres.mjs --liste
