@@ -28,10 +28,13 @@ const GEMINI_KEY = process.env.GEMINI_API_KEY
   || (existsSync(new URL('../.dev/gemini_key', import.meta.url))
     ? readFileSync(new URL('../.dev/gemini_key', import.meta.url), 'utf8').trim() : '');
 const DS_PROJETS = process.env.NOTION_DS || '78e87c8c-4916-4d46-8cd2-00b0bcd471fa';
-/* La base Candidatures est une deuxième source de données ; son id vient du dépôt, pas d'un
-   réglage à la main. Tant qu'il n'est pas posé, le script refuse de tourner au lieu de
-   deviner un identifiant. */
-const DS_CAND = process.env.NOTION_CAND_DS || '';
+/* La base Candidatures est une deuxième source de données : en CI elle vient de la variable de
+   dépôt `vars.NOTION_CAND_DS`, et en local du fichier ignoré par Git `.dev/candidatures_ds`
+   (posé par .dev/posant-schema-candidatures.mjs). Jamais d'id en dur dans le code versionné :
+   tant qu'aucune des deux n'existe, le script refuse de tourner au lieu de deviner. */
+const DS_CAND = process.env.NOTION_CAND_DS
+  || (existsSync(new URL('../.dev/candidatures_ds', import.meta.url))
+    ? readFileSync(new URL('../.dev/candidatures_ds', import.meta.url), 'utf8').trim() : '');
 
 const MODE = process.argv.includes('--ecrire') ? 'ecrire' : 'sec';
 const SONDE = (process.argv.find((a) => a.startsWith('--sonde=')) || '').split('=').slice(1).join('=')
@@ -665,7 +668,7 @@ async function principal() {
   let prets = 0, refuses = 0, signales = 0;
   for (const f of aTraiter.slice(0, MAX_FICHES)) {
     const p = f.properties;
-    const nom = titreDe(p, 'Intitulé');
+    let nom = titreDe(p, 'Intitulé');
     const lien = urlDe(p, "Lien de l'offre");
     const colle = txt(p, "Texte de l'offre");
 
@@ -676,12 +679,14 @@ async function principal() {
     let annonce = '';
     let source = '';
     let structure = null;
+    let titreLu = '';
     const notes = [];
     if (lien) {
       const r = await lireAnnonce(lien);
       if (r.texte) {
         annonce = r.texte;
         structure = r.structure || null;
+        titreLu = (r.titre || '').trim();
         source = `lu sur ${new URL(lien).host} (${r.methode})`;
       } else notes.push(`lien non lisible : ${r.erreur}`);
     }
@@ -692,6 +697,16 @@ async function principal() {
       console.log(`  ! ${dispo(nom, f.id)} ${MASQUE ? '(détails masqués)' : notes.join(' | ')}`);
       signales++;
       continue;
+    }
+
+    /* « je colle juste le lien » : si la fiche n'a pas d'Intitulé, celui lu sur la page tient
+       lieu de nom, et il est RÉÉCRIT dans la fiche. Sans ça le dossier n'a pas de titre, le
+       dispatch par nom ne peut plus le cibler, et la ligne reste vide dans la base. */
+    let intituleAAjuster = '';
+    if (!nom) {
+      intituleAAjuster = titreLu || (colle.split('\n').map((l) => l.trim()).filter(Boolean)[0] || '').slice(0, 120);
+      if (intituleAAjuster) { nom = intituleAAjuster; notes.push(`intitulé repris de l'annonce : ${intituleAAjuster}`); }
+      else notes.push('la fiche n\'a ni intitulé ni titre lisible : le nommer dans « Intitulé »');
     }
 
     /* Les deux documents servis au modèle sont les seules sources autorisées ; le contrôle
@@ -729,6 +744,7 @@ async function principal() {
     notes.push(`annonce : ${source}`);
     if (coupes.length) notes.push(`coupe appliquée : ${coupes.join(', ')}`);
     const props = propertiesPourEcrire(sortie, deja, notes.join(' | '), optionsFormat);
+    if (intituleAAjuster) props['Intitulé'] = { title: [{ text: { content: intituleAAjuster } }] };
     if (MODE === 'ecrire') await ecrireCandidature(f.id, props);
     prets++;
     console.log(`  ${MODE === 'ecrire' ? '+' : '•'} ${dispo(nom, f.id)} lettre ${sortie.lettre.length} car. | ${sortie.projets.split(',').length} projet(s)`);
