@@ -1,0 +1,86 @@
+# Flux E — une annonce collée dans Notion devient un dossier de candidature complet.
+# Le user pose un lien (ou le texte) dans la base « Candidatures » et passe la ligne en
+# « À traiter ». Le script lit l'annonce — JSON-LD de l'ATS si la page l'expose, sinon le
+# texte visible, sinon le texte collé — puis rédige Lettre / Pourquoi moi / Ce que l'annonce
+# demande / Questions d'entretien / Projets mis en avant, à partir de DEUX sources seulement :
+# l'annonce, et la matière vraie (data/profil-candidature.md + les fiches publiées de la base
+# Projets).
+#
+# Il ne poste, n'envoie et ne maille RIEN, nulle part. Un dossier s'envoie à la main.
+#
+# Gardes réellement appliqués dans scripts/candidature.mjs :
+#  - un chiffre absent de l'annonce ET de la matière fait refuser le champ (et le dossier) ;
+#  - les noms de projets doivent exister dans la matière ;
+#  - « à compléter » recopié = refus ; « nous » / « notre équipe » = refus ;
+#  - la langue de la lettre doit être celle de l'annonce (une retouche est demandée sinon) ;
+#  - plafond de longueur : une retouche est demandée, puis la coupe se fait à la fin de phrase ;
+#  - l'entreprise, le lieu et le salaire viennent du JSON-LD quand il existe : ce sont des
+#    données, pas une déduction du modèle, et ils n'écrasent jamais une saisie du user ;
+#  - en journal de CI, les intitulés, textes et coordonnées sont masqués (dépôt public).
+#
+# Secrets : NOTION_TOKEN + GEMINI_API_KEY (déjà en place pour les flux A à D).
+# Variable de dépôt : NOTION_CAND_DS = identifiant de la source de données « Candidatures ».
+name: Portfolio — dossiers de candidature
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # tous les jours 03:00 UTC = 06:00 Antananarivo. Un run sans ligne
+                          # en « À traiter » n'appelle ni Notion en écriture ni Gemini : 0 coût.
+  workflow_dispatch:
+    inputs:
+      candidature:
+        description: 'Intitulé exact de la ligne à traiter (vide = toutes les lignes « À traiter »)'
+        required: false
+        type: string
+      max:
+        description: 'Nombre de dossiers au plus ce passage (1 à 12)'
+        required: true
+        default: '3'
+        type: string
+      mode:
+        description: 'Écrire dans Notion ou montrer le dossier sans écrire'
+        required: true
+        default: verifier
+        type: choice
+        options:
+          - verifier
+          - ecrire
+
+concurrency:
+  group: candidatures
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  dossier:
+    name: Annonce -> dossier de candidature
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Vérifier les secrets
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NOTION_CAND_DS: ${{ vars.NOTION_CAND_DS }}
+        run: |
+          test -n "$NOTION_TOKEN"   || { echo "::error::NOTION_TOKEN absent du dépôt"; exit 1; }
+          test -n "$GEMINI_API_KEY" || { echo "::error::GEMINI_API_KEY absent du dépôt"; exit 1; }
+          test -n "$NOTION_CAND_DS" || { echo "::error::vars.NOTION_CAND_DS non renseigné : Settings → Secrets and variables → Actions → Variables"; exit 1; }
+
+      - name: Rédiger les dossiers en attente
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NOTION_CAND_DS: ${{ vars.NOTION_CAND_DS }}
+          CIBLE: ${{ inputs.candidature }}
+        run: |
+          MODE=
+          [ "${{ inputs.mode }}" = "ecrire" ] && MODE=--ecrire
+          node scripts/candidature.mjs $MODE --max="${{ inputs.max || '3' }}" "${CIBLE}"
