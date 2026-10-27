@@ -81,6 +81,10 @@ jobs:
           NOTION_CAND_DS: ${{ vars.NOTION_CAND_DS }}
           CIBLE: ${{ inputs.candidature }}
         run: |
-          MODE=
-          [ "${{ inputs.mode }}" = "ecrire" ] && MODE=--ecrire
+          # Le créneau quotidien écrit : c'est le but du flux (trouver la lettre le matin).
+          # `workflow_dispatch` avec « verifier » laisse le mode sec, et un run sans ligne
+          # « À traiter » n'appelle ni Gemini ni Notion : le --ecrire du cron ne coûte rien
+          # les jours où il n'y a rien à faire.
+          MODE="--ecrire"
+          if [ "${{ inputs.mode }}" = "verifier" ]; then MODE=""; fi
           node scripts/candidature.mjs $MODE --max="${{ inputs.max || '3' }}" "${CIBLE}"
