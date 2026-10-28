@@ -1,6 +1,7 @@
 /* Mini-programme de CV : il régénère un CV à partir de ce qui est VRAI, c'est-à-dire de
    deux sources seulement — `data/profil-candidature.md` (les faits personnels que tu as
-   écrits toi-même) et la base Notion « Projets » (ce qui tourne, avec ses technologies).
+   écrits toi-même, plus `data/profil-prive.md` pour les coordonnées, hors version) et la
+   base Notion « Projets » (ce qui tourne, avec ses technologies).
 
    Ce qu'il ne fait PAS, et c'est le coeur du programme :
      - il n'écrit aucune rubrique dont la source dit « à compléter » : études, expérience,
@@ -34,20 +35,28 @@
      node scripts/cv.mjs --sans-lien              -> garde les projets sans URL publique
      node scripts/cv.mjs --sec                    -> n'affiche que le rapport (manquants, tri)
 
-   Variables : NOTION_TOKEN / NOTION_TOKEN_FILE / NOTION_DS (mêmes que le flux A).
-   Le dossier cv/ est ignoré par git : un CV porte des coordonnées personnelles, il n'a
-   rien à faire dans un dépôt public ni sur le site.
+   Variables : NOTION_TOKEN / NOTION_TOKEN_FILE / NOTION_DS (mêmes que le flux A), et trois
+   chemins modifiables pour les essais — CV_PROFIL, CV_PRIVE, CV_DOSSIER.
+   Deux choses ne montent jamais dans le dépôt : le dossier cv/, et les coordonnées de
+   data/profil-prive.md. Le dépôt est public (`private: false` mesuré sur l'API GitHub) et le
+   site est servi depuis ce dépôt : un email versionné se retrouve en ligne au premier push.
 */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 
 const RACINE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DS = process.env.NOTION_DS || "78e87c8c-4916-4d46-8cd2-00b0bcd471fa";
 /* Le profil reste la source unique ; CV_PROFIL permet de tester une variante (ou de
    préparer un CV pour une cible précise) sans toucher au fichier autorisé du dépôt. */
 const PROFIL = process.env.CV_PROFIL || join(RACINE, "data", "profil-candidature.md");
+/* Le dépôt est public (`private: false` mesuré sur l'API GitHub), et le site est servi depuis
+   ce même dépôt : un email ou un téléphone écrit dans data/profil-candidature.md se retrouve
+   en ligne dès le push. Les coordonnées vivent donc dans data/profil-prive.md, hors version,
+   que le programme recolle sur la rubrique Contact avant de construire le document. Côté
+   flux E, rien ne change : les lettres n'ont jamais eu besoin d'une adresse. */
+const PRIVE = process.env.CV_PRIVE || join(RACINE, "data", "profil-prive.md");
 /* CV_DOSSIER permet de tester une variante (profil rempli, palier forcé) sans écraser le CV
    réel dans cv/ — la boucle d'ajustement imprime plusieurs fois, elle écrase ses propres
    fichiers à chaque essai, un essai de test ne doit pas laisser sa copie derrière lui. */
@@ -181,6 +190,30 @@ const trouvee = (rub, mot) => {
   const cle = Object.keys(rub).find((k) => k.toLowerCase().includes(String(mot).toLowerCase()));
   return cle ? (rub[cle] || []).filter((l) => !MANQUANT.test(l)) : [];
 };
+const cleDe = (l) => { const i = l.indexOf(":"); return i === -1 ? "" : l.slice(0, i).trim().toLowerCase(); };
+/* Recolle le fichier hors version sur le profil public : une puce du privé remplace la puce
+   du public qui porte la même étiquette (« Email », « Téléphone »), et s'ajoute si elle
+   n'existe pas encore ; une rubrique absente du public est ajoutée telle quelle. Remplacer
+   plutôt qu'ajouter est ce qui permet d'écrire « Email : à compléter » dans le dépôt sans
+   voir deux lignes de contact dans le CV. */
+function recolle(rub, privees) {
+  let n = 0;
+  for (const [section, lignes] of Object.entries(privees)) {
+    const cle = Object.keys(rub).find((k) => {
+      const a = k.toLowerCase(), b = section.toLowerCase();
+      return a.includes(b) || b.includes(a);
+    }) || section;
+    rub[cle] = rub[cle] || [];
+    for (const l of lignes) {
+      const e = cleDe(l);
+      const j = e ? rub[cle].findIndex((x) => cleDe(x) === e) : -1;
+      if (j >= 0) { if (rub[cle][j] !== l) { rub[cle][j] = l; n++; } }
+      else { rub[cle].push(l); n++; }
+    }
+  }
+  return n;
+}
+
 
 /* — Source 2 : la base Projets. — */
 async function fiches() {
@@ -275,6 +308,9 @@ const PALIERS = [
 async function main() {
   if (!existsSync(PROFIL)) throw new Error(`Profil introuvable : ${PROFIL}`);
   const rub = rubriques(readFileSync(PROFIL, "utf8"));
+  /* Le contact privé n'est pas dans le dépôt : il s'ajoute ici, et nulle part ailleurs. */
+  const privees = existsSync(PRIVE) ? rubriques(readFileSync(PRIVE, "utf8")) : null;
+  const recollees = privees ? recolle(rub, privees) : 0;
   const manquants = [];
   const suivi = (cle, v) => { if (!v) manquants.push(cle); return v; };
 
@@ -394,6 +430,12 @@ async function main() {
     else aCompleter.push(cleProfil);
   }
 
+  /* Ordre de lecture : un recruteur cherche d'abord l'expérience, et la formation vient
+     après tout le reste. Quand le profil ne porte pas d'expérience, les projets la portent
+     et rien ne bouge. */
+  const avantProjets = personnelles.filter(([t]) => t === "Expérience professionnelle");
+  const apresProjets = personnelles.filter(([t]) => t !== "Expérience professionnelle");
+
   if (!titreProfil) manquants.push("titre professionnel");
   if (!contact.length) manquants.push("contact (email, téléphone, liens)");
   const jourCV = dateDuJour(dateService);
@@ -434,6 +476,8 @@ async function main() {
     const pile = pal.pile ? stack : [...new Set(retenus.flatMap((f) => f.technologies))];
     if (pile.length) L.push("", "## Compétences", "", pile.join(" · "));
 
+    for (const [titreCV, valeur] of avantProjets) L.push("", `## ${titreCV}`, "", valeur);
+
     if (retenus.length) {
       L.push("", "## Projets", "");
       /* Phrase lisible par un humain : « vérifiés à la génération » se dit dans un rapport de
@@ -453,7 +497,7 @@ async function main() {
       }
     }
 
-    for (const [titreCV, valeur] of personnelles) L.push("", `## ${titreCV}`, "", valeur);
+    for (const [titreCV, valeur] of apresProjets) L.push("", `## ${titreCV}`, "", valeur);
 
     /* Pas de « Antananarivo, le 28 octobre 2026 » en pied de CV : c'est une convention de
        lettre, et une ville suivie d'une date isolée se fait lire par un parseur comme une
@@ -483,7 +527,9 @@ async function main() {
     `Notes de sélection : ${vivants.map(detailNote).join(" · ")}.`,
     avertissements.length ? `À corriger dans Notion, le programme ne réécrit aucune source :\n  - ${avertissements.join("\n  - ")}` : "",
     aCompleter.length ? `Rubriques absentes faute de source : ${aCompleter.join(", ")}.` : "Toutes les rubriques personnelles ont une source remplie.",
-    contact.length ? "" : "Contact absent : le CV n'a ni email ni téléphone, et sans l'un des deux un ATS ne peut même pas identifier le candidat. À écrire dans data/profil-candidature.md, rubrique Contact.",
+    contact.length ? "" : "Contact absent : le CV n'a ni email ni téléphone, et sans l'un des deux un ATS ne peut même pas identifier le candidat. À écrire dans data/profil-prive.md (hors dépôt, le dépôt est public), rubrique Contact.",
+    privees ? `Contact relu dans ${relative(RACINE, PRIVE)} : ${contact.length} ligne(s) affichée(s), dont ${recollees} venue(s) du fichier hors version.`
+      : `Attention : ${relative(RACINE, PRIVE)} est absent, le CV ne peut pas afficher d'email ni de téléphone (ils ne vivent pas dans le dépôt public).`,
     manquants.length ? `Également absent faute de source : ${manquants.join(", ")}.` : "",
     tirets ? `${tirets} tiret(s) long(s) retiré(s) des sources, le document n'en porte aucun.` : "Aucun tiret long dans le document, ni écrit par le programme ni repris des sources.",
     `Aucun nombre, diplôme ou société n'a été ajouté par le programme (généré le ${jourCV || "date indisponible"}${cible ? `, cible : « ${cible} »` : ", aucune cible : --cible augmente le poids des fiches qui y correspondent"}).`,
@@ -687,9 +733,14 @@ function html(md, meta) {
   * { box-sizing: border-box; }
   body { margin: 0 auto; max-width: ${t.maxl}; padding: ${t.pad}; color: var(--encre);
     font: ${t.corps}/${t.inter} "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-  h1 { font-size: ${t.h1}; margin: 0 0 1mm; letter-spacing: .2mm; }
+  h1 { font-size: ${t.h1}; margin: 0 0 1mm; }
   h2 { font-size: ${t.h2}; margin: ${t.m2}; padding-bottom: .8mm; color: var(--accent);
-    border-bottom: .3mm solid var(--filet); text-transform: uppercase; letter-spacing: .35mm; }
+    border-bottom: .3mm solid var(--filet); text-transform: uppercase; }
+  /* Pas de letter-spacing sur les titres : le nom du candidat en porte un, lui se lit bien.
+     Mesuré le 28/10 sur le PDF imprimé, un interlettre de 0,35 mm fait découper « PROFIL » en
+     « P RO F I L » à l'extraction du texte. Or un ATS matche les mots de rubrique (« Profil »,
+     « Expérience », « Formation », « Langues ») sur le texte extrait : un titre espacé, c'est
+     une rubrique qu'il ne voit pas. La majuscule et le filet suffisent à l'air du document. */
   /* Le nom du projet est un sous-titre, pas une puce : il reste collé à sa première ligne
      quand la page se coupe (break-after: avoid), sinon un titre orphelin clôt la page. */
   h3 { font-size: ${t.h3}; margin: 0; color: var(--encre); break-after: avoid; }

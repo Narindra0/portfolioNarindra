@@ -10,6 +10,11 @@
 # se retrouverait en ligne sans que personne ne l'ait decide.
 cv/
 
+# Coordonnes personnelles separees du profil public : data/profil-candidature.md doit rester
+# la source des lettres en CI, donc versionnee, donc sans email ni telephone. scripts/cv.mjs
+# recolle ce fichier sur la rubrique Contact a la generation.
+data/profil-prive.md
+
 # Systeme
 .DS_Store
 Thumbs.db

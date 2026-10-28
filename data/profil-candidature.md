@@ -15,8 +15,13 @@ Un « à compléter » se laisse vide, il ne se remplit pas par une supposition.
 
 ## Contact (le CV n'affiche que ce qui est rempli ici)
 
-- Email : à compléter
-- Téléphone : à compléter
+Le dépôt est public et le site est servi depuis ce dépôt : l'email et le téléphone ne vivent
+pas dans ce fichier, ils sont dans `data/profil-prive.md` (hors version), que `scripts/cv.mjs`
+recolle ici à la génération. Les lettres du flux E tournent en CI sans ce fichier et n'ont
+jamais eu besoin d'une adresse.
+
+- Email : à compléter (voir data/profil-prive.md)
+- Téléphone : à compléter (voir data/profil-prive.md)
 - LinkedIn : à compléter
 - Portfolio : https://narindraportfolio.netlify.app
 - GitHub : https://github.com/Narindra0
@@ -37,19 +42,30 @@ Un « à compléter » se laisse vide, il ne se remplit pas par une supposition.
 
 ## Ce que je ne sais pas, et que je n'écris jamais
 
-- Aucune expérience dans une entreprise tierce : je n'ai pas de liste d'emplois antérieurs
-  à ce jour dans ce fichier. Une lettre ne doit donc jamais dire « chez X, j'ai fait Y ».
-- Aucun chiffre de revenu, d'utilisateur, de client ou de croissance qui n'est pas écrit
-  dans une fiche projet.
-- Aucune formation, diplôme ou certification tant que ce n'est pas rempli ci-dessous.
+- Aucun employeur, aucun diplôme, aucun chiffre qui ne soit pas écrit dans ce fichier ou dans
+  une fiche projet. Les trois lignes ci-dessous portent la matière vérifiée : une lettre peut
+  les citer, elle ne peut pas en ajouter une quatrième.
+- Aucun chiffre de revenu, d'utilisateur, de client ou de croissance qui n'est pas écrit ici
+  ou dans une fiche projet.
+- Aucune certification : je n'ai ni AWS, ni Scrum, ni TOEIC à déclarer.
 
-## À compléter par moi quand je postule (le script ne les invente pas)
+## Faits personnels (transcrits de mon CV du 19 octobre, relus par moi)
 
-- Études / diplôme : à compléter
-- Expérience en entreprise (société, poste, période) : à compléter
+- Études / diplôme : Licence en génie logiciel et systèmes, Université Advancea, Antananarivo
+  (2024 – 2025) ; Diplôme de technicien supérieur, Université Advancea, Antananarivo
+  (2023 – 2024) ; Baccalauréat série D avec mention, Lycée privé CPE, Andoharanofotsy (2022)
+- Expérience en entreprise (société, poste, période) : Fondateur et développeur, Pass'io
+  (depuis janvier 2025) : plateforme de streaming musical pour Madagascar, paiements Mobile
+  Money, 80 % des revenus reversés aux artistes, environ 300 artistes actifs · Développeur
+  frontend, Zanova, CDD (janvier – juillet 2026) : CRM métier développé en équipe, du cahier
+  des charges à la mise en production, utilisé par un centre d'appels d'environ 100 agents ·
+  Développeur et designer, ApiNess (septembre – décembre 2025) : Ravina, assistant agricole
+  d'optimisation des plantations, conception UI/UX et mise en production sur serveur ·
+  Stagiaire développeur web, BOA Madagascar (août – octobre 2024) : logiciel interne de
+  gestion de projets pour le département informatique, design web et référencement
+- Langues et niveau : Malagasy (langue maternelle), français (courant)
 - Prétention salariale : à compléter
 - Mobilité / télétravail / date de disponibilité : à compléter
-- Langues et niveau : à compléter
 
 ## Ton d'écriture
 
