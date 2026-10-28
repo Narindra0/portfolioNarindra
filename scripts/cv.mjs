@@ -334,7 +334,7 @@ async function main() {
   for (const f of vivants) {
     const premier = (f.corps || "").split(/[^A-Za-zÀ-ÿ'’-]+/)[0] || "";
     if (premier && !OUVRANTS.test(premier) && !f.corps.toLowerCase().includes(f.nom.toLowerCase()))
-      avertissements.push(`${f.nom} : sa description s'ouvre sur « ${premier}… », qui n'est ni son nom ni un mot générique — le lecteur croira à un autre produit.`);
+      avertissements.push(`${f.nom} : sa description s'ouvre sur « ${premier}… », qui n'est ni son nom ni un mot générique. Le lecteur croira à un autre produit.`);
     if (/\bnous\b/i.test(f.corps)) avertissements.push(`${f.nom} : sa description dit « nous », alors que le profil interdit le « nous » (travail solo).`);
     if (!f.technologies.length) avertissements.push(`${f.nom} : aucune technologie dans la fiche, rien à faire peser côté mots-clés.`);
   }
@@ -347,7 +347,7 @@ async function main() {
   for (const mot of mots(champ(rub, "Identité", "Statut"))) {
     const f = vivants.find((x) => mots(x.nom).includes(mot));
     if (f && dateDe(f) && dateDe(f) < il_y_a_un_an)
-      avertissements.push(`${f.nom} : le profil te dit dessus au présent, mais sa fiche porte une dernière activité en ${lisible(f.fin || f.debut)} — corrige la date, ou le classement écartera le projet phare.`);
+      avertissements.push(`${f.nom} : le profil te dit dessus au présent, mais sa fiche porte une dernière activité en ${lisible(f.fin || f.debut)} : corrige la date, ou le classement écartera le projet phare.`);
   }
 
   const nom = champ(rub, "Identité", "Nom");
@@ -368,7 +368,7 @@ async function main() {
   /* Un renvoi à « la base Projets » est une note de travail : le lecteur n'a pas d'accès à
      ton Notion, et une parenthèse qu'il ne peut pas ouvrir affaiblit la phrase qui la porte. */
   if (/voir la base|base Projets/i.test(champ(rub, "Identité", "Statut")))
-    avertissements.push("Profil : « (voir la base Projets) » est un renvoi interne à ton Notion — à retirer de data/profil-candidature.md, le lecteur ne peut pas l'ouvrir.");
+    avertissements.push("Profil : « (voir la base Projets) » est un renvoi interne à ton Notion, à retirer de data/profil-candidature.md, le lecteur ne peut pas l'ouvrir.");
 
   /* Rubriques du bas : elles ne sortent que si le profil les remplit. Le titre imprimé est
      celui qu'un ATS cherche (« Formation », « Expérience professionnelle », « Langues »),
@@ -411,7 +411,7 @@ async function main() {
     const retenus = vivants.slice(0, n).sort((a, b) => dateDe(b) - dateDe(a));
     const L = [];
     L.push(`# ${majuscule(nom) || "Nom à compléter"}`);
-    const ligne2 = [majuscule(titreProfil), ville].filter(Boolean).join(" — ");
+    const ligne2 = [majuscule(titreProfil), ville].filter(Boolean).join(" · ");
     if (ligne2) L.push(ligne2);
     if (contact.length) {
       L.push("");
@@ -449,7 +449,7 @@ async function main() {
         const technos = f.technologies.slice(0, pal.technos).join(" · ");
         const liens = [f.lien && `[${domaine(f.lien)}](${f.lien})`, f.github && `[Code : ${domaine(f.github)}](${f.github})`].filter(Boolean);
         const pied = [technos && `**${technos}**`, ...liens].filter(Boolean);
-        if (pied.length) L.push(pied.join(" — "));
+        if (pied.length) L.push(pied.join(" · "));
       }
     }
 
@@ -457,8 +457,12 @@ async function main() {
 
     /* Pas de « Antananarivo, le 28 octobre 2026 » en pied de CV : c'est une convention de
        lettre, et une ville suivie d'une date isolée se fait lire par un parseur comme une
-       expérience sans intitulé. La date de génération reste dans le rapport. */
-    return { markdown: L.join("\n") + "\n", ligne2, retenus };
+       expérience sans intitulé. La date de génération reste dans le rapport.
+       Et le document repasse par `sansTiretLong` : le tiret long est la signature d'un texte
+       de machine, il n'entre pas dans un document qui se signe, même quand une source Notion
+       en porte un. */
+    const { texte, remplaces } = sansTiretLong(L.join("\n") + "\n");
+    return { markdown: texte, ligne2, retenus, tirets: remplaces };
   };
 
   let n = max;
@@ -466,7 +470,7 @@ async function main() {
      si le CV tient serré sans qu'on le lui demande, autant garder la version lisible. Ce
      n'est pas le drapeau qui décrète la densité, c'est le nombre de pages mesuré. — */
   let pal = 0;
-  let { markdown, ligne2, retenus } = construis(n, PALIERS[pal]);
+  let { markdown, ligne2, retenus, tirets } = construis(n, PALIERS[pal]);
 
   const detailNote = (f) => `${f.nom} ${f.note.toFixed(2)} (matière ${Math.round(f.scoreMatiere * 100)}, ${f.technologies.length} technos, ${lisible(f.fin || f.debut) || "sans date"})`;
   /* Le rapport se lit sur le document FINAL : la boucle d'ajustement retire des fiches, un
@@ -479,8 +483,9 @@ async function main() {
     `Notes de sélection : ${vivants.map(detailNote).join(" · ")}.`,
     avertissements.length ? `À corriger dans Notion, le programme ne réécrit aucune source :\n  - ${avertissements.join("\n  - ")}` : "",
     aCompleter.length ? `Rubriques absentes faute de source : ${aCompleter.join(", ")}.` : "Toutes les rubriques personnelles ont une source remplie.",
-    contact.length ? "" : "Contact absent : le CV n'a ni email ni téléphone — sans l'un des deux, un ATS ne peut même pas identifier le candidat. À écrire dans data/profil-candidature.md, rubrique Contact.",
+    contact.length ? "" : "Contact absent : le CV n'a ni email ni téléphone, et sans l'un des deux un ATS ne peut même pas identifier le candidat. À écrire dans data/profil-candidature.md, rubrique Contact.",
     manquants.length ? `Également absent faute de source : ${manquants.join(", ")}.` : "",
+    tirets ? `${tirets} tiret(s) long(s) retiré(s) des sources, le document n'en porte aucun.` : "Aucun tiret long dans le document, ni écrit par le programme ni repris des sources.",
     `Aucun nombre, diplôme ou société n'a été ajouté par le programme (généré le ${jourCV || "date indisponible"}${cible ? `, cible : « ${cible} »` : ", aucune cible : --cible augmente le poids des fiches qui y correspondent"}).`,
   ].filter(Boolean);
 
@@ -523,7 +528,7 @@ async function main() {
       else if (n > 3) n -= 1;
       else if (pal < PALIERS.length - 1) pal += 1;
       else break;
-      ({ markdown, ligne2, retenus } = construis(n, PALIERS[pal]));
+      ({ markdown, ligne2, retenus, tirets } = construis(n, PALIERS[pal]));
       ecris(markdown, ligne2, PALIERS[pal]);
       pdf = imprimeEnPdf(DOSSIER, nom);
     }
@@ -537,7 +542,7 @@ async function main() {
        n'ont rien à voir avec la mise en page. */
     const rendues = vivants.slice(n, max).map((f) => f.nom);
     console.log(`   ajusté pour tenir sur une page : ${essais.join(" · ")} → ${PALIERS[pal].nom}/${n} fiches → ${pdf.pages} page${pdf.pages > 1 ? "s" : ""}`
-      + (rendues.length ? ` — retirées par l'ajustement : ${rendues.join(", ")}` : ""));
+      + (rendues.length ? `, fiches retirées par l'ajustement : ${rendues.join(", ")}` : ""));
   } else if (flag("une-page") && pdf.pages) {
     console.log(`   une page tenue dès le premier essai : ${PALIERS[pal].nom}/${n} fiches → ${pdf.pages} page`);
   }
@@ -608,6 +613,21 @@ const domaine = (u) => {
    en tête de rubrique avec sa majuscule. Aucun mot n'est ajouté ni retiré. */
 const majuscule = (s) => String(s || "").replace(/^(\p{L})/u, (m) => m.toUpperCase());
 
+/* Le tiret long « — » est la marque de fabrique d'un texte écrit par une machine : un humain
+   qui rédige un CV fait une phrase, ou met une virgule. Le programme ne l'emploie donc
+   nulle part, et il le retire aussi des sources (une Description Notion peut en porter un).
+   Deux cas, jamais de suppression sèche qui collerait deux mots : l'incise devient une virgule,
+   le tiret isolé devient un trait d'union simple. Le « – » des plages de dates (août 2026 –
+   octobre 2026) n'est pas le même caractère et reste. Retourne le texte nettoyé et le nombre
+   de remplacements, pour que le rapport puisse le dire plutôt que le promettre. */
+function sansTiretLong(s) {
+  const avant = String(s ?? "");
+  const apres = avant
+    .replace(/[ \t]+—[ \t]+/g, ", ")
+    .replace(/[ \t]*—[ \t]*/g, " - ");
+  return { texte: apres, remplaces: (avant.match(/—/g) || []).length };
+}
+
 /* Échappement : le texte vient de Notion, un « < » isolé ne doit pas casser la page. */
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -659,8 +679,8 @@ function html(md, meta) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="${esc(meta.nom || "")}">
-<meta name="description" content="CV — ${esc(meta.ligne2 || "")}">
-<title>CV — ${esc(meta.nom || "")}</title>
+<meta name="description" content="CV de ${esc(meta.ligne2 || "")}">
+<title>CV de ${esc(meta.nom || "")}</title>
 <style>
   @page { size: A4; margin: ${t.page}; }
   :root { --encre: #14181d; --doux: #4b5560; --filet: #d7dbe0; --accent: #1f5c8b; }

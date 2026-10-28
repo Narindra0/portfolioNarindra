@@ -103,8 +103,15 @@ const jour = (p, n) => p[n]?.date?.start || "";
    laisse lire une phrase cassée en plein élan. On remonte donc jusqu'au dernier mot qui a
    un sens, sans jamais descendre sous 60 % de la place disponible. */
 const OUTILS = new Set(["et", "ou", "ni", "the", "a", "à", "au", "aux", "de", "du", "des", "le", "la", "les", "un", "une", "en", "dans", "par", "pour", "sur", "sous", "avec", "sans", "est", "sont", "se", "son", "sa", "ses", "ce", "cet", "cette", "ces", "qui", "que", "comme", "très", "plus", "peu", "tout", "tous", "toutes"]);
+/* Le tiret long « — » est la signature d'un texte sorti d'une machine : une carte LinkedIn en
+   porte la trace dès la première phrase. La consigne du prompt le dit au modèle, ce remplacement
+   le garantit dans la matière lue depuis Notion. Le « – » des plages de dates n'est pas ce
+   caractère-là. */
+const sansTiretLong = (s) => String(s ?? "")
+  .replace(/[ \t]+—[ \t]+/g, ", ")
+  .replace(/[ \t]*—[ \t]*/g, " - ");
 const nettoyer = (s, max) => {
-  const plat = String(s || "").replace(/\s+/g, " ").trim();
+  const plat = sansTiretLong(s).replace(/\s+/g, " ").trim();
   if (!max || plat.length <= max) return plat;
   /* Une phrase qui déborde de quelques caractères se lit mieux entière qu'avec un « … »
      planté en son milieu : la marge reste petite et le studio renvoie un 422 si ça déborde. */
@@ -123,7 +130,7 @@ const nettoyer = (s, max) => {
   }
   return texte.replace(/[,;:.\-]$/, "") + "…";
 };
-const phrases = (s) => String(s || "").replace(/\s+/g, " ").trim().split(/(?<=[.!?]) /).filter(Boolean);
+const phrases = (s) => sansTiretLong(s).replace(/\s+/g, " ").trim().split(/(?<=[.!?]) /).filter(Boolean);
 /* Le pied de carte doit dire OÙ aller. « github.com » seul ne veut rien dire : sur les
    plateformes qui hébergent plusieurs projets, on garde le chemin (owner/repo). Mesuré le
    2026-10-26 sur la carte LocalSound-Share, le pied affichait « github.com ». */

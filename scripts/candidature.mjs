@@ -315,7 +315,7 @@ Règles absolues :
 1. N'utiliser QUE ce qui est écrit dans l'annonce et dans la matière. N'inventer aucun employeur, aucune diplôme, aucune date, aucun effectif, aucun chiffre, aucun client, aucune technologie. Une matière qui porte « à compléter » est une information ABSENTE : on n'en parle pas, on ne la remplit pas.
 2. Ne jamais dire qu'il a travaillé pour une entreprise tierce : sa matière ne liste que ses propres projets.
 3. Répondre à l'annonce, pas à un modèle : chaque point du « Pourquoi moi » doit reprendre une exigence écrite dans l'annonce et y opposer un projet ou une compétence précise de la matière.
-4. Français, première personne du singulier, ton sobre et concret. Jamais « nous » ni « notre équipe ». Pas de « passionné », « dynamique », « force de proposition », « rigoureux » sans preuve.
+4. Français, première personne du singulier, ton sobre et concret. Jamais « nous » ni « notre équipe ». Pas de « passionné », « dynamique », « force de proposition », « rigoureux » sans preuve. Jamais de tiret long « — » dans une phrase : une phrase courte, ou une virgule.
 5. Les hashtags, les formules de politesse alambiquées et les phrases d'accroche marketing sont interdits. Une lettre commence par pourquoi cette annonce, continue par ce qui répond, finit par la suite proposée (un échange, une démo).
 6. Si l'annonce est en anglais, rédiger en anglais ; sinon en français.
 7. Les noms de projets et les liens se citent tels qu'ils sont dans la matière, sans les raccourcir ni les reformuler.
@@ -414,6 +414,12 @@ function nettoie(s) {
     .replace(/^\s*```.*$/gim, '')
     .replace(/^(Lettre|Lettre)\s*:\s*/i, '')
     .replace(/\[([^\]\n]{0,40})\]/g, '$1')      /* les crochets de gabarit ne doivent pas survivre */
+    /* Le tiret long est la signature d'un texte de machine : un recruteur qui en voit trois
+       dans une lettre a compris qui l'a écrite. La consigne 4 du prompt le dit au modèle, ce
+       remplacement le garantit quand même, et le « – » des plages de dates n'est pas ce
+       caractère-là. */
+    .replace(/[ \t]+—[ \t]+/g, ', ')
+    .replace(/[ \t]*—[ \t]*/g, ' - ')
     .trim();
 }
 
