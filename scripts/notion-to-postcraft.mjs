@@ -648,9 +648,14 @@ async function main() {
   }
 
   mkdirSync(dir, { recursive: true });
-  const base = `postcraft-${slug(titre(cible.properties))}-${template}-${format}`;
+  /* La route se déduit du drapeau, pas de la présence de slides (la mosaïque renvoie UNE
+     image, le carrousel un ZIP). Le suffixe va aussi dans le nom LOCAL : sans lui, un
+     `--mosaique --render` écrasait la carte unique du même projet sous le même nom. */
+  const route = flag("mosaique") ? "/api/render-mosaic" : payload.slides ? "/api/render-carousel" : "/api/render";
+  const suffixe = route === "/api/render-mosaic" ? "-mosaique" : route === "/api/render-carousel" ? "-carousel" : "";
+  const base = `postcraft-${slug(titre(cible.properties))}-${template}-${format}${suffixe}`;
   writeFileSync(join(dir, `${base}.json`), JSON.stringify(payload, null, 2) + "\n");
-  console.log(`Fiche « ${titre(cible.properties)} » → template ${template}, format ${format}${payload.slides ? `, ${payload.slides.length} slides` : ""}.`);
+  console.log(`Fiche « ${titre(cible.properties)} » → template ${template}, format ${format}${payload.slides ? (flag("mosaique") ? `, mosaïque ${payload.slides.length} panneaux` : `, ${payload.slides.length} slides`) : ""}.`);
   console.log(`Payload écrit : ${repertoire}/${base}.json`);
 
   if (!flag("render")) {
@@ -660,11 +665,7 @@ async function main() {
 
   const cle = process.env.POSTCRAFT_KEY || cleDepaire("API_KEY");
   if (!cle) throw new Error("Clé API manquante : POSTCRAFT_KEY (ou .dev.vars pour un test local).");
-  /* La mosaïque renvoie UNE image (le carrousel renvoie un ZIP) : la route se déduit du
-     drapeau, pas de la présence de slides, sinon `--mosaique` demanderait un ZIP. */
-  const route = flag("mosaique") ? "/api/render-mosaic" : payload.slides ? "/api/render-carousel" : "/api/render";
   const extensionAttendue = route === "/api/render-carousel" ? "zip" : payload.imageType;
-  const suffixe = route === "/api/render-mosaic" ? "-mosaique" : route === "/api/render-carousel" ? "-carousel" : "";
   const r = await fetch(`${ORIGINE}${route}`, {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${cle}` },
