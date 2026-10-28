@@ -20,6 +20,14 @@
      3. Pour voir la décision sans rien écrire :
         node scripts/notion-to-postcraft.mjs --prochain
         node scripts/notion-to-postcraft.mjs --preparer --sec
+     4. Pour la mesure d'audience (le clic sur un lien qu'on possède, LinkedIn ne donnant pas
+        ses statistiques — mesuré le 28/10) :
+        node scripts/notion-to-postcraft.mjs --chiffres [--sec]
+        -> lit les compteurs du Worker POSTCRAFT (/api/mesure, même clé que le rendu), affiche
+           le tableau, puis reporte le total de chaque slug dans « Clics » de la fiche dont
+           « Lien mesuré » porte ce slug. --armer, lui, déclare le slug du projet armé
+           (POST /api/mesure/lien) et pose « Lien mesuré » sur la fiche ; l'échec de cette
+           étape n'annule jamais l'armement, le post passe avant le compteur.
 
    Variables d'environnement :
      NOTION_TOKEN      jeton d'intégration Notion (défaut : fichier NOTION_TOKEN_FILE,
@@ -28,6 +36,8 @@
      NOTION_DS         identifiant de la source de données (défaut : base du portfolio)
      POSTCRAFT_URL     origine du studio (défaut : http://127.0.0.1:8791, ou l'URL workers.dev)
      POSTCRAFT_KEY     clé Bearer de l'API (défaut : .dev.vars du studio, pour un test local)
+     MESURE_URL        origine publique qui compte les clics (défaut : l'URL workers.dev du
+                       studio — un 127.0.0.1 ne peut être cliqué depuis le fil LinkedIn)
      REPO_BRANCHE      branche où atterrissent les PNG (défaut : donnees)
 
    Sans --render, l'outil écrit uniquement les JSON de payload : on peut les coller dans le
@@ -36,6 +46,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve, isAbsolute } from "node:path";
+import { slugDe, urlMesuree, enregistre, lisChiffres, tableau, cleMesure } from "./mesure.mjs";
 
 const RACINE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DS = process.env.NOTION_DS || "78e87c8c-4916-4d46-8cd2-00b0bcd471fa";
@@ -531,6 +542,17 @@ async function preparer({ pages, reglages, auteur, sec }) {
   const chemin = join(RACINE, DOSSIER_VISUELS, fichier);
   const publique = `https://raw.githubusercontent.com/${REPO}/${BRANCHE_VISUELS}/${DOSSIER_VISUELS}/${fichier}`;
   console.log(`Visuel ${planches ? "mosaïque 4 panneaux" : "carte unique"} « ${templateRetenu} » rendu : ${(png.length / 1024).toFixed(0)} Ko → ${DOSSIER_VISUELS}/${fichier}`);
+
+  /* Le lien mesuré se prépare ici et ne s'enregistre qu'à l'armement : déclarer un slug pour
+     une fiche qui n'aura jamais son créneau, c'est un compteur mort. La destination est le lien
+     qui sera imprimé sur la carte, donc rien quand ce lien est mort (mesuré le 26/10 : BusNaka
+     en 404, DigiKaratra en connexion refusée). */
+  const vers = lienSur(p.properties).url;
+  const mesure = vers ? { slug: slugDe(nom), vers, url: urlMesuree(slugDe(nom)) } : null;
+  console.log(mesure
+    ? `Mesure : ${mesure.url} → ${mesure.vers}`
+    : "Mesure : aucun lien vivant sur cette fiche, rien à compter ce créneau.");
+
   if (sec) {
     console.log("--sec : aucun fichier écrit, aucune fiche modifiée.");
     return 0;
@@ -556,7 +578,7 @@ async function preparer({ pages, reglages, auteur, sec }) {
       return { id: x.id, nom, motif: armee ? "arme concurrente" : "drapeau reste coche (test manuel)", champs };
     });
 
-  writeFileSync(ETAT, JSON.stringify({ pageId: p.id, nom, fichier, url: publique, template: templateRetenu, mosaique: !!planches, desarmer }, null, 2) + "\n");
+  writeFileSync(ETAT, JSON.stringify({ pageId: p.id, nom, fichier, url: publique, template: templateRetenu, mosaique: !!planches, mesure, desarmer }, null, 2) + "\n");
   console.log(`PNG écrit, Notion pas encore touché : --armer le fera après la poussée vérifiée sur « ${BRANCHE_VISUELS} ».`);
   if (desarmer.length) console.log(`À désarmer au même moment : ${desarmer.map((d) => `${d.nom} (${d.motif})`).join(", ")}`);
   return 0;
@@ -577,6 +599,18 @@ async function armer() {
     "Prêt à publier": enCase(true),
   });
   console.log(`Fiche « ${e.nom} » armée (gabarit ${e.template}) : ${e.url}`);
+  /* Le compteur ne se déclare qu'ici : la carte est en ligne, la fiche est armée, donc le lien
+     qui part dans le post a une destination. Un échec d'enregistrement n'annule pas l'armement
+     (le post se publiera, juste sans mesure) — la pub passe avant le compteur. */
+  if (e.mesure) {
+    const r = await enregistre({ slug: e.mesure.slug, vers: e.mesure.vers, note: e.nom });
+    if (r.ok) {
+      await ecrire(e.pageId, { "Lien mesuré": enUrl(e.mesure.url) });
+      console.log(`  mesure : ${e.mesure.url} → ${e.mesure.vers} (slug « ${e.mesure.slug} » déclaré, « Lien mesuré » posé sur la fiche)`);
+    } else {
+      console.log(`  mesure non déclarée (${r.erreur || "réponse " + r.status}) : le post partira sans compteur.`);
+    }
+  }
   for (const d of e.desarmer || []) {
     await ecrire(d.id, d.champs);
     console.log(`  désarmée (${d.motif}) : ${d.nom}`);
@@ -598,6 +632,33 @@ async function main() {
   if (flag("armer")) return armer();
 
   const pages = await listeFiches();
+
+  /* --chiffres : le digest de mesure. Le Worker tient les clics, Notion tient la lecture.
+     Trois créneaux par semaine, le flux A passe déjà ici, donc les chiffres tombent sans
+     planifier quoi que ce soit d'autre (et l'horloge GitHub n'est pas fiable, mesuré le 28/10).
+     --sec affiche sans écrire. */
+  if (flag("chiffres")) {
+    const r = await lisChiffres();
+    if (!r.ok) { console.log(`Compteurs illisibles : ${r.erreur}`); return; }
+    console.log(tableau(r));
+    const parSlug = new Map((r.lignes || []).map((l) => [l.slug, l]));
+    const ecrit = !flag("sec");
+    let croisees = 0, sansCompteur = 0;
+    for (const p of pages) {
+      const u = url(p.properties, "Lien mesuré");
+      if (!u) continue;
+      let s = "";
+      try { s = slugDe(new URL(u).pathname.replace(/^\/go\//, "")); } catch { continue; }
+      const l = parSlug.get(s);
+      if (!l) { sansCompteur++; continue; }
+      const nom = titre(p.properties);
+      if (ecrit) await ecrire(p.id, { Clics: { number: l.total || 0 } });
+      croisees++;
+      console.log(`  ${nom} : ${l.total || 0} clic(s)${l.dernier ? ` (dernier ${l.dernier})` : ""}${ecrit ? "" : " — --sec, rien d'écrit"}`);
+    }
+    console.log(`${croisees} fiche(s) mise(s) à jour dans « Clics »${sansCompteur ? `, ${sansCompteur} lien(s) mesuré(s) sans compteur côté Worker` : ""}.`);
+    return;
+  }
 
   if (flag("liste")) {
     console.log(`${pages.length} fiches dans la base.\n`);

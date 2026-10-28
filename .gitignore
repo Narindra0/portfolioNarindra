@@ -18,3 +18,7 @@ data/profil-prive.md
 # Systeme
 .DS_Store
 Thumbs.db
+
+# Cache de wrangler : une commande wrangler lancee depuis ce depot (tests de mesure) ecrit ici.
+# Jamais versionne, jamais publie.
+.wrangler/
