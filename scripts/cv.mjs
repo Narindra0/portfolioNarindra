@@ -26,6 +26,9 @@
      node scripts/cv.mjs                          -> affiche le Markdown sur stdout, rien n'est écrit
      node scripts/cv.mjs --ecrire                 -> écrit cv/cv.md, cv/cv.txt et cv/cv.html
      node scripts/cv.mjs --ecrire --pdf           -> + le PDF A4, imprimé par le navigateur local
+     node scripts/cv.mjs --ecrire --pdf --une-page -> le même PDF, ajusté pour tenir sur UNE page
+       (le programme imprime, compte les pages, serre la typographie jusqu'au plancher de
+       lisibilité, puis rend une fiche à la fois tant que ça déborde — c'est `npm run cv:pdf`)
      node scripts/cv.mjs --cible "Développeur fullstack, mission data"
      node scripts/cv.mjs --max 6                  -> nombre de projets affichés (défaut 6)
      node scripts/cv.mjs --sans-lien              -> garde les projets sans URL publique
@@ -45,7 +48,10 @@ const DS = process.env.NOTION_DS || "78e87c8c-4916-4d46-8cd2-00b0bcd471fa";
 /* Le profil reste la source unique ; CV_PROFIL permet de tester une variante (ou de
    préparer un CV pour une cible précise) sans toucher au fichier autorisé du dépôt. */
 const PROFIL = process.env.CV_PROFIL || join(RACINE, "data", "profil-candidature.md");
-const DOSSIER = join(RACINE, "cv");
+/* CV_DOSSIER permet de tester une variante (profil rempli, palier forcé) sans écraser le CV
+   réel dans cv/ — la boucle d'ajustement imprime plusieurs fois, elle écrase ses propres
+   fichiers à chaque essai, un essai de test ne doit pas laisser sa copie derrière lui. */
+const DOSSIER = process.env.CV_DOSSIER || join(RACINE, "cv");
 
 const args = process.argv.slice(2);
 const opt = (nom, defaut) => {
@@ -216,13 +222,18 @@ function projet(f) {
   const propre = (u) => String(u || "").replace(/\.git\/?$/i, "");
   const lien = propre(urlDe(p, "Lien Démo")) || propre(urlDe(p, "Lien GitHub"));
   const second = propre(urlDe(p, "Lien GitHub"));
-  const corps = passage(txt(p, "Description") || txt(p, "Mission"), 300);
+  const matiere = txt(p, "Description") || txt(p, "Mission");
+  const corps = passage(matiere, 300);
   return {
     nom: (p["Nom du projet"]?.title || []).map((t) => t.plain_text).join("").trim(),
     role: phrase(txt(p, "Rôle"), 90),
     categorie: sel(p, "Catégorie"),
     technologies: multi(p, "Technologies"),
     corps,
+    /* La matière entière reste sous la main : la longueur affichée se décide à l'impression
+       (une page ou deux), pas à la lecture de la base — sinon la note de sélection
+       changerait selon le format demandé, et elle cesserait de mesurer les fiches. */
+    matiere,
     lien,
     github: second && second !== lien ? second : "",
     debut: jour(p, "Date de création"),
@@ -230,6 +241,36 @@ function projet(f) {
     statut: sel(p, "Statut Portfolio"),
   };
 }
+
+/* — Les paliers de mise en page, du plus aéré au plus serré, dans l'ordre où la boucle
+   d'ajustement « une page » les essaie. Ce que chaque palier change et rien d'autre :
+     budget   longueur maximale d'une description de projet (en caractères)
+     technos  technologies affichées par fiche
+     pile     true = la liste complète des compétences ; false = celles des fiches affichées
+              seulement, parce qu'en une page vingt mots-clés dont la moitié ne porte aucun
+              projet, c'est du remplissage pour un ATS et du bruit pour un humain
+     css      marges d'impression, corps de texte, interligne, tailles de titres, blancs
+   Le premier palier est le rendu « normal » à deux pages ; un CV demandé en une page part du
+   deuxième et n'ouvre le suivant que si l'impression a mesuré un débordement. Rognier le
+   contenu vient en dernier, après le plus serré des paliers. — */
+const PALIERS = [
+  {
+    nom: "normal", budget: 300, technos: 6, pile: true,
+    css: { page: "14mm 15mm", maxl: "186mm", pad: "6mm 4mm", corps: "10pt", inter: "1.42", h1: "19pt", h2: "11pt", h3: "10.5pt", m2: "4.5mm 0 1.5mm", m3: "3mm", mli: "1.4mm", meta: "9pt", mp: "1mm 0", m2ul: "1.5mm 0 0" },
+  },
+  {
+    nom: "dense", budget: 200, technos: 5, pile: false,
+    css: { page: "11mm 12mm", maxl: "188mm", pad: "5mm 3mm", corps: "9.4pt", inter: "1.3", h1: "17pt", h2: "10pt", h3: "9.8pt", m2: "2.6mm 0 1mm", m3: "1.6mm", mli: ".7mm", meta: "8.4pt", mp: ".6mm 0", m2ul: "1mm 0 0" },
+  },
+  {
+    nom: "serré", budget: 175, technos: 4, pile: false,
+    css: { page: "9mm 10mm", maxl: "190mm", pad: "4mm 2mm", corps: "8.9pt", inter: "1.24", h1: "15.5pt", h2: "9.5pt", h3: "9.2pt", m2: "2mm 0 .8mm", m3: "1.2mm", mli: ".5mm", meta: "8pt", mp: ".5mm 0", m2ul: ".8mm 0 0" },
+  },
+  {
+    nom: "extrême", budget: 150, technos: 3, pile: false,
+    css: { page: "8mm 9mm", maxl: "192mm", pad: "3mm 2mm", corps: "8.4pt", inter: "1.18", h1: "14.5pt", h2: "9pt", h3: "8.7pt", m2: "1.6mm 0 .6mm", m3: "1mm", mli: ".4mm", meta: "7.6pt", mp: ".4mm 0", m2ul: ".6mm 0 0" },
+  },
+];
 
 async function main() {
   if (!existsSync(PROFIL)) throw new Error(`Profil introuvable : ${PROFIL}`);
@@ -259,24 +300,22 @@ async function main() {
   const nTech = normalisateur(vivants.map((f) => f.technologies.length));
   const nJour = normalisateur(vivants.map(dateDe));
   for (const f of vivants) {
-    const matiere = nCar(f.corps.length);
+    /* `matiere` est le nom de la matière brute de la fiche : la composante de la note
+       s'appelle scoreMatiere, sinon l'Object.assign écrase le texte dont le rendu a besoin
+       et le CV se construit à partir d'un nombre. */
+    const scoreMatiere = nCar(f.corps.length);
     const cles = nTech(f.technologies.length);
     const fraicheur = nJour(dateDe(f));
     const preuve = f.etats.github && f.etats.github.ok ? 1 : 0.6;
     const texte = `${f.technologies.join(" ")} ${f.categorie} ${f.role} ${f.corps}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const recouvre = motsCible.length ? motsCible.filter((m) => texte.includes(m)).length / motsCible.length : 0.5;
-    Object.assign(f, { matiere, cles, fraicheur, preuve, recouvre });
-    f.note = 0.3 * matiere + 0.25 * cles + 0.25 * fraicheur + 0.1 * preuve + 0.1 * recouvre;
+    Object.assign(f, { scoreMatiere, cles, fraicheur, preuve, recouvre });
+    f.note = 0.3 * scoreMatiere + 0.25 * cles + 0.25 * fraicheur + 0.1 * preuve + 0.1 * recouvre;
   }
   vivants.sort((a, b) => b.note - a.note);
-  /* Six, pas quatorze, et pas cinq non plus : mesuré le 28/10, cinq fiches laissent une
-     seconde page remplie au quart — un document qui s'arrête au tiers de sa dernière page
-     fait inachevé. Six remplissent les deux pages sans les forcer. */
+  /* Plafond de fiches affichées : six par défaut. En mode une page, ce n'est qu'un point de
+     départ — la boucle d'ajustement, à la fin, retire les moins bien notées jusqu'à tenir. */
   const max = Number(opt("max", 6));
-  const retenus = vivants.slice(0, max);
-  /* Le CV se lit du haut : parmi les retenus, le plus récent d'abord, la note ne sert qu'à
-     décider qui entre. */
-  retenus.sort((a, b) => dateDe(b) - dateDe(a));
 
   /* Le stack se compte sur TOUTES les fiches publiées, pas seulement celles qu'on affiche :
      cinq projets ne racontent pas dix-huit technologies. Ce sont les noms du select Notion,
@@ -331,55 +370,6 @@ async function main() {
   if (/voir la base|base Projets/i.test(champ(rub, "Identité", "Statut")))
     avertissements.push("Profil : « (voir la base Projets) » est un renvoi interne à ton Notion — à retirer de data/profil-candidature.md, le lecteur ne peut pas l'ouvrir.");
 
-  /* — Le document. Les titres de rubriques sont choisis pour un lecteur automatique :
-     « Profil », « Compétences », « Projets », « Formation », « Langues » sont les mots
-     qu'un ATS cherche ; « Ce que je sais faire, prouvé par ce qui tourne » se lit très bien
-     par un humain et se fait ignorer par une machine. Deuxieme regle ATS : l'URL est ecrite
-     en clair dans le texte, pas planquee derriere un libelle — un parseur lit ce qui
-     s'affiche, pas seulement l'attribut href. — */
-  const L = [];
-  L.push(`# ${majuscule(nom) || "Nom à compléter"}`);
-  const ligne2 = [majuscule(suivi("titre professionnel", titreProfil)), ville].filter(Boolean).join(" — ");
-  if (ligne2) L.push(ligne2);
-  if (contact.length) {
-    L.push("");
-    L.push(contact.map((c) => {
-      const v = c.valeur;
-      const ecrite = /^https?:\/\//i.test(v) ? `[${domaine(v)}](${v})` : /@/.test(v) ? `[${v}](mailto:${v})` : v;
-      return `${c.cle} : ${ecrite}`;
-    }).join(" · "));
-  } else manquants.push("contact (email, téléphone, liens)");
-  if (cible) L.push("", `**Objet : ${cible}**`);
-
-  if (statut || savoirFaire.length) {
-    L.push("", "## Profil", "");
-    if (statut) L.push(majuscule(statut.replace(/\s+/g, " ")), "");
-    for (const s of savoirFaire) L.push(`- ${s}`);
-  }
-
-  if (stack.length) L.push("", "## Compétences", "", stack.join(" · "));
-
-  if (retenus.length) {
-    L.push("", "## Projets", "");
-    /* Phrase lisible par un humain : « vérifiés à la génération » se dit dans un rapport de
-       programme, pas dans un document qui se signe. */
-    L.push(`${retenus.length} projets présentés sur ${publies.length} publiés et consultables en ligne, retenus pour leur activité récente et la matière qu'ils apportent.`);
-    /* Un bloc par projet plutôt qu'une liste à puces imbriquées : le nom devient un
-       sous-titre, le lecteur saute de projet en projet, et le convertisseur HTML n'a pas à
-       gérer deux niveaux de liste. */
-    for (const f of retenus) {
-      const periode = [lisible(f.debut), lisible(f.fin)].filter(Boolean).join(" – ");
-      const meta = [f.role, f.categorie, periode].filter(Boolean).join(" · ");
-      L.push("", `### ${f.nom}`);
-      if (meta) L.push(`*${meta}*`);
-      if (f.corps) L.push(f.corps);
-      const technos = f.technologies.slice(0, 6).join(" · ");
-      const liens = [f.lien && `[${domaine(f.lien)}](${f.lien})`, f.github && `[Code : ${domaine(f.github)}](${f.github})`].filter(Boolean);
-      const pied = [technos && `**${technos}**`, ...liens].filter(Boolean);
-      if (pied.length) L.push(pied.join(" — "));
-    }
-  }
-
   /* Rubriques du bas : elles ne sortent que si le profil les remplit. Le titre imprimé est
      celui qu'un ATS cherche (« Formation », « Expérience professionnelle », « Langues »),
      pas le libellé de notre fichier source. « Prétention » ne va pas dans le CV : un chiffre
@@ -392,6 +382,7 @@ async function main() {
     ["Mobilité", "Mobilité"],
   ];
   const aCompleter = [];
+  const personnelles = [];
   for (const [titreCV, cleProfil] of blocs) {
     const ligne = Object.values(rub).flat().find((l) => l.toLowerCase().startsWith(cleProfil.toLowerCase()));
     /* La valeur commence APRÈS le premier « : » de la ligne, pas après la clé cherchée :
@@ -399,27 +390,92 @@ async function main() {
        à la longueur de la clé recollerait le libellé entre parenthèses dans le CV. */
     const deuxpoints = ligne ? ligne.indexOf(":") : -1;
     const valeur_ligne = deuxpoints === -1 ? "" : ligne.slice(deuxpoints + 1).trim();
-    if (valeur_ligne && !MANQUANT.test(valeur_ligne)) {
-      L.push("", `## ${titreCV}`, "", valeur_ligne);
-    } else aCompleter.push(cleProfil);
+    if (valeur_ligne && !MANQUANT.test(valeur_ligne)) personnelles.push([titreCV, valeur_ligne]);
+    else aCompleter.push(cleProfil);
   }
 
-  /* Pas de « Antananarivo, le 28 octobre 2026 » en pied de CV : c'est une convention de
-     lettre, et une ville suivie d'une date isolée se fait lire par un parseur comme une
-     expérience sans intitulé. La date de génération reste dans le rapport. */
+  if (!titreProfil) manquants.push("titre professionnel");
+  if (!contact.length) manquants.push("contact (email, téléphone, liens)");
   const jourCV = dateDuJour(dateService);
 
-  /* La provenance ne va PAS dans le CV : un document qu'on envoie ne se justifie pas
-     d'avoir été généré. Elle est imprimée dans le rapport, et le CV se termine sur sa
-     dernière rubrique. */
-  const markdown = L.join("\n") + "\n";
+  /* — Le document, construit pour un palier de mise en page donné. C'est la boucle
+     d'ajustement plus bas qui choisit le palier et le nombre de fiches : le rendu imprimé
+     décide de ce qui tient sur la page, pas un chiffre choisi la veille.
+     Les titres de rubriques sont choisis pour un lecteur automatique : « Profil »,
+     « Compétences », « Projets », « Formation », « Langues » sont les mots qu'un ATS
+     cherche ; « Ce que je sais faire, prouvé par ce qui tourne » se lit très bien par un
+     humain et se fait ignorer par une machine. Deuxième règle ATS : l'URL est écrite en
+     clair dans le texte, pas planquée derrière un libellé — un parseur lit ce qui
+     s'affiche, pas seulement l'attribut href. — */
+  const construis = (n, pal = PALIERS[0]) => {
+    const retenus = vivants.slice(0, n).sort((a, b) => dateDe(b) - dateDe(a));
+    const L = [];
+    L.push(`# ${majuscule(nom) || "Nom à compléter"}`);
+    const ligne2 = [majuscule(titreProfil), ville].filter(Boolean).join(" — ");
+    if (ligne2) L.push(ligne2);
+    if (contact.length) {
+      L.push("");
+      L.push(contact.map((c) => {
+        const v = c.valeur;
+        const ecrite = /^https?:\/\//i.test(v) ? `[${domaine(v)}](${v})` : /@/.test(v) ? `[${v}](mailto:${v})` : v;
+        return `${c.cle} : ${ecrite}`;
+      }).join(" · "));
+    }
+    if (cible) L.push("", `**Objet : ${cible}**`);
 
-  const detailNote = (f) => `${f.nom} ${f.note.toFixed(2)} (matière ${Math.round(f.matiere * 100)}, ${f.technologies.length} technos, ${lisible(f.fin || f.debut) || "sans date"})`;
-  const rapport = [
-    `${tous.length} fiches lues dans la base, ${publies.length} avec « Statut Portfolio = Ajouté », ${avecLien.length} avec un lien public, ${vivants.length} dont le lien répond, ${retenus.length} retenues (--max ${max}).`,
+    if (statut || savoirFaire.length) {
+      L.push("", "## Profil", "");
+      if (statut) L.push(majuscule(statut.replace(/\s+/g, " ")), "");
+      for (const s of savoirFaire) L.push(`- ${s}`);
+    }
+
+    /* Compétences : la pile complète au palier normal, celles des fiches affichées seulement
+       dans les paliers serrés (voir le commentaire de PALIERS). */
+    const pile = pal.pile ? stack : [...new Set(retenus.flatMap((f) => f.technologies))];
+    if (pile.length) L.push("", "## Compétences", "", pile.join(" · "));
+
+    if (retenus.length) {
+      L.push("", "## Projets", "");
+      /* Phrase lisible par un humain : « vérifiés à la génération » se dit dans un rapport de
+         programme, pas dans un document qui se signe. */
+      L.push(`${retenus.length} projets présentés sur ${publies.length} publiés et consultables en ligne, retenus pour leur activité récente et la matière qu'ils apportent.`);
+      for (const f of retenus) {
+        const periode = [lisible(f.debut), lisible(f.fin)].filter(Boolean).join(" – ");
+        const meta = [f.role, f.categorie, periode].filter(Boolean).join(" · ");
+        const corps = passage(f.matiere, pal.budget);
+        L.push("", `### ${f.nom}`);
+        if (meta) L.push(`*${meta}*`);
+        if (corps) L.push(corps);
+        const technos = f.technologies.slice(0, pal.technos).join(" · ");
+        const liens = [f.lien && `[${domaine(f.lien)}](${f.lien})`, f.github && `[Code : ${domaine(f.github)}](${f.github})`].filter(Boolean);
+        const pied = [technos && `**${technos}**`, ...liens].filter(Boolean);
+        if (pied.length) L.push(pied.join(" — "));
+      }
+    }
+
+    for (const [titreCV, valeur] of personnelles) L.push("", `## ${titreCV}`, "", valeur);
+
+    /* Pas de « Antananarivo, le 28 octobre 2026 » en pied de CV : c'est une convention de
+       lettre, et une ville suivie d'une date isolée se fait lire par un parseur comme une
+       expérience sans intitulé. La date de génération reste dans le rapport. */
+    return { markdown: L.join("\n") + "\n", ligne2, retenus };
+  };
+
+  let n = max;
+  /* Le premier essai se fait toujours au palier le plus aéré, y compris en mode « une page » :
+     si le CV tient serré sans qu'on le lui demande, autant garder la version lisible. Ce
+     n'est pas le drapeau qui décrète la densité, c'est le nombre de pages mesuré. — */
+  let pal = 0;
+  let { markdown, ligne2, retenus } = construis(n, PALIERS[pal]);
+
+  const detailNote = (f) => `${f.nom} ${f.note.toFixed(2)} (matière ${Math.round(f.scoreMatiere * 100)}, ${f.technologies.length} technos, ${lisible(f.fin || f.debut) || "sans date"})`;
+  /* Le rapport se lit sur le document FINAL : la boucle d'ajustement retire des fiches, un
+     rapport figé avant l'impression annoncerait des projets qui ne sont plus dans le PDF. */
+  const rapportDe = (ret) => [
+    `${tous.length} fiches lues dans la base, ${publies.length} avec « Statut Portfolio = Ajouté », ${avecLien.length} avec un lien public, ${vivants.length} dont le lien répond, ${ret.length} retenues (${PALIERS[pal].nom}, ${n} fiches affichées).`,
     mortes.length ? `Écartées, lien mort mesuré à la génération : ${mortes.map((m) => `${m.f.nom} (${domaine(m.f.lien)} → ${m.e.lien.code})`).join(", ")}.` : "Tous les liens affichés répondent.",
     sansLien ? `${sansLien} projet(s) publié(s) sans URL publique écartés (--sans-lien pour les garder) : le CV ne montre que ce qu'un lecteur peut ouvrir.` : "",
-    vivants.length > max ? `Non affichées, classées après : ${vivants.slice(max).map((f) => f.nom).join(", ")}.` : "",
+    vivants.length > ret.length ? `Non affichées, classées après : ${vivants.slice(ret.length).map((f) => f.nom).join(", ")}.` : "",
     `Notes de sélection : ${vivants.map(detailNote).join(" · ")}.`,
     avertissements.length ? `À corriger dans Notion, le programme ne réécrit aucune source :\n  - ${avertissements.join("\n  - ")}` : "",
     aCompleter.length ? `Rubriques absentes faute de source : ${aCompleter.join(", ")}.` : "Toutes les rubriques personnelles ont une source remplie.",
@@ -428,24 +484,71 @@ async function main() {
     `Aucun nombre, diplôme ou société n'a été ajouté par le programme (généré le ${jourCV || "date indisponible"}${cible ? `, cible : « ${cible} »` : ", aucune cible : --cible augmente le poids des fiches qui y correspondent"}).`,
   ].filter(Boolean);
 
-  if (flag("sec")) { console.log(rapport.join("\n")); return; }
-  console.log(markdown);
-  console.log("\n--- rapport ---\n" + rapport.join("\n"));
+  if (flag("sec")) { console.log(rapportDe(retenus).join("\n")); return; }
 
-  if (!flag("ecrire")) { console.log("\nRien n'a été écrit : ajoutez --ecrire pour produire cv/cv.md, cv/cv.txt et cv/cv.html (--pdf pour le A4)."); return; }
+  if (!flag("ecrire")) {
+    console.log(markdown);
+    console.log("\n--- rapport ---\n" + rapportDe(retenus).join("\n"));
+    console.log("\nRien n'a été écrit : ajoutez --ecrire pour produire cv/cv.md, cv/cv.txt et cv/cv.html (--pdf pour le A4).");
+    return;
+  }
+
   mkdirSync(DOSSIER, { recursive: true });
-  const ecrits = [];
-  writeFileSync(join(DOSSIER, "cv.md"), markdown); ecrits.push("cv.md");
-  /* Le même contenu sans aucune mise en forme : certains portails n'avalent que du texte
-     brut, et c'est le format qui ne peut pas se parser de travers. */
-  writeFileSync(join(DOSSIER, "cv.txt"), brut(markdown)); ecrits.push("cv.txt");
-  writeFileSync(join(DOSSIER, "cv.html"), html(markdown, { nom, ligne2, contact, rapport })); ecrits.push("cv.html");
-  console.log(`\nÉcrit : ${ecrits.map((f) => join(DOSSIER, f)).join("\nÉcrit : ")}`);
+  const ecris = (md, lg, p) => {
+    writeFileSync(join(DOSSIER, "cv.md"), md);
+    /* Le même contenu sans aucune mise en forme : certains portails n'avalent que du texte
+       brut, et c'est le format qui ne peut pas se parser de travers. */
+    writeFileSync(join(DOSSIER, "cv.txt"), brut(md));
+    writeFileSync(join(DOSSIER, "cv.html"), html(md, { nom, ligne2: lg, contact, palier: p }));
+  };
+
+  /* — Ajustement à la page : le programme ne croit pas tenir sur une page, il le mesure. Il
+     imprime, lit le nombre de pages du PDF, et en cas de débordement il serre la typographie
+     jusqu'au PLANCHER de lisibilité ; au-delà, ce n'est plus la police qui paye, c'est une
+     fiche rendue (la moins bien notée), jusqu'à trois projets — en dessous, le document n'est
+     plus un CV et il vaut mieux deux pages. Dernier serrage seulement quand il ne reste rien
+     à rendre : 8,4 pt sur six fiches, ça se lit, mais une fiche de moins se lit mieux.
+     C'est la seule façon honnête de promettre « une page » : le jour où tu remplis email,
+     études et langues, le document grandit, et la boucle serre ou rend une fiche au lieu de
+     déborder sur la page suivante. — */
+  const PLANCHER = PALIERS.findIndex((p) => p.nom === "serré");
+  const essais = [];
+  let pdf = { raison: "impression non demandée" };
+  ecris(markdown, ligne2, PALIERS[pal]);
   if (flag("pdf")) {
-    const pdf = imprimeEnPdf(DOSSIER, nom);
-    console.log(typeof pdf === "string" ? `Écrit : ${pdf}` : `PDF non produit : ${pdf.raison}\nCtrl+P sur cv/cv.html → « Enregistrer en PDF » donne le même A4.`);
+    pdf = imprimeEnPdf(DOSSIER, nom);
+    while (flag("une-page") && pdf.pages > 1) {
+      essais.push(`${PALIERS[pal].nom}/${n} fiches → ${pdf.pages} pages`);
+      if (pal < PLANCHER) pal += 1;
+      else if (n > 3) n -= 1;
+      else if (pal < PALIERS.length - 1) pal += 1;
+      else break;
+      ({ markdown, ligne2, retenus } = construis(n, PALIERS[pal]));
+      ecris(markdown, ligne2, PALIERS[pal]);
+      pdf = imprimeEnPdf(DOSSIER, nom);
+    }
+  }
+
+  console.log(markdown);
+  console.log("\n--- rapport ---\n" + rapportDe(retenus).join("\n"));
+  console.log(`\nÉcrit : ${["cv.md", "cv.txt", "cv.html"].map((f) => join(DOSSIER, f)).join("\nÉcrit : ")}`);
+  if (essais.length) {
+    /* On ne nomme que les fiches rendues PAR la boucle : celles déjà écartées par --max
+       n'ont rien à voir avec la mise en page. */
+    const rendues = vivants.slice(n, max).map((f) => f.nom);
+    console.log(`   ajusté pour tenir sur une page : ${essais.join(" · ")} → ${PALIERS[pal].nom}/${n} fiches → ${pdf.pages} page${pdf.pages > 1 ? "s" : ""}`
+      + (rendues.length ? ` — retirées par l'ajustement : ${rendues.join(", ")}` : ""));
+  } else if (flag("une-page") && pdf.pages) {
+    console.log(`   une page tenue dès le premier essai : ${PALIERS[pal].nom}/${n} fiches → ${pdf.pages} page`);
+  }
+  if (!flag("pdf")) {
+    console.log(flag("une-page")
+      ? "Le « une page » n'est pas mesuré sans --pdf : l'ajustement se joue à l'impression. relance avec --ecrire --pdf --une-page."
+      : "Ctrl+P sur cv/cv.html → « Enregistrer en PDF », format A4 (ou ajoute --pdf pour l'imprimer ici).");
   } else {
-    console.log("Ctrl+P sur cv/cv.html → « Enregistrer en PDF », format A4 (ou ajoute --pdf pour l'imprimer ici).");
+    console.log(pdf.sortie
+      ? `Écrit : ${pdf.sortie}\n   ${pdf.pages} page${pdf.pages > 1 ? "s" : ""}, ${pdf.format}, ${pdf.texte ? "texte sélectionnable (parseable par un ATS)" : "ATTENTION : aucun texte vectoriel détecté"}`
+      : `PDF non produit : ${pdf.raison}\nCtrl+P sur cv/cv.html → « Enregistrer en PDF » donne le même A4.`);
   }
   console.log("Rappel : le dossier cv/ est ignoré par git, un CV n'a rien à faire dans un dépôt public.");
 }
@@ -484,13 +587,14 @@ function imprimeEnPdf(dossier, nom) {
   ], { encoding: "utf8", timeout: 120000 });
   if (!existsSync(sortie)) return { raison: `le navigateur n'a rien écrit (${(r.stderr || "").trim().slice(0, 160) || `code ${r.status}`})` };
   /* Le nombre de pages et la MediaBox se lisent dans le fichier : c'est la preuve que le
-     @page A4 est honoré, pas l'espoir qu'il le soit. */
+     @page A4 est honoré, pas l'espoir qu'il le soit. Et c'est ce compte qui pilote la
+     boucle d'ajustement « une page » ci-dessus. */
   const binaire = readFileSync(sortie).toString("latin1");
   const pages = (binaire.match(/\/Type\s*\/Page[^s]/g) || []).length;
   const boite = /\/MediaBox\s*\[\s*0 0 ([\d.]+) ([\d.]+)/.exec(binaire);
   const format = boite ? `${Math.round((Number(boite[1]) / 72) * 25.4)} × ${Math.round((Number(boite[2]) / 72) * 25.4)} mm` : "format inconnu";
-  console.log(`   ${pages} page(s), ${format}${/ToUnicode/.test(binaire) ? ", texte sélectionnable (parseable par un ATS)" : ", ATTENTION : aucun texte vectoriel détecté"}`);
-  return sortie;
+  const texte = /ToUnicode/.test(binaire);
+  return { sortie, pages, format, texte };
 }
 
 const domaine = (u) => {
@@ -545,6 +649,10 @@ function html(md, meta) {
   }
   if (liste) corps.push("</ul>");
   if (section) corps.push("</section>");
+  /* Une seule structure pour tous les paliers : la densité ne touche que les blancs, le corps
+     de texte et la longueur des descriptions, jamais l'ordre ni les titres de rubriques — un
+     CV qui change de plan selon le bouton choisi se relit mal et se parse encore plus mal. */
+  const t = (meta.palier || PALIERS[0]).css;
   return `<!doctype html>
 <html lang="fr">
 <head>
@@ -554,26 +662,26 @@ function html(md, meta) {
 <meta name="description" content="CV — ${esc(meta.ligne2 || "")}">
 <title>CV — ${esc(meta.nom || "")}</title>
 <style>
-  @page { size: A4; margin: 14mm 15mm; }
+  @page { size: A4; margin: ${t.page}; }
   :root { --encre: #14181d; --doux: #4b5560; --filet: #d7dbe0; --accent: #1f5c8b; }
   * { box-sizing: border-box; }
-  body { margin: 0 auto; max-width: 180mm; padding: 10mm 6mm; color: var(--encre);
-    font: 10pt/1.42 "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-  h1 { font-size: 19pt; margin: 0 0 1mm; letter-spacing: .2mm; }
-  h2 { font-size: 11pt; margin: 4.5mm 0 1.5mm; padding-bottom: .8mm; color: var(--accent);
+  body { margin: 0 auto; max-width: ${t.maxl}; padding: ${t.pad}; color: var(--encre);
+    font: ${t.corps}/${t.inter} "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  h1 { font-size: ${t.h1}; margin: 0 0 1mm; letter-spacing: .2mm; }
+  h2 { font-size: ${t.h2}; margin: ${t.m2}; padding-bottom: .8mm; color: var(--accent);
     border-bottom: .3mm solid var(--filet); text-transform: uppercase; letter-spacing: .35mm; }
   /* Le nom du projet est un sous-titre, pas une puce : il reste collé à sa première ligne
      quand la page se coupe (break-after: avoid), sinon un titre orphelin clôt la page. */
-  h3 { font-size: 10.5pt; margin: 0; color: var(--encre); break-after: avoid; }
+  h3 { font-size: ${t.h3}; margin: 0; color: var(--encre); break-after: avoid; }
   /* Le projet est un bloc solidaire : jamais coupé entre deux pages, l'espace vient du
      bloc, pas du titre. */
-  .projet { break-inside: avoid; margin-top: 3mm; }
-  h3 + p em { color: var(--doux); font-size: 9pt; }
-  p { margin: 1mm 0; orphans: 2; widows: 2; }
-  ul { margin: 1.5mm 0 0; padding-left: 5mm; }
-  li { margin: 0 0 1.4mm; }
+  .projet { break-inside: avoid; margin-top: ${t.m3}; }
+  h3 + p em { color: var(--doux); font-size: ${t.meta}; }
+  p { margin: ${t.mp}; orphans: 2; widows: 2; }
+  ul { margin: ${t.m2ul} 0 0; padding-left: 5mm; }
+  li { margin: 0 0 ${t.mli}; }
   a { color: var(--accent); text-decoration: none; }
-  em { color: var(--doux); font-style: normal; font-size: 9.5pt; }
+  em { color: var(--doux); font-style: normal; font-size: ${t.meta}; }
   hr { border: 0; border-top: .3mm solid var(--filet); margin: 5mm 0 2mm; }
   hr + p { color: var(--doux); font-size: 8.5pt; }
   h1 + p { color: var(--doux); }
