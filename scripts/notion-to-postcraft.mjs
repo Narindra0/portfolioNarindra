@@ -2,16 +2,21 @@
    Lit une fiche projet de la base Notion (la même que le flux B du portfolio) et fabrique
    soit un visuel unique, soit un carrousel de 3 à 10 slides, prêts à publier sur LinkedIn.
 
-   Trois usages :
+   Quatre usages :
      1. En local, pour préparer/contrôler un visuel :
         node scripts/notion-to-postcraft.mjs --liste
         node scripts/notion-to-postcraft.mjs --projet "Pass'io" --carousel --render
+        node scripts/notion-to-postcraft.mjs --projet "Pass'io" --mosaique --render
         node scripts/notion-to-postcraft.mjs --projet "Meshway" --format landscape --out sorties/
      2. Dans l'Action « LinkedIn — visuels » (3 créneaux par semaine, 2 h 30 avant Make) :
-        node scripts/notion-to-postcraft.mjs --preparer
+        node scripts/notion-to-postcraft.mjs --preparer --mosaique
         -> choisit LA fiche du prochain post, rend sa carte portrait, écrit le PNG sous
            assets/visuels-postcraft/ (le workflow le pousse sur « donnees »), pose l'URL dans
            « Visuel du post » et arme la fiche ; toute autre fiche armée est désarmée.
+           Sans --mosaique, une seule carte est rendue ; avec, la fiche est racontée en
+           quatre panneaux recollés dans LA MÊME image 1080×1350 — l'API LinkedIn joignable
+           depuis Make ne publie qu'un média par post (mesuré sur module_spec : aucun module
+           multi-images ni document), donc plusieurs visuels = une composition.
      3. Pour voir la décision sans rien écrire :
         node scripts/notion-to-postcraft.mjs --prochain
         node scripts/notion-to-postcraft.mjs --preparer --sec
@@ -245,8 +250,12 @@ function contenuDe(p, auteur, lim = LIMITS.portrait) {
   };
 }
 
-/* Trame narrative du carrousel, construite uniquement sur ce que porte la fiche. */
-function slidesDe(p, nombre, lim = LIMITS.portrait) {
+/* Trame narrative du carrousel, construite uniquement sur ce que porte la fiche.
+   options.compteur = false pour une mosaïque : les panneaux ne se « tournent » pas, un
+   « 02 / 04 » sur une image unique serait une pagination mensongère.
+   options.couverture : la phrase d'accroche de la première planche change avec le support. */
+function slidesDe(p, nombre, lim = LIMITS.portrait, options = {}) {
+  const { compteur = true, couverture = "Défilez pour découvrir le projet." } = options;
   const nom = titre(p);
   const description = txt(p, "Description");
   const mission = txt(p, "Mission");
@@ -265,7 +274,7 @@ function slidesDe(p, nombre, lim = LIMITS.portrait) {
     .filter(Boolean).join(" · ");
 
   const base = [
-    { title: nom, subtitle: nettoyer(categorie, 40) || "Projet", body: "Défilez pour découvrir le projet.", cta: "" },
+    { title: nom, subtitle: nettoyer(categorie, 40) || "Projet", body: couverture, cta: "" },
     { title: "Le point de départ", subtitle: "Le contexte", body: nettoyer(corps[0] || description, lim.body), cta: "" },
     { title: "Ce que j'ai voulu résoudre", subtitle: "L'objectif", body: nettoyer(mission || corps.slice(1).join(" ") || description, lim.body), cta: "" },
     { title: "Ce que le projet fait", subtitle: liste.length ? `${liste.length} fonctionnalités` : "Le produit", body: nettoyer(liste.slice(0, 4).map((l) => l.split(":")[0].trim()).join(" · "), lim.body) || nettoyer(corps.slice(0, 2).join(" "), lim.body), cta: "" },
@@ -273,13 +282,20 @@ function slidesDe(p, nombre, lim = LIMITS.portrait) {
     { title: moisDe(date) ? `Démarré en ${moisDe(date)}` : "Et maintenant", subtitle: "La suite", body: nettoyer(corps[corps.length - 1] || mission || description, lim.body), cta: "" },
     { title: nom, subtitle: "À retenir", body: nettoyer(rappel, lim.body), cta: cta || "Merci de votre lecture" },
   ];
-  /* 3 à 10 slides : couverture et chute fixes, les étapes du milieu se répètent si nécessaire. */
+  /* Deux façons de composer :
+     - un plan explicite (mosaïque) : on choisit les étapes qui portent l'information ;
+     - 3 à 10 slides (carrousel) : couverture et chute fixes, les étapes du milieu se
+       répètent si nécessaire. */
+  if (options.plan) {
+    const prises = options.plan.map((i) => base[i]);
+    return compteur ? renumerote(prises) : prises;
+  }
   const milieu = base.slice(1, -1);
   const choisis = [base[0]];
   while (choisis.length < nombre - 1) choisis.push(...milieu);
   choisis.length = Math.max(1, nombre - 1);
   choisis.push(base[base.length - 1]);
-  return renumerote(choisis.slice(0, nombre));
+  return compteur ? renumerote(choisis.slice(0, nombre)) : choisis.slice(0, nombre);
 }
 /* Une date ISO ne s'affiche pas telle quelle sur une carte : « 2025-06-15 » devient « juin 2025 ». */
 const MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
@@ -294,6 +310,16 @@ function renumerote(slides) {
   return slides.map((s, i) => i === total - 1
     ? s
     : { ...s, cta: `${String(i + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}` });
+}
+
+/* Les quatre panneaux de la mosaïque, à un seul endroit : la voie automatique et le test
+   local doivent composer la même image. Plan = couverture, ce que fait le projet, comment il
+   est construit, ce qu'il faut en retenir ; la couverture porte la matière de la fiche
+   (jamais une phrase d'accroche inventée par le script) et les panneaux se passent du
+   compteur « 02 / 04 », qui n'a pas de sens sur une image unique. */
+function mosaiqueDe(p, lim, contenu) {
+  const couverture = nettoyer(contenu.description, 120) || nettoyer(contenu.subtitle, 120) || "Le projet en quatre temps.";
+  return slidesDe(p, 4, lim, { plan: [0, 3, 4, 6], compteur: false, couverture });
 }
 
 function slug(s) {
@@ -396,8 +422,8 @@ function cleNormalise(table, valeur) {
   return "";
 }
 
-async function rendre(payload, fichier, cle) {
-  const r = await fetch(`${ORIGINE}/api/render`, {
+async function rendre(payload, fichier, cle, route = "/api/render", tailleMini = 3000) {
+  const r = await fetch(`${ORIGINE}${route}`, {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${cle}` },
     body: JSON.stringify({ ...payload, filename: fichier }),
@@ -408,7 +434,7 @@ async function rendre(payload, fichier, cle) {
     e.statut = r.status;
     throw e;
   }
-  if (!(corps.length > 3000)) throw new Error("Rendu suspect : le PNG renvoyé est trop petit pour être une carte.");
+  if (!(corps.length > tailleMini)) throw new Error("Rendu suspect : le PNG renvoyé est trop petit pour être une carte.");
   return corps;
 }
 
@@ -430,7 +456,14 @@ async function preparer({ pages, reglages, auteur, sec }) {
   console.log(`Prochaine fiche : « ${nom} » (${cat})${armee ? " — déjà armée, on lui refait sa carte et on garde la main dessus" : ""}.`);
   rangs.slice(1, 5).forEach((r, i) => console.log(`  candidat ${i + 2} : « ${titre(r.p.properties)} » (${r.cat})`));
 
-  const gabarits = chaine(reglagePour(reglages, nom, cat), reglages);
+  const enMosaique = flag("mosaique") || process.env.VISUEL_MODE === "mosaique";
+  /* Un panneau de mosaïque est petit : au rendu réel du 28/10, « story » (fond plein, deux
+     blocs de texte, badge de date) remplit la cellule alors que les gabarits aérés (« swiss »)
+     laissent la moitié du panneau vide. Le gabarit de la catégorie reste dans la chaîne, en
+     repli si le premier refuse le texte (422). */
+  const gabarits = enMosaique
+    ? [...new Set([reglages.defautMosaique || reglages.defautCarrousel || "story", ...chaine(reglagePour(reglages, nom, cat), reglages)])]
+    : chaine(reglagePour(reglages, nom, cat), reglages);
   await sondeLiens(p.properties);
   /* Le log du run d'Actions doit permettre de relire « pourquoi ce gabarit » sans ouvrir le
      JSON : la chaîne d'essai complète y figure, repli de 422 compris. */
@@ -441,28 +474,56 @@ async function preparer({ pages, reglages, auteur, sec }) {
   const cle = process.env.POSTCRAFT_KEY || cleDepaire("API_KEY");
   if (!cle) throw new Error("Clé API POSTCRAFT manquante : secret POSTCRAFT_KEY (ou .dev.vars en local).");
 
-  let png = null, templateRetenu = "";
-  for (const template of gabarits) {
-    const payload = { template, format: "portrait", imageType: "png", content: contenu };
-    try {
-      png = await rendre(payload, `${slug(nom)}-${template}.png`, cle);
-      templateRetenu = template;
-      break;
-    } catch (e) {
-      /* 422 = le texte déborde de ce gabarit : on passe au suivant. Tout le reste (401, 500,
-         quota navigateur épuisé) est bloquant : armer une fiche sans carte publierait un post
-         sans visuel, ou un visuel de mauvaise qualité. */
-      if (e.statut === 422) { console.log(`  gabarit « ${template} » refusé (texte trop long), essai du suivant…`); continue; }
-      console.error(`  échec du rendu avec « ${template} » : ${e.message}`);
-      throw e;
+  /* Une tentative sur toute la chaîne de gabarits, dans une forme donnée (mosaïque ou carte).
+     Renvoie null quand la forme est indisponible pour cause de texte trop long (422) sur tous
+     les gabarits : l'appelant peut alors réessayer dans l'autre forme. */
+  async function chaîne(gabarits, planches) {
+    /* Sur une mosaïque, chaque panneau est lu à côté des autres : la ligne de technos et les
+       pastilles de chiffres, portées par le contenu global, se répèteraient à l'identique
+       quatre fois (mesuré sur le premier rendu du 28/10). Le panneau porte donc son propre
+       texte — les slides — et le gabarit ne garde que sa signature (nom, auteur, lien). */
+    const textes = planches ? { ...contenu, tech: "", stats: "" } : contenu;
+    for (const template of gabarits) {
+      const payload = { template, format: "portrait", imageType: "png", content: textes };
+      if (planches) payload.slides = planches;
+      const nomFichier = `${slug(nom)}-${template}${planches ? "-mosaique" : ""}.png`;
+      try {
+        const png = planches
+          ? await rendre(payload, nomFichier, cle, "/api/render-mosaic", 20_000)
+          : await rendre(payload, nomFichier, cle);
+        return { png, template };
+      } catch (e) {
+        /* 422 = le texte déborde de ce gabarit : on passe au suivant. Tout le reste (401, 500,
+           quota navigateur épuisé) est bloquant : armer une fiche sans carte publierait un post
+           sans visuel, ou un visuel de mauvaise qualité. Sauf en mosaïque, où l'échec technique
+           a un repli connu : la carte unique, qui a fait ses preuves depuis le 26/10. */
+        if (e.statut === 422) { console.log(`  gabarit « ${template} » refusé (texte trop long), essai du suivant…`); continue; }
+        if (planches) { console.error(`  mosaïque indisponible (${e.message}) : le créneau repart en carte unique.`); return null; }
+        console.error(`  échec du rendu avec « ${template} » : ${e.message}`);
+        throw e;
+      }
     }
+    return null;
   }
-  if (!png) throw new Error(`Aucun gabarit de la chaîne ${gabarits.join(", ")} n'a accepté ce texte.`);
 
-  const fichier = `${slug(nom)}-${templateRetenu}.png`;
+  /* Deux formes de visuel. La mosaïque (4 panneaux dans la même image 1080×1350) est le mode
+     de l'automatique depuis le 28/10 : l'API LinkedIn accessible à Make ne publie QU'UN média
+     par post (mesuré sur module_spec — aucun module multi-images, aucun module document/PDF),
+     donc « présenter le projet en plusieurs visuels » doit se composer dans le PNG lui-même. */
+  /* Les quatre panneaux qui racontent un projet : voir mosaiqueDe(). */
+  let planches = enMosaique ? mosaiqueDe(p.properties, lim, contenu) : null;
+  let rendu = await chaîne(gabarits, planches);
+  if (!rendu && planches) {
+    planches = null;
+    rendu = await chaîne(gabarits, null);
+  }
+  if (!rendu) throw new Error(`Aucun gabarit de la chaîne ${gabarits.join(", ")} n'a accepté ce texte.`);
+  const { png, template: templateRetenu } = rendu;
+
+  const fichier = `${slug(nom)}-${templateRetenu}${planches ? "-mosaique" : ""}.png`;
   const chemin = join(RACINE, DOSSIER_VISUELS, fichier);
   const publique = `https://raw.githubusercontent.com/${REPO}/${BRANCHE_VISUELS}/${DOSSIER_VISUELS}/${fichier}`;
-  console.log(`Carte ${templateRetenu} rendue : ${(png.length / 1024).toFixed(0)} Ko → ${DOSSIER_VISUELS}/${fichier}`);
+  console.log(`Visuel ${planches ? "mosaïque 4 panneaux" : "carte unique"} « ${templateRetenu} » rendu : ${(png.length / 1024).toFixed(0)} Ko → ${DOSSIER_VISUELS}/${fichier}`);
   if (sec) {
     console.log("--sec : aucun fichier écrit, aucune fiche modifiée.");
     return 0;
@@ -488,7 +549,7 @@ async function preparer({ pages, reglages, auteur, sec }) {
       return { id: x.id, nom, motif: armee ? "arme concurrente" : "drapeau reste coche (test manuel)", champs };
     });
 
-  writeFileSync(ETAT, JSON.stringify({ pageId: p.id, nom, fichier, url: publique, template: templateRetenu, desarmer }, null, 2) + "\n");
+  writeFileSync(ETAT, JSON.stringify({ pageId: p.id, nom, fichier, url: publique, template: templateRetenu, mosaique: !!planches, desarmer }, null, 2) + "\n");
   console.log(`PNG écrit, Notion pas encore touché : --armer le fera après la poussée vérifiée sur « ${BRANCHE_VISUELS} ».`);
   if (desarmer.length) console.log(`À désarmer au même moment : ${desarmer.map((d) => `${d.nom} (${d.motif})`).join(", ")}`);
   return 0;
@@ -568,7 +629,9 @@ async function main() {
   const cartographie = reglagePour(reglages, titre(cible.properties), sel(cible.properties, "Catégorie"));
   await sondeLiens(cible.properties);
   const template = opt("template",
-    cartographie || (flag("carousel") ? reglages.defautCarrousel : reglages.defaut) || "minimal");
+    flag("mosaique")
+      ? (reglages.defautMosaique || "story")
+      : cartographie || (flag("carousel") ? reglages.defautCarrousel : reglages.defaut) || "minimal");
 
   const lim = LIMITS[format] || LIMITS.portrait;
   const payload = {
@@ -578,6 +641,11 @@ async function main() {
     content: contenuDe(cible.properties, auteur, lim),
   };
   if (flag("carousel")) payload.slides = slidesDe(cible.properties, nombre, lim);
+  /* La même fonction que l'automatique : ce qu'on regarde ici est bien ce qui sera publié. */
+  if (flag("mosaique")) {
+    payload.slides = mosaiqueDe(cible.properties, lim, payload.content);
+    Object.assign(payload.content, { tech: "", stats: "" });
+  }
 
   mkdirSync(dir, { recursive: true });
   const base = `postcraft-${slug(titre(cible.properties))}-${template}-${format}`;
@@ -592,11 +660,15 @@ async function main() {
 
   const cle = process.env.POSTCRAFT_KEY || cleDepaire("API_KEY");
   if (!cle) throw new Error("Clé API manquante : POSTCRAFT_KEY (ou .dev.vars pour un test local).");
-  const route = payload.slides ? "/api/render-carousel" : "/api/render";
+  /* La mosaïque renvoie UNE image (le carrousel renvoie un ZIP) : la route se déduit du
+     drapeau, pas de la présence de slides, sinon `--mosaique` demanderait un ZIP. */
+  const route = flag("mosaique") ? "/api/render-mosaic" : payload.slides ? "/api/render-carousel" : "/api/render";
+  const extensionAttendue = route === "/api/render-carousel" ? "zip" : payload.imageType;
+  const suffixe = route === "/api/render-mosaic" ? "-mosaique" : route === "/api/render-carousel" ? "-carousel" : "";
   const r = await fetch(`${ORIGINE}${route}`, {
     method: "POST",
     headers: { "content-type": "application/json", authorization: `Bearer ${cle}` },
-    body: JSON.stringify({ ...payload, filename: `${base}${payload.slides ? "-carousel" : ""}.${payload.slides ? "zip" : payload.imageType}` }),
+    body: JSON.stringify({ ...payload, filename: `${base}${suffixe}.${extensionAttendue}` }),
   });
   const corps = Buffer.from(await r.arrayBuffer());
   const type = r.headers.get("content-type") || "";

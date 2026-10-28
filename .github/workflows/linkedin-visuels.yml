@@ -1,11 +1,16 @@
 # Flux A (suite) — la carte du prochain post LinkedIn se fabrique toute seule.
 #
 # Ce qui tourne ici, 2 h 30 avant Make :
-#   1. scripts/notion-to-postcraft.mjs --preparer  choisit LA fiche du prochain créneau
-#      (publiable, catégorie la moins publiée, puis la plus riche, puis la plus ancienne),
-#      appelle l'API POSTCRAFT en portrait 1080×1350 et écrit le PNG sous
-#      assets/visuels-postcraft/. Si le gabarit prévu refuse le texte (422), il essaie la
-#      chaîne de repli story → minimal. Aucun texte n'est inventé : tout vient de la fiche.
+#   1. scripts/notion-to-postcraft.mjs --preparer --mosaique  choisit LA fiche du prochain
+#      créneau (publiable, catégorie la moins publiée, puis la plus riche, puis la plus
+#      ancienne) et appelle l'API POSTCRAFT en portrait 1080×1350. Depuis le 28/10, le visuel
+#      est une MOSAÏQUE : quatre panneaux (le projet, ce qu'il fait, comment il est construit,
+#      ce qu'il faut en retenir) recollés dans la même image — l'API LinkedIn joignable depuis
+#      Make ne publie qu'un seul média par post, donc « plusieurs visuels » se compose ici.
+#      Le PNG est écrit sous assets/visuels-postcraft/. Si un gabarit refuse le texte (422),
+#      il essaie la chaîne de repli story → swiss → minimal ; si la mosaïque tombe (500, quota
+#      navigateur), le créneau repart en carte unique. Aucun texte n'est inventé : tout vient
+#      de la fiche.
 #   2. Le PNG est poussé sur la branche « donnees » — donc 0 crédit Netlify, et une URL
 #      publique brute que l'API LinkedIn accepte (ShareImage en method:"link" exige une URL).
 #   3. scripts/notion-to-postcraft.mjs --armer écrit « Visuel du post », met
@@ -81,11 +86,11 @@ jobs:
         run: |
           set -e
           if [ "${{ github.event.inputs.mode }}" = "apercu" ]; then
-            node scripts/notion-to-postcraft.mjs --preparer --sec
+            node scripts/notion-to-postcraft.mjs --preparer --mosaique --sec
             exit 0
           fi
           set +e
-          node scripts/notion-to-postcraft.mjs --preparer
+          node scripts/notion-to-postcraft.mjs --preparer --mosaique
           code=$?
           if [ $code -eq 3 ]; then
             echo "::warning::Reservoir vide : aucune fiche publiable, rien n'est arme ni publie. Completer des fiches Notion (Statut Portfolio = Ajoute + un lien + une accroche)."

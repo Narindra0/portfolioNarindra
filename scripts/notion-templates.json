@@ -1,7 +1,8 @@
 {
-  "_commentaire": "Quel gabarit POSTCRAFT pour quelle fiche Notion. parProjet gagne sur parCategorie, qui gagne sur defaut. Le contenu vient toujours de Notion : ce fichier ne choisit que la mise en scène. Trois gabarits seulement, tous vérifiés sur un rendu réel en portrait le 2026-10-26 (story, swiss, fieldnotes) ; minimal sert de dernier repli quand un texte déborde. La variété vient du fond et de la grille, pas d'un quatrième style non éprouvé.",
+  "_commentaire": "Quel gabarit POSTCRAFT pour quelle fiche Notion. parProjet gagne sur parCategorie, qui gagne sur defaut. Le contenu vient toujours de Notion : ce fichier ne choisit que la mise en scène. Trois gabarits seulement, tous vérifiés sur un rendu réel en portrait le 26/10 (story, swiss, fieldnotes) ; minimal sert de dernier repli quand un texte déborde. defautCarrousel = le gabarit des séries de plusieurs images (une par slide). defautMosaique = celui des quatre panneaux recollés dans UNE image : story, mesuré le 28/10 le seul à remplir une cellule de 540x675 sans grand vide (swiss y laisse la moitié haute blanche).",
   "defaut": "story",
   "defautCarrousel": "story",
+  "defautMosaique": "story",
   "parCategorie": {
     "AgriTech": "fieldnotes",
     "Fintech & Sim": "swiss",
