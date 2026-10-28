@@ -11,7 +11,7 @@ Un « à compléter » se laisse vide, il ne se remplit pas par une supposition.
 - Titre que j'assume : développeur fullstack, fondateur de Pass'io
 - Ville, fuseau : Antananarivo, Madagascar (UTC+3)
 - Statut : je travaille à mon compte sur Pass'io ; je construis en parallèle un portefeuille
-  de projets réels et en exploitation (voir la base Projets)
+  de projets réels et en exploitation.
 
 ## Contact (le CV n'affiche que ce qui est rempli ici)
 
