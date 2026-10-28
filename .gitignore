@@ -5,6 +5,11 @@
 # publique avant que --armer n'ecrive dans Notion. Local a un run, jamais a versionner.
 .visuel-etat.json
 
+# CV genere par scripts/cv.mjs : il porte les coordonnees personnelles (email, telephone,
+# LinkedIn). Le depot est public et le site est servi depuis ce meme depot : un CV versionne
+# se retrouverait en ligne sans que personne ne l'ait decide.
+cv/
+
 # Systeme
 .DS_Store
 Thumbs.db

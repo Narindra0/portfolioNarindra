@@ -13,6 +13,14 @@ Un « à compléter » se laisse vide, il ne se remplit pas par une supposition.
 - Statut : je travaille à mon compte sur Pass'io ; je construis en parallèle un portefeuille
   de projets réels et en exploitation (voir la base Projets)
 
+## Contact (le CV n'affiche que ce qui est rempli ici)
+
+- Email : à compléter
+- Téléphone : à compléter
+- LinkedIn : à compléter
+- Portfolio : https://narindraportfolio.netlify.app
+- GitHub : https://github.com/Narindra0
+
 ## Ce que je sais faire, prouvé par ce qui tourne
 
 - **Développement fullstack** : les projets de la base sont en ligne, pas maquettes (front,
