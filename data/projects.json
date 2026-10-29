@@ -203,8 +203,8 @@
     "couleur_secondaire": "#64B5F6",
     "icone": "fa-id-card",
     "lien": {
-      "type": "Aucun",
-      "url": "",
+      "type": "GitHub",
+      "url": "https://github.com/Narindra0/DigiKaratra",
       "libelle": "Visiter DigiKaratra"
     },
     "date": "2026-01-23"
@@ -286,8 +286,8 @@
     "couleur_secondaire": "#FFB74D",
     "icone": "fa-bus",
     "lien": {
-      "type": "Aucun",
-      "url": "",
+      "type": "GitHub",
+      "url": "https://github.com/Narindra0/BusNaka",
       "libelle": "Visiter BusNaka"
     },
     "date": "2026-03-31"
