@@ -408,6 +408,37 @@ function chiffresHorsSource(texte, sources) {
   return [...vus];
 }
 
+/* Deuxième garde, ajoutée après la première lettre réelle (29/10). Le chiffre n'est pas le seul
+   fait qu'un recruteur vérifie : le nom d'un framework s'éprouve en cinq minutes d'entretien. Mesure
+   du jour : la lettre écrivait « l'écosystème PHP (Symfony, Laravel) et TypeScript (Node.js, Next.js) »
+   alors que la matière ne porte ni Laravel ni Node.js — les deux mots venaient de la colonne
+   « Compétences demandées » de l'annonce. La règle 1 du prompt l'interdit déjà, mais le prompt n'a
+   pas de mémoire : c'est le contrôle qui impose.
+
+   La liste est fermée, volontairement. Les noms trop courts ou trop français (Go, C, R, « Vue »
+   qui se lit dans « en vue de », « Java » dans « JavaScript ») en produiraient trop de faux
+   positifs pour qu'on leur fasse encore confiance ; on ne vérifie que ce qui se revendique.
+   « JavaScript » en est sorti sur la même raison : quiconque écrit TypeScript et du React en
+   produit, le lui reprocher serait du bruit plutôt que de la vigilance. */
+const REG_TECHS = [...new Set([
+  'Laravel', 'Symfony', 'CodeIgniter', 'Node.js', 'NestJS', 'Express', 'Django', 'Flask', 'FastAPI',
+  'Next.js', 'Nuxt', 'Vue.js', 'Angular', 'Svelte', 'React Native', 'Spring Boot', 'WordPress',
+  'Shopify', 'Supabase', 'Firebase', 'PostgreSQL', 'MongoDB', 'MySQL', 'Redis', 'SQLite',
+  'Docker', 'Kubernetes', 'Terraform', 'AWS', 'Azure', 'Google Cloud', 'Cloudflare', 'Vercel', 'Render',
+  'GraphQL', 'RabbitMQ', 'Kafka', 'WebSocket', 'Playwright', 'Selenium', 'Cypress', 'TypeScript',
+  'PHP', 'Python', 'Kotlin', 'Swift', 'Rust', 'Flutter', 'Dart', 'Electron', 'Tauri',
+])].map((t) => [t, new RegExp(`\\b${t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:s)?\\b`, 'i')]);
+
+/* On ne teste que les champs qui parlent de LUI. La checklist « Ce que l'annonce demande » et la
+   colonne des compétences sont censées recopier l'annonce, y compris ce qu'il ne sait pas faire. */
+function techsHorsSource(texte, matiere) {
+  const vues = [];
+  for (const [nom, r] of REG_TECHS) {
+    if (r.test(String(texte ?? '')) && !r.test(matiere)) vues.push(nom);
+  }
+  return vues;
+}
+
 function nettoie(s) {
   return String(s ?? '')
     .replace(/\r/g, '')
@@ -463,7 +494,7 @@ const ANG = /\b(the|and|for|with|this|that|from|your|you|are|will|have|our|we|ex
 const FRA = /\b(le|la|les|et|pour|avec|ce|cette|vos|nous|est|sont|dans|une|des|travail|équipe|expérience|qui|que|sur|aux)\b/gi;
 const langueDe = (s) => ((String(s).match(ANG) || []).length > (String(s).match(FRA) || []).length ? 'anglais' : 'français');
 
-function valider(objet, sources, attend = '') {
+function valider(objet, sources, attend = '', matiere = '') {
   const coupes = [];
   const champ = (cle, limite, obligatoire = true, dansLaLangue = false) => {
     const v = nettoie(objet?.[cle]);
@@ -496,12 +527,24 @@ function valider(objet, sources, attend = '') {
   /* Les noms de projets doivent exister dans la matière : un modèle qui écrit « Passio ERP »
      à la place de « Pass'io » envoie une candidature vers un projet introuvable. */
   if (sortie.projets) {
-    const matiere = sources.toLowerCase();
+    const bas = sources.toLowerCase();
     for (const n of sortie.projets.split(',').map((x) => x.trim()).filter(Boolean)) {
-      if (!matiere.includes(n.toLowerCase())) erreurs.push(`projets : « ${n} » n'existe pas dans la matière`);
+      if (!bas.includes(n.toLowerCase())) erreurs.push(`projets : « ${n} » n'existe pas dans la matière`);
     }
   }
-  return { sortie, erreurs, coupes };
+  /* Les technos, elles, ne se rejouent pas d'emblée : une annonce qui exige Laravel mérite
+     quand même une candidature, et refuser le dossier pour un mot serait plus coûteux que utile.
+     La retouche tentée par redigerEtValider ci-dessous essaie de le faire disparaître ; s'il
+     survit, le signalement part dans la « Note du script » de la fiche, à lire avant l'envoi. */
+  const avertissements = [];
+  if (matiere) {
+    for (const cle of ['lettre', 'pourquoi', 'questions']) {
+      for (const t of techsHorsSource(sortie[cle], matiere)) {
+        avertissements.push(`${COLONNES[cle] || cle} : « ${t} » n'est documenté ni dans le profil ni dans les fiches`);
+      }
+    }
+  }
+  return { sortie, erreurs, coupes, avertissements };
 }
 
 /* ————————————————————————————————————————————— écriture Notion
@@ -564,27 +607,33 @@ async function ecrireCandidature(pageId, props) {
   await notion(`/v1/pages/${pageId}`, { method: 'PATCH', body: JSON.stringify({ properties: props }) });
 }
 
-/* Génération + validation, avec UNE retouche quand seuls les plafonds de longueur sont
-   dépassés. Le modèle écrit volontiers 1 700 caractères quand on lui en demande 1 600 : la
-   coupe propre sauve le dossier mais rogne un argument, donc on redemande d'abord une version
-   plus courte en donnant la mesure exacte. Les refus de véracité (chiffre inventé, « nous »,
-   projet inexistant) ne se rejouent pas : relancer serait tenter sa chance contre la règle. */
+/* Génération + validation, avec UNE retouche quand le texte est juste trop long, écrit dans la
+   mauvaise langue, ou revendique une technologie que la matière ne porte pas. Le modèle écrit
+   volontiers 1 700 caractères quand on lui en demande 1 600 : la coupe propre sauve le dossier
+   mais rogne un argument, donc on redemande d'abord une version plus courte en donnant la mesure
+   exacte. Les refus de véracité (chiffre inventé, « nous », projet inexistant) ne se rejouent pas :
+   relancer serait tenter sa chance contre la règle. */
 async function redigerEtValider({ annonce, matiere, intitule, source }) {
   const sources = `${annonce}\n${matiere}`;
   const attend = langueDe(annonce);
   const objet = await rediger({ annonce, matiere, intitule, source });
-  const premier = valider(objet, sources, attend);
+  const premier = valider(objet, sources, attend, matiere);
   /* Deux familles déclenchent la retouche : les plafonds dépassés, et la langue — une consigne
      du prompt système que le modèle n'a pas suivie (mesuré). Les refus de véracité ne se
-     rejouent pas : relancer serait tenter sa chance contre la règle. */
+     rejouent pas : relancer serait tenter sa chance contre la règle. Une techno hors source, si :
+     elle vient de l'annonce, la nommer dans la relance suffit à la faire tomber (un seul appel). */
   const aRetoucher = premier.coupes.length > 0
-    || (premier.erreurs.length > 0 && premier.erreurs.every((e) => /rédigé en/.test(e)));
+    || (premier.erreurs.length > 0 && premier.erreurs.every((e) => /rédigé en/.test(e)))
+    || (premier.erreurs.length === 0 && premier.avertissements.length > 0);
   if (!aRetoucher) return premier;
+  const motsInventes = [...new Set(premier.avertissements.map((a) => (a.match(/« ([^»]+) »/) || [])[1]).filter(Boolean))];
   const consigne = (premier.erreurs.length ? `Langue : l'annonce est écrite en ${attend}, rédige la lettre, le « pourquoi » et les questions d'entretien EN ${attend}. ` : '')
     + (premier.coupes.length ? `Certains champs dépassent le plafond et ont dû être coupés : ${premier.coupes.join(', ')}. ` : '')
+    + (motsInventes.length ? `Technologies à retirer du texte : ${motsInventes.join(', ')}. Ces mots viennent de l'annonce, pas de sa pile réelle : ne les cite plus, dis ce que la matière documente. ` : '')
     + `Réécris l'objet JSON complet, mêmes règles et mêmes faits, chaque champ sous son plafond : phrase plus courte, une puce de moins si nécessaire. Ne supprime pas la fin de la lettre, elle propose la suite.`;
-  const second = valider(await rediger({ annonce, matiere, intitule, source, consigne }), sources, attend);
-  const meilleur = second.erreurs.length === 0 && second.coupes.length <= premier.coupes.length ? second : premier;
+  const second = valider(await rediger({ annonce, matiere, intitule, source, consigne }), sources, attend, matiere);
+  const poids = (x) => x.erreurs.length * 10 + x.coupes.length + x.avertissements.length;
+  const meilleur = second.erreurs.length === 0 && poids(second) <= poids(premier) ? second : premier;
   return meilleur;
 }
 
@@ -610,9 +659,10 @@ async function principal_essai() {
   const matiereDoc = readFileSync(new URL('../data/profil-candidature.md', import.meta.url), 'utf8');
   const matiere = await matiereProjets();
   const contexte = `${matiereDoc.trim()}\n\n## PROJETS EN PRODUCTION (${matiere.nombre})\n${matiere.texte}`;
-  const { sortie, erreurs, coupes } = await redigerEtValider({ annonce: r.texte, matiere: contexte, intitule: r.titre, source: r.methode });
+  const { sortie, erreurs, coupes, avertissements } = await redigerEtValider({ annonce: r.texte, matiere: contexte, intitule: r.titre, source: r.methode });
   if (erreurs.length) console.log(`\n! dossier refusé par la validation :\n  - ${erreurs.join('\n  - ')}`);
   if (coupes.length) console.log(`\n~ coupe appliquée (plafond) : ${coupes.join(', ')}`);
+  if (avertissements.length) console.log(`~ à vérifier avant envoi :\n  - ${avertissements.join('\n  - ')}`);
   for (const [k, v] of Object.entries(sortie)) {
     if (v) console.log(`\n--- ${k} (${v.length} car.) ---\n${v}`);
   }
@@ -717,9 +767,9 @@ async function principal() {
 
     /* Les deux documents servis au modèle sont les seules sources autorisées ; le contrôle
        des chiffres se fait contre eux, exactement contre ce qui a été donné à lire. */
-    let sortie, erreurs, coupes;
+    let sortie, erreurs, coupes, avertissements;
     try {
-      ({ sortie, erreurs, coupes } = await redigerEtValider({ annonce, matiere: contexte, intitule: nom, source }));
+      ({ sortie, erreurs, coupes, avertissements } = await redigerEtValider({ annonce, matiere: contexte, intitule: nom, source }));
     } catch (e) {
       console.log(`  ! ${dispo(nom, f.id)} Gemini : ${String(e.message).slice(0, 160)}`);
       signales++;
@@ -749,6 +799,9 @@ async function principal() {
     }
     notes.push(`annonce : ${source}`);
     if (coupes.length) notes.push(`coupe appliquée : ${coupes.join(', ')}`);
+    /* Le dossier part quand même : une techno empruntée à l'annonce n'est pas un mensonge sur
+       un chiffre, c'est une phrase à retirer avant l'envoi. La note le dit dans la fiche. */
+    if (avertissements.length) notes.push(`à retirer avant envoi : ${avertissements.slice(0, 3).join(' ; ')}`);
     const props = propertiesPourEcrire(sortie, deja, notes.join(' | '), optionsFormat);
     if (intituleAAjuster) props['Intitulé'] = { title: [{ text: { content: intituleAAjuster } }] };
     if (MODE === 'ecrire') await ecrireCandidature(f.id, props);
