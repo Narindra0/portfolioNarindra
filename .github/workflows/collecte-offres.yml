@@ -1,29 +1,41 @@
-# Flux F — la collecte du matin : asako.mg et portaljob-madagascar.com, garés dans Notion.
+# Flux F — la collecte du matin : asako.mg, portaljob-madagascar.com et les missions free-work.com,
+# garées dans Notion.
 #
-# Le script lit les deux plateformes, garde les offres qui ressemblent au profil de Narindra
+# Le script lit les trois sources, garde les offres qui ressemblent au profil de Narindra
 # (les mots sont dans scripts/collecte-offres.mjs, en haut du fichier, éditables), et crée une
 # ligne par offre retenue avec le statut `Nouvelle offre`. La ligne attend : ni dossier, ni envoi.
 # Ce n'est que quand le user passe lui-même une ligne en `À traiter` que le flux E rédige la lettre.
 #
-# Deux points qui exigent d'être écrits quelque part, parce qu'ils ne se devinent pas :
+# Trois points qui exigent d'être écrits quelque part, parce qu'ils ne se devinent pas :
 #  - ce flux n'appelle PAS Gemini : un jour sans offre nouvelle coûte zéro requête sur une clé dont
 #    le quota gratuit est de 20 par jour et que se partagent déjà les flux A, C, D et E ;
 #  - portaljob est une coquille Inertia : le HTML de la liste ne contient aucune offre. Le script
 #    passe par POST /api/emploi/annonces, qui demande un referer du site (sinon 403 « Access not
 #    allowed ») et une paire session/jeton posée par GET /sanctum/csrf-cookie (sinon 419). Les
 #    en-têtes et le pot à cookies sont dans le script, mesurés le 27/10.
+#  - free-work.com est une application Nuxt, mais sa liste est rendue côté serveur : les 16
+#    missions d'une page sont dans les ancres du HTML et leur matière (client, lieu, régime de
+#    télétravail, TJM, durée, compétences, descriptif) dans le script __NUXT_DATA__ — un tableau
+#    plat dont les valeurs sont des index, résolu par la fonction `devalue` du script. Aucun
+#    navigateur, aucun login. Mesuré le 29/10 : 16 ancres = 16 entités sur les pages 1 à 4,
+#    robots.txt ne défend que /login, /logout et /fw-deals.
 #
 # Gardes réellement appliqués dans scripts/collecte-offres.mjs :
 #  - anti-doublon sur le lien ET sur l'intitulé : une même offre publiée sur les deux sites ne crée
 #    qu'une ligne (mesuré : « Développeur full-stack confirmé (PHP/Laravel…) » était sur les deux) ;
 #  - une ligne ne prend une option Format que si cette option existe dans le schéma relu ;
+#  - les missions free-work ne sont garées qu'en télétravail total : le filtre remote=full de l'URL
+#    est vérifié entité par entité (remoteMode == « full ») et une mission dont le payload ne donne
+#    rien est écartée, pas devinée (le périmètre « remote uniquement » est un choix du user, 29/10) ;
 #  - plafond de lignes par course (--max, 25 par défaut) : la base ne se remplit pas d'un coup ;
-#  - 1,2 s entre chaque requête, 5 pages asako et 4 pages portaljob au plus ;
+#  - 1,2 s entre chaque requête, 5 pages asako, 4 pages portaljob et 4 pages free-work au plus
+#    (les deux derniers sont resserrables par les variables de dépôt PJ_PAGES et FW_PAGES, sans
+#    pousser un commit) ;
 #  - en journal de CI, les intitulés, entreprises, liens et motifs sont masqués : le dépôt est public.
 #
 # Secrets : NOTION_TOKEN seulement (aucun GEMINI_API_KEY ici).
 # Variable de dépôt : NOTION_CAND_DS = identifiant de la source de données « Candidatures ».
-name: Portfolio — collecte d'offres (asako + portaljob)
+name: Portfolio — collecte d'offres (asako + portaljob + free-work)
 
 on:
   schedule:
@@ -32,7 +44,7 @@ on:
   workflow_dispatch:
     inputs:
       source:
-        description: 'Les deux plateformes, ou une seule'
+        description: 'Les trois sources, ou une seule'
         required: true
         default: toutes
         type: choice
@@ -40,6 +52,7 @@ on:
           - toutes
           - asako
           - portaljob
+          - freework
       max:
         description: 'Nombre de lignes au plus ce passage (1 à 60)'
         required: true

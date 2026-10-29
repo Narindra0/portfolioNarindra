@@ -1,5 +1,5 @@
-/* Flux F — la collecte des offres. Deux plateformes malgaches sont lues chaque matin, les offres
-   qui ressemblent au profil de Narindra sont GARÉES dans la base « Candidatures » avec le statut
+/* Flux F — la collecte des offres. Trois plateformes sont lues chaque matin, les offres qui
+   ressemblent au profil de Narindra sont GARÉES dans la base « Candidatures » avec le statut
    `Nouvelle offre`, et rien d'autre ne se passe.
 
    Ce que ce script ne fait pas, et c'est le contrat :
@@ -29,11 +29,28 @@
        lecteur : pas de JSON-LD, la coquille vide. C'est pour ça que le descriptif lu dans l'API est
        copié dans « Texte de l'offre » : le flux E, lui, refuse le lien et prend le texte collé.
        Celles d'asako se lisent bien (JSON-LD JobPosting), donc aucune copie n'est nécessaire.
+     - free-work.com (missions freelance, marché français) rend sa liste côté serveur et se passe
+       de navigateur (mesuré le 29/10) : /fr/tech-it/jobs?contracts=contractor&remote=full porte
+       16 ancres /fr/tech-it/job-mission/<métier>/<slug> ET un <script id="__NUXT_DATA__"> au format
+       « devalue » de Nuxt — un tableau plat où les valeurs d'un objet sont des INDEX dans ce
+       tableau. Résolu, il donne pour les 16 missions (appariement mesuré 16/16 sur les pages 1 à 4)
+       le client, le lieu, le régime de télétravail, le TJM quand l'annonce en affiche un, la durée,
+       les compétences et le descriptif : aucune page de détail n'est nécessaire pour collecter.
+       Le paramètre remote=full est honoré par le serveur (mesuré : 16/16 entités en remoteMode
+       « full », contre un mélange partial/full sans lui) — mais la règle « remote uniquement » est
+       quand même vérifiée entité par entité, parce qu'un paramètre qui changerait de sens ne doit
+       pas faire entrer une mission sur site sous son nom. Le choix du périmètre vient de lui
+       (29/10) : les missions ne sont garées que si elles sont en télétravail total.
+       Sa page de détail, elle, expose un JobPosting JSON-LD complet (titre, organisation, datePosted,
+       validThrough, lieu) : le flux E peut donc lire le lien, comme pour asako.
+       robots.txt lu le 29/10 : « User-agent: * » ne défend que /login, /logout et /fw-deals.
 
    Usage :
      NOTION_TOKEN=… node scripts/collecte-offres.mjs                     sec : ce qui serait garé
      … node scripts/collecte-offres.mjs --ecrire                          écrit les lignes
      … node scripts/collecte-offres.mjs --source=asako --max=8            une seule plateforme
+     … node scripts/collecte-offres.mjs --source=freework                 les missions seules
+     … FW_PAGES=6 … node scripts/collecte-offres.mjs                     plus de pages de missions
      … node scripts/collecte-offres.mjs --liste                           état de la file, sans lire les sites
 */
 import { readFileSync, existsSync } from 'node:fs';
@@ -52,7 +69,7 @@ const LISTE = process.argv.includes('--liste');
 const borne = (n, min, max) => Math.min(max, Math.max(min, parseInt(n, 10) || min));
 const MAX_LIGNES = borne((process.argv.find((a) => a.startsWith('--max=')) || '').split('=')[1] || 25, 1, 60);
 const VEUT = (process.argv.find((a) => a.startsWith('--source=')) || '').split('=')[1] || '';
-const SOURCES = VEUT ? [VEUT.toLowerCase()] : ['asako', 'portaljob'];
+const SOURCES = VEUT ? [VEUT.toLowerCase()] : ['asako', 'portaljob', 'freework'];
 
 /* Plafonds de politesse et de coût : le créneau doit rester court et les sites ne doivent pas
    sentir un crawler. Mesuré : le secteur informatique d'asako fait 2 pages, portaljob 60 — on ne
@@ -61,6 +78,10 @@ const SOURCES = VEUT ? [VEUT.toLowerCase()] : ['asako', 'portaljob'];
    evite de devoir pousser un commit pour lire trois pages de plus un dimanche soir. */
 const MAX_PAGES_ASAKO = 5;
 const MAX_PAGES_PORTALJOB = borne(process.env.PJ_PAGES || 4, 1, 10);
+/* Le réservoir de missions est français et loin d'être épuisé : la page 4 du filtre
+   contractor + remote=full datait encore du 14/10 (mesuré le 29/10). Quatre pages de 16, lues à
+   1,2 s d'intervalle, laissent donc le créneau sous la minute et ne ressemblent pas à un crawler. */
+const MAX_PAGES_FREEWORK = borne(process.env.FW_PAGES || 4, 1, 10);
 const PAUSE_MS = 1200;
 const MAX_TEXTE_OFFRE = 6000;
 
@@ -111,15 +132,24 @@ function trancher(offre) {
   const dansTitre = trouve(titre, MOTIFS_PROFIL, MOTS_PROFIL);
   const dansTexte = [...new Set(trouve([offre.desc || '', offre.contrat || '', offre.secteur || ''].join(' '), MOTIFS_PROFIL, MOTS_PROFIL))];
   if (dansTitre.length < 1 && dansTexte.length < 2) return { garde: false, motif: 'aucun mot du profil' };
+  /* Le lieu : soit un mot de zone dans le texte (asako, portaljob écrivent « Antananarivo » ou
+     « Full remote » dans l'annonce), soit le régime de télétravail déclaré par la plateforme elle-même.
+     Free-Work ne met jamais « remote » dans son intitulé : son champ remoteMode vaut « full », et
+     c'est la même information, sortie de la source au lieu du prose. Le périmètre retenu par le user
+     le 29/10 pour les missions est « remote uniquement », donc « partial » (mixte) ne compte pas. */
+  const teletravailTotal = offre.remote === 'full';
   const lieu = [offre.ville || '', titre].join(' ');
-  if (!MOTIFS_LIEU.some((r) => r.test(' ' + normalise(lieu) + ' '))) {
+  if (!teletravailTotal && !MOTIFS_LIEU.some((r) => r.test(' ' + normalise(lieu) + ' '))) {
     return { garde: false, motif: 'hors zone (' + (offre.ville || 'lieu non indiqué') + ')' };
   }
   return {
     garde: true,
     note: `collecte ${offre.source.toLowerCase()} · mots du titre : ${dansTitre.join(', ') || '—'}`
       + ` · mots du descriptif : ${dansTexte.join(', ') || '—'} · lieu : ${offre.ville || 'non indiqué'}`
+      + (teletravailTotal ? ' · télétravail total déclaré par la plateforme' : '')
       + (offre.contrat ? ` · contrat : ${offre.contrat}` : '')
+      + (offre.duree ? ` · durée annoncée : ${offre.duree}` : '')
+      + (offre.tjm ? ` · TJM annoncé : ${offre.tjm}` : '')
       + (offre.urgent ? ' · annonce marquée urgente' : ''),
   };
 }
@@ -247,9 +277,100 @@ async function lirePortalJob() {
   return offres;
 }
 
-/* Les deux compteurs alimentent la même file, avec les mêmes règles de forme : pas d'offre sans
-   titre ni sans lien, et un titre coupé à 300 caractères pour rester lisible dans Notion. */
-function offrePrenante(file, o) {
+/* ———————————————————————————— free-work.com : Nuxt, mais la liste est rendue côté serveur
+   La page porte à la fois les 16 ancres de mission et le payload de l'application. Les ancres
+   donnent l'URL canonique que le flux E saura lire (celle du JobPosting JSON-LD mesuré le 29/10) ;
+   le payload donne le client, le lieu, le régime de télétravail, le TJM, la durée, les compétences
+   et le descriptif. Les croiser sur le slug évite de fetcher 16 pages de détail par course. */
+const FW = 'https://www.free-work.com';
+/* Les deux filtres sont dans l'URL, mesurés le 29/10 : contracts=contractor (missions freelance,
+   pas de salariés) et remote=full (télétravail total). Le tri ne leur fait pas aveuglément
+   confiance : la règle « remote uniquement » est redite en dessous, sur la donnée de l'entité. */
+const FW_LISTE = `${FW}/fr/tech-it/jobs?contracts=contractor&remote=full`;
+
+/* Le format « devalue » de Nuxt 3 : un tableau plat, et dans chaque objet les valeurs sont des
+   INDEX de ce tableau (y compris les chaînes). Un index hors tableau est une valeur posée en clair
+   (mesuré : les `id` techniques, 661159, sortent tels quels) ; la profondeur est bornée parce
+   qu'un objet qui se cite lui-même bouclerait. */
+function devalue(tab) {
+  return function res(i, p) {
+    const v = typeof i === 'number' && i >= 0 && i < tab.length ? tab[i] : i;
+    if (v === null || typeof v !== 'object') return v;
+    if (p > 7) return undefined;
+    if (Array.isArray(v)) return v.map((x) => res(x, p + 1));
+    const out = {};
+    for (const [k, x] of Object.entries(v)) out[k] = res(x, p + 1);
+    return out;
+  };
+}
+
+/* La durée est annoncée en nombre + unité anglaise ; l'unité est rendue en français parce que le
+   note part dans une base qu'il lit, lui, à la main. */
+const DUREES = { month: 'mois', months: 'mois', day: 'jour', days: 'jours', year: 'an', years: 'ans' };
+
+async function lireFreeWork() {
+  const offres = [];
+  const vues = new Set();
+  let fauteDePayload = 0;
+  let horsRemote = 0;
+  for (let page = 1; page <= MAX_PAGES_FREEWORK; page++) {
+    const url = page === 1 ? FW_LISTE : `${FW_LISTE}&page=${page}`;
+    const r = await fetch(url, { headers: { 'user-agent': UA, accept: 'text/html' } });
+    if (!r.ok) { console.log(`  free-work ${url} -> HTTP ${r.status}, arret de ce compte`); break; }
+    const html = await r.text();
+    const brut = (html.match(/<script[^>]+id="__NUXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i) || [])[1];
+    let tab = [];
+    try { tab = JSON.parse(brut || '[]'); } catch { tab = []; }
+    const res = devalue(tab);
+    const parSlug = new Map();
+    for (let i = 0; i < tab.length; i++) {
+      const v = tab[i];
+      /* Le marqueur d'une mission, mesuré : les clés brutes title ET remoteMode. Le @type littéral
+         n'existe pas dans ce tableau — il pointe vers une index. */
+      if (!v || typeof v !== 'object' || Array.isArray(v) || !('title' in v) || !('remoteMode' in v)) continue;
+      const o = res(i);
+      if (o && typeof o.title === 'string' && typeof o.slug === 'string' && !parSlug.has(o.slug)) parSlug.set(o.slug, o);
+    }
+    const ancres = [...new Set([...html.matchAll(/href="(\/fr\/tech-it\/job-mission\/[^"]+)"/g)].map((m) => m[1]))];
+    if (!ancres.length) { console.log(`  free-work page ${page} : 0 ancre, arret`); break; }
+    let nouvelles = 0;
+    for (const a of ancres) {
+      if (vues.has(a)) continue;
+      nouvelles++;
+      const o = parSlug.get(a.split('/').pop());
+      /* Une mission sans entité résolue : son régime de télétravail est inconnu, donc elle ne peut
+         pas passer la règle « remote uniquement ». Comptée, pas devinée. */
+      if (!o) { fauteDePayload++; vues.add(a); continue; }
+      if (o.remoteMode !== 'full') { horsRemote++; vues.add(a); continue; }
+      vues.add(a);
+      offrePrenante(offres, {
+        source: 'Free-Work',
+        url: FW + a,
+        titre: htmlVersTexte(o.title),
+        entreprise: (o.company && o.company.name) || '',
+        /* L'annonce colle une ville française même en télétravail total : les deux informations
+           restent, dans l'ordre de ce qui décide (le régime, puis le bureau déclaré). */
+        ville: 'Télétravail total' + (o.location && o.location.label ? ' (' + o.location.label + ')' : ''),
+        remote: o.remoteMode,
+        contrat: 'Freelance',
+        date: o.publishedAt || '',
+        tjm: typeof o.dailySalary === 'string' ? o.dailySalary : '',
+        competences: (o.skills || []).map((s) => s && s.name).filter(Boolean).slice(0, 14).join(', '),
+        duree: o.durationValue ? `${o.durationValue} ${DUREES[normalise(o.durationPeriod || 'month')] || 'mois'}` : '',
+        desc: htmlVersTexte(o.description || '').slice(0, MAX_TEXTE_OFFRE),
+      });
+    }
+    console.log(`  free-work page ${page} : ${ancres.length} mission(s) lue(s), ${parSlug.size} entité(s) au payload, ${nouvelles} nouvelle(s)`);
+    if (!nouvelles) { console.log('  free-work : plus aucune mission nouvelle, arret'); break; }
+    await attente();
+  }
+  if (fauteDePayload) console.log(`  free-work : ${fauteDePayload} mission(s) sans entité dans le payload, écartées faute de régime de télétravail connu`);
+  if (horsRemote) console.log(`  free-work : ${horsRemote} mission(s) non en télétravail total, écartées (règle du 29/10)`);
+  return offres;
+}
+
+/* Les trois compteurs alimentent la même file, avec les mêmes règles de forme : pas d'offre sans
+   titre ni sans lien, et un titre coupé à 300 caractères pour rester lisible dans Notion. */function offrePrenante(file, o) {
   if (!o.titre || !/^https?:/i.test(o.url)) return;
   o.titre = o.titre.slice(0, 300);
   file.push(o);
@@ -358,6 +479,7 @@ const principal = async () => {
   const brutes = [];
   if (SOURCES.includes('asako')) brutes.push(...await lireAsako());
   if (SOURCES.includes('portaljob')) brutes.push(...await lirePortalJob());
+  if (SOURCES.includes('freework')) brutes.push(...await lireFreeWork());
 
   const existantes = await fiches();
   const deja = new Set(existantes.map((f) => cleLien(urlDe(f.properties, 'Lien de l\'offre'))).filter(Boolean));
@@ -373,10 +495,15 @@ const principal = async () => {
   const gardees = [];
   const ecartees = {};
   const ecarter = (m) => { ecartees[m] = (ecartees[m] || 0) + 1; };
+  /* Le motif « hors zone » est suivi du lieu TEL QUEL : « hors zone (Andranomena) » a été lu dans un
+     journal de CI à l'instant. Un quartier malgache dans un log public renseigne sur la recherche
+     d'emploi au moins autant qu'un intitulé, et les autres motifs (mots exclus) ne disent que du
+     vocabulaire générique. Donc : le compteur reste, le lieu passe. */
+  const motifPublie = (m) => (MASQUE && m.startsWith('hors zone') ? 'hors zone (lieu masque en journal public)' : m);
   for (const o of brutes) {
     if (deja.has(cleLien(o.url)) || dejaTitres.has(cleTitre(o.titre))) { ecarter('deja dans la base'); continue; }
     const v = trancher(o);
-    if (!v.garde) { ecarter(v.motif); continue; }
+    if (!v.garde) { ecarter(motifPublie(v.motif)); continue; }
     deja.add(cleLien(o.url));
     dejaTitres.add(cleTitre(o.titre));
     gardees.push({ ...o, note: v.note });
@@ -412,12 +539,18 @@ const principal = async () => {
       'Entreprise': o.entreprise ? { rich_text: riche(o.entreprise) } : undefined,
       'Lien de l\'offre': { url: o.url },
       'Localisation': o.ville ? { rich_text: riche(o.ville) } : undefined,
+      /* Le TJM et les compétences sont recopiés tels que la plateforme les annonce : ce sont des
+         faits de l'annonce, pas de la matière rédigée, et ils répondent à la première question
+         qu'il pose devant une ligne (« est-ce que ça paie, et est-ce que je sais faire »). */
+      'Salaire indiqué': o.tjm ? { rich_text: riche(o.tjm) } : undefined,
+      'Compétences demandées': o.competences ? { rich_text: riche(o.competences) } : undefined,
       'Note du script': { rich_text: riche(o.note) },
     };
     const format = formatDe(o.contrat || '', opts.Format);
     if (format) p['Format'] = { select: { name: format } };
     /* Le descriptif n'est copié que pour portaljob : sa page de detail ne rend rien pour un lecteur,
-       alors que celle d'asako expose un JobPosting complet que le flux E sait lire dans le lien. */
+       alors que celles d'asako et de free-work exposent un JobPosting JSON-LD complet que le flux E
+       sait lire dans le lien. */
     if (o.desc && o.source === 'PortalJob') p['Texte de l\'offre'] = { rich_text: riche(o.desc) };
     if (/^\d{4}-\d{2}-\d{2}$/.test(o.echeance || '')) p['Échéance'] = { date: { start: o.echeance } };
     for (const k of Object.keys(p)) if (!p[k]) delete p[k];
