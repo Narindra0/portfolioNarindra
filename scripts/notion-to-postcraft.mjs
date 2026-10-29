@@ -188,23 +188,50 @@ function lien(p) {
    (narindra.pythonanywhere.com = HTTP 404) et DigiKaratra (digikaratra.alwaysdata.net =
    connexion refusée). */
 const atteignables = new Map();
-async function sondeLiens(p) {
-  const { url: cible } = lien(p);
-  if (!cible || atteignables.has(cible)) return;
-  let detail = "erreur réseau";
+/* Une seule sonde pour tout le programme : le cache garde l'état ET le détail, pour que la carte
+   et la file d'attente rendent le même verdict sur une même URL. */
+async function etatDuLien(cible) {
+  if (atteignables.has(cible)) return atteignables.get(cible);
+  let etat = { ok: false, detail: "erreur réseau" };
   try {
     const r = await fetch(cible, { redirect: "follow", signal: AbortSignal.timeout(12000), headers: { "User-Agent": "controle-lien", Accept: "text/html,application/json" } });
-    detail = `HTTP ${r.status}`;
-    atteignables.set(cible, r.ok);
+    etat = { ok: r.ok, detail: `HTTP ${r.status}` };
   } catch (e) {
-    atteignables.set(cible, false);
+    etat = { ok: false, detail: e.name === "TimeoutError" ? "délai dépassé" : `réseau ${e.cause?.code || e.name}` };
   }
-  console.log(`  lien ${atteignables.get(cible) ? "vivant" : `MORT (${detail})`} : ${cible}${atteignables.get(cible) ? "" : " — la carte partira sans adresse ni appel à cliquer"}`);
+  atteignables.set(cible, etat);
+  return etat;
+}
+
+async function sondeLiens(p) {
+  const { url: cible } = lien(p);
+  if (!cible) return;
+  const etat = await etatDuLien(cible);
+  console.log(`  lien ${etat.ok ? "vivant" : `MORT (${etat.detail})`} : ${cible}${etat.ok ? "" : " : la carte partira sans adresse ni appel à cliquer"}`);
+}
+
+/* Le filtre publiable exige un lien, pas un lien VIVANT. Mesuré le 2026-10-29 : DigiKaratra
+   arrivait 2e de la file et BusNaka 4e alors que leurs deux hébergements gratuits étaient morts
+   (digikaratra.alwaysdata.net = ENOTFOUND, narindra.pythonanywhere.com = 404), et que leurs
+   dépôts GitHub, eux, répondent 200. Un post au lien mort ne se rattrape pas (il reste dans le
+   fil) et le compteur enregistre un clic vers une impasse : la file est donc sondée, et une
+   destination morte descend en bout de file au lieu de passer au créneau suivant. */
+async function trieParDestination(rangs) {
+  for (const r of rangs) {
+    const { url: cible } = lien(r.p.properties);
+    const etat = cible ? await etatDuLien(cible) : { ok: false, detail: "aucun lien" };
+    r.vivant = etat.ok;
+    r.detail = etat.detail;
+    r.vers = cible;
+  }
+  const morts = rangs.filter((r) => !r.vivant);
+  for (const r of morts) console.log(`  destination morte, la fiche descend en bout de file : « ${titre(r.p.properties)} » -> ${r.vers || "(aucun lien)"} [${r.detail}]`);
+  return [...rangs.filter((r) => r.vivant), ...morts];
 }
 
 function lienSur(p) {
   const l = lien(p);
-  return l.url && atteignables.get(l.url) === false ? { url: "", cta: "" } : l;
+  return l.url && atteignables.get(l.url)?.ok === false ? { url: "", cta: "" } : l;
 }
 
 /* Les gabarits dimensionnent la typographie en cqw (liée à la LARGEUR du cadre) : en paysage,
@@ -463,10 +490,18 @@ async function rendre(payload, fichier, cle, route = "/api/render", tailleMini =
 const ETAT = join(RACINE, ".visuel-etat.json");
 
 async function preparer({ pages, reglages, auteur, sec }) {
-  const rangs = classer(pages);
+  let rangs = classer(pages);
   if (!rangs.length) {
     console.log("AUCUNE FICHE PUBLIABLE : rien n'est armé, rien ne sera publié ce créneau.");
     console.log("Le réservoir est vide dès que les fiches « Ajouté » avec un lien sont toutes postées — il faut compléter des fiches, pas baisser le filtre.");
+    return 3;
+  }
+  rangs = await trieParDestination(rangs);
+  if (!rangs[0].vivant) {
+    /* Toutes les destinations sont mortes : publier ici mettrait un lien mort sous son nom, et le
+       compteur enregistrerait un clic vers une impasse. On n'arme rien, le créneau est vide, et le
+       log dit exactement quoi réparer. */
+    console.log("AUCUNE DESTINATION VIVANTE : rien n'est armé ce créneau. Réparer les liens (dépôt public ou démo en ligne) puis relancer.");
     return 3;
   }
   const { p, cat, armee } = rangs[0];
@@ -677,9 +712,9 @@ async function main() {
 
   if (flag("prochain") || flag("preparer")) {
     if (flag("prochain")) {
-      const rangs = classer(pages);
+      const rangs = await trieParDestination(classer(pages));
       console.log(`${rangs.length} fiche(s) publiable(s) sur ${pages.length}.\n`);
-      rangs.forEach((r, i) => console.log(`${i + 1}. ${titre(r.p.properties)} — ${r.cat} — ${r.armee ? "DÉJÀ ARMÉE" : "à armer"} — gabarit ${reglagePour(reglages, titre(r.p.properties), r.cat)} — richesse ${r.riche.toFixed(1)} — ${r.date}`));
+      rangs.forEach((r, i) => console.log(`${i + 1}. ${titre(r.p.properties)} — ${r.cat} — ${r.armee ? "DÉJÀ ARMÉE" : "à armer"} — destination ${r.vivant ? "vivante" : `MORTE [${r.detail}]`} — gabarit ${reglagePour(reglages, titre(r.p.properties), r.cat)} — richesse ${r.riche.toFixed(1)} — ${r.date}`));
       if (!rangs.length) console.log("Rien de publiable : il faut compléter des fiches (Statut Portfolio = Ajouté + lien + 60 caractères de matière).");
       return;
     }

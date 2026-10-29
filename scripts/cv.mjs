@@ -253,8 +253,16 @@ function projet(f) {
   /* Un lien de dépôt saisi avec le suffixe « .git » se colle tel quel dans Notion : dans un
      navigateur, l'URL ne s'ouvre pas. On le retire à la lecture, pour l'affichage et la cible. */
   const propre = (u) => String(u || "").replace(/\.git\/?$/i, "");
-  const lien = propre(urlDe(p, "Lien Démo")) || propre(urlDe(p, "Lien GitHub"));
-  const second = propre(urlDe(p, "Lien GitHub"));
+  /* La voie est celle des autres consommateurs (site, carte LinkedIn, flux C) : « Type de lien =
+     GitHub » impose le dépôt, sinon la démo passe en premier. Sans cette règle, une fiche dont
+     l'hébergement gratuit est mort mais le dépôt vivant sortait du CV : mesuré le 2026-10-29 sur
+     BusNaka (pythonanywhere, HTTP 404) et DigiKaratra (alwaysdata, DNS inconnu), dont les dépôts
+     GitHub répondent 200. */
+  const type = sel(p, "Type de lien");
+  const demo = propre(urlDe(p, "Lien Démo"));
+  const github = propre(urlDe(p, "Lien GitHub"));
+  const lien = type === "GitHub" ? (github || demo) : (demo || github);
+  const second = type === "GitHub" ? (demo && demo !== lien ? demo : "") : github;
   const matiere = txt(p, "Description") || txt(p, "Mission");
   const corps = passage(matiere, 300);
   return {
@@ -319,14 +327,19 @@ async function main() {
   const avecLien = flag("sans-lien") ? publies : publies.filter((f) => f.lien);
   const sansLien = publies.length - avecLien.length;
 
-  /* Chaque lien est sondé avant d'engager le document. */
+  /* Chaque lien est sondé avant d'engager le document. Le lien principal est engagé dans le CV :
+     mort, la fiche sort. Un second lien mort ne fait pas sortir la fiche, il est retiré de
+     l'impression : mesuré le 2026-10-29, BusNaka et DigiKaratra disparaissaient tous les deux
+     alors que leur dépôt GitHub répond 200 et que seul leur hébergement gratuit est mort. */
   const etats = await Promise.all(avecLien.map(async (f) => ({ lien: await sonde(f.lien), github: f.github ? await sonde(f.github) : null })));
   const vivants = [];
   const mortes = [];
+  const secondes = [];
   avecLien.forEach((f, i) => {
     const e = etats[i];
-    if (e.lien.ok && (e.github === null || e.github.ok)) vivants.push(Object.assign(f, { etats: e }));
-    else mortes.push({ f, e });
+    if (!e.lien.ok) { mortes.push({ f, e }); return; }
+    if (e.github && !e.github.ok) { secondes.push(`${f.nom} (${domaine(f.github)})`); f.github = ""; }
+    vivants.push(Object.assign(f, { etats: e }));
   });
 
   const cible = opt("cible", "");
@@ -522,6 +535,7 @@ async function main() {
   const rapportDe = (ret) => [
     `${tous.length} fiches lues dans la base, ${publies.length} avec « Statut Portfolio = Ajouté », ${avecLien.length} avec un lien public, ${vivants.length} dont le lien répond, ${ret.length} retenues (${PALIERS[pal].nom}, ${n} fiches affichées).`,
     mortes.length ? `Écartées, lien mort mesuré à la génération : ${mortes.map((m) => `${m.f.nom} (${domaine(m.f.lien)} → ${m.e.lien.code})`).join(", ")}.` : "Tous les liens affichés répondent.",
+    secondes.length ? `Second lien retiré de l'impression : ${secondes.join(", ")} (la voie principale répond, seul le lien secondaire est mort).` : "",
     sansLien ? `${sansLien} projet(s) publié(s) sans URL publique écartés (--sans-lien pour les garder) : le CV ne montre que ce qu'un lecteur peut ouvrir.` : "",
     vivants.length > ret.length ? `Non affichées, classées après : ${vivants.slice(ret.length).map((f) => f.nom).join(", ")}.` : "",
     `Notes de sélection : ${vivants.map(detailNote).join(" · ")}.`,
