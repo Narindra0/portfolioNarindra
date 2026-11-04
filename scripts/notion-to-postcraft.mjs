@@ -7,6 +7,10 @@
         node scripts/notion-to-postcraft.mjs --liste
         node scripts/notion-to-postcraft.mjs --projet "Pass'io" --carousel --render
         node scripts/notion-to-postcraft.mjs --projet "Pass'io" --mosaique --render
+        node scripts/notion-to-postcraft.mjs --projet "Meshway" --mosaique --palette nuit --render
+           -> --palette force une des palettes de notion-templates.json pour comparer deux
+              rendus ; sans elle c'est la palette de la catégorie qui s'applique, et elle n'est
+              testée que sur le gabarit story (les autres gardent leur couleur propre).
         node scripts/notion-to-postcraft.mjs --projet "Meshway" --format landscape --out sorties/
      2. Dans l'Action « LinkedIn — visuels » (3 créneaux par semaine, 2 h 30 avant Make) :
         node scripts/notion-to-postcraft.mjs --preparer --mosaique
@@ -459,12 +463,82 @@ function reglagePour(reglages, nom, cat) {
    retomber sur la fiche. Sans cette tolérance, un accent oublié dans le mapping = gabarit
    défaut et l'erreur est silencieuse. */
 function cleNormalise(table, valeur) {
+  return gabaritDe(entreeDe(table, valeur));
+}
+/* L'entrée brute (chaîne ou objet {template, palette}) : la palette se lit au même endroit que
+   le gabarit, sinon on aurait deux tableaux à maintenir en parallèle et ils divergeraient. */
+function entreeDe(table, valeur) {
   if (!table || !valeur) return "";
   const cible = normal(valeur);
   for (const [cle, entree] of Object.entries(table)) {
-    if (normal(cle) === cible) return gabaritDe(entree);
+    if (normal(cle) === cible) return entree;
   }
   return "";
+}
+
+/* ————————————————————— Rotation de palette ————————————————————— */
+
+/* Pourquoi ce code existe : la mosaïque impose le gabarit story, et story porte sa palette en
+   dur dans le studio (fond #193B36, vert forêt). Mesuré le 4/11, les 4 derniers posts étaient
+   verts. La palette n'est pas une fantaisie de plus : elle redonne une identité par catégorie à
+   un format qui ne peut plus compter sur le choix du gabarit. */
+
+function versHex(c) {
+  const h = String(c || "").trim().replace(/^#?/, "#");
+  return /^#[0-9a-f]{6}$/i.test(h) ? h : "";
+}
+const composante = (hex, i) => {
+  const v = parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16) / 255;
+  return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+};
+const luminosite = (hex) => 0.2126 * composante(hex, 0) + 0.7152 * composante(hex, 1) + 0.0722 * composante(hex, 2);
+/* Ratio WCAG 2.x : 4,5 est le seuil du texte courant. Une carte lue sur téléphone dans un fil
+   d'actualités n'a pas droit à un contraste décoratif. */
+function contraste(bg, fg) {
+  const [a, b] = [luminosite(bg), luminosite(fg)].sort((x, y) => y - x);
+  return (a + 0.05) / (b + 0.05);
+}
+
+/* Une palette nommée du JSON, vérifiée et chiffrée : renvoie { style, motif }. `motif` est
+   rempli quand on refuse, pour que le log explique sans relire le fichier. `exigerContraste`
+   sert aux deux chemins : la rotation automatique refuse un fond trop proche du texte, un test
+   à la main (`--palette`) passe par la même règle, une carte illisible ne se justifie pas parce
+   qu'on l'a demandée soi-même. */
+function paletteBrute(reglages, nom) {
+  if (!nom) return { style: null, motif: "aucune palette demandée" };
+  const p = reglages.palettes?.[nom];
+  if (!p) return { style: null, motif: `palette « ${nom} » absente du bloc palettes` };
+  const bg = versHex(p.bg);
+  const fg = versHex(p.fg);
+  const accent = versHex(p.accent);
+  if (!bg || !fg) return { style: null, motif: `palette « ${nom} » : bg ou fg illisible (${p.bg} / ${p.fg})` };
+  const ratio = contraste(bg, fg);
+  if (ratio < 4.5) return { style: null, motif: `palette « ${nom} » refusée : contraste ${ratio.toFixed(2)} sous 4,5` };
+  const style = { bg, fg };
+  if (accent) style.accent = accent;
+  return { style, ratio, motif: "" };
+}
+
+/* La palette demandée, et seulement si elle est applicable et sûre.
+   Quatre refus, tous expliqués dans le log pour qu'un run d'Actions se relise sans ouvrir le
+   JSON : pas de bloc palettes, nom inconnu, gabarit autre que story (sa couleur est sa
+   signature), contraste fond/texte trop faible. Dans ces quatre cas on rend la palette du
+   gabarit, c'est-à-dire exactement ce qui marchait hier. */
+function palettePour(reglages, nom, cat, template) {
+  const gabaritsColorables = [String(reglages.defautMosaique || ""), "story"].filter(Boolean);
+  const paletteDe = (entree) => (entree && typeof entree === "object" ? String(entree.palette || "") : "");
+  /* Un projet peut être listé pour son gabarit sans palette (« "Pass'io": "swiss" » en forme
+     chaîne) : on descend alors chercher la palette de sa catégorie au lieu de retomber bêtement
+     sur la palette défaut. */
+  const voulu = paletteDe(entreeDe(reglages.parProjet, nom)) || paletteDe(entreeDe(reglages.parCategorie, cat));
+  const nomPalette = voulu || String(reglages.defautPalette || "");
+  if (!nomPalette) return { nom: "", style: null, motif: "aucune palette réglée" };
+  if (!reglages.palettes) return { nom: "", style: null, motif: "pas de bloc palettes dans notion-templates.json" };
+  if (!gabaritsColorables.includes(template)) {
+    return { nom: nomPalette, style: null, motif: `non appliquée : le gabarit « ${template} » garde sa couleur propre` };
+  }
+  const { style, ratio, motif } = paletteBrute(reglages, nomPalette);
+  return { nom: nomPalette, style, ratio, motif };
 }
 
 async function rendre(payload, fichier, cle, route = "/api/render", tailleMini = 3000) {
@@ -538,13 +612,19 @@ async function preparer({ pages, reglages, auteur, sec }) {
     const textes = planches ? { ...contenu, tech: "", stats: "" } : contenu;
     for (const template of gabarits) {
       const payload = { template, format: "portrait", imageType: "png", content: textes };
+      /* La palette se choisit APRÈS la décision de gabarit : sur une mosaïque le premier de la
+         chaîne est presque toujours story, donc c'est ici que la rotation couleur s'applique. Un
+         repli sur swiss ou minimal reprend leurs couleurs dessinées, sans rien forcer. */
+      const pal = palettePour(reglages, nom, cat, template);
+      if (pal.style) payload.style = pal.style;
+      else if (pal.motif) console.log(`  palette : ${pal.motif}.`);
       if (planches) payload.slides = planches;
-      const nomFichier = `${slug(nom)}-${template}${planches ? "-mosaique" : ""}.png`;
+      const nomFichier = `${slug(nom)}-${template}${pal.style ? `-${pal.nom}` : ""}${planches ? "-mosaique" : ""}.png`;
       try {
         const png = planches
           ? await rendre(payload, nomFichier, cle, "/api/render-mosaic", 20_000)
           : await rendre(payload, nomFichier, cle);
-        return { png, template };
+        return { png, template, palette: pal.style ? pal.nom : "", fichier: nomFichier };
       } catch (e) {
         /* 422 = le texte déborde de ce gabarit : on passe au suivant. Tout le reste (401, 500,
            quota navigateur épuisé) est bloquant : armer une fiche sans carte publierait un post
@@ -571,12 +651,12 @@ async function preparer({ pages, reglages, auteur, sec }) {
     rendu = await chaîne(gabarits, null);
   }
   if (!rendu) throw new Error(`Aucun gabarit de la chaîne ${gabarits.join(", ")} n'a accepté ce texte.`);
-  const { png, template: templateRetenu } = rendu;
-
-  const fichier = `${slug(nom)}-${templateRetenu}${planches ? "-mosaique" : ""}.png`;
+  /* Le nom de fichier vient du rendu, pas d'une reconstruction ici : il porte la palette quand
+     elle a été appliquée, et le PNG en ligne doit s'appeler comme la carte qu'on voit. */
+  const { png, template: templateRetenu, palette: paletteRetenue, fichier } = rendu;
   const chemin = join(RACINE, DOSSIER_VISUELS, fichier);
   const publique = `https://raw.githubusercontent.com/${REPO}/${BRANCHE_VISUELS}/${DOSSIER_VISUELS}/${fichier}`;
-  console.log(`Visuel ${planches ? "mosaïque 4 panneaux" : "carte unique"} « ${templateRetenu} » rendu : ${(png.length / 1024).toFixed(0)} Ko → ${DOSSIER_VISUELS}/${fichier}`);
+  console.log(`Visuel ${planches ? "mosaïque 4 panneaux" : "carte unique"} « ${templateRetenu} »${paletteRetenue ? ` en palette ${paletteRetenue}` : ""} rendu : ${(png.length / 1024).toFixed(0)} Ko → ${DOSSIER_VISUELS}/${fichier}`);
 
   /* Le lien mesuré se prépare ici et ne s'enregistre qu'à l'armement : déclarer un slug pour
      une fiche qui n'aura jamais son créneau, c'est un compteur mort. La destination est le lien
@@ -613,7 +693,7 @@ async function preparer({ pages, reglages, auteur, sec }) {
       return { id: x.id, nom, motif: armee ? "arme concurrente" : "drapeau reste coche (test manuel)", champs };
     });
 
-  writeFileSync(ETAT, JSON.stringify({ pageId: p.id, nom, fichier, url: publique, template: templateRetenu, mosaique: !!planches, mesure, desarmer }, null, 2) + "\n");
+  writeFileSync(ETAT, JSON.stringify({ pageId: p.id, nom, fichier, url: publique, template: templateRetenu, palette: paletteRetenue, mosaique: !!planches, mesure, desarmer }, null, 2) + "\n");
   console.log(`PNG écrit, Notion pas encore touché : --armer le fera après la poussée vérifiée sur « ${BRANCHE_VISUELS} ».`);
   if (desarmer.length) console.log(`À désarmer au même moment : ${desarmer.map((d) => `${d.nom} (${d.motif})`).join(", ")}`);
   return 0;
@@ -633,7 +713,7 @@ async function armer() {
     "Statut LinkedIn": enSelect("À publier"),
     "Prêt à publier": enCase(true),
   });
-  console.log(`Fiche « ${e.nom} » armée (gabarit ${e.template}) : ${e.url}`);
+  console.log(`Fiche « ${e.nom} » armée (gabarit ${e.template}${e.palette ? `, palette ${e.palette}` : ""}) : ${e.url}`);
   /* Le compteur ne se déclare qu'ici : la carte est en ligne, la fiche est armée, donc le lien
      qui part dans le post a une destination. Un échec d'enregistrement n'annule pas l'armement
      (le post se publiera, juste sans mesure) — la pub passe avant le compteur. */
@@ -714,7 +794,7 @@ async function main() {
     if (flag("prochain")) {
       const rangs = await trieParDestination(classer(pages));
       console.log(`${rangs.length} fiche(s) publiable(s) sur ${pages.length}.\n`);
-      rangs.forEach((r, i) => console.log(`${i + 1}. ${titre(r.p.properties)} — ${r.cat} — ${r.armee ? "DÉJÀ ARMÉE" : "à armer"} — destination ${r.vivant ? "vivante" : `MORTE [${r.detail}]`} — gabarit ${reglagePour(reglages, titre(r.p.properties), r.cat)} — richesse ${r.riche.toFixed(1)} — ${r.date}`));
+      rangs.forEach((r, i) => console.log(`${i + 1}. ${titre(r.p.properties)} — ${r.cat} — ${r.armee ? "DÉJÀ ARMÉE" : "à armer"} — destination ${r.vivant ? "vivante" : `MORTE [${r.detail}]`} — gabarit ${reglagePour(reglages, titre(r.p.properties), r.cat)} — palette ${palettePour(reglages, titre(r.p.properties), r.cat, reglages.defautMosaique || "story").nom || "aucune"} — richesse ${r.riche.toFixed(1)} — ${r.date}`));
       if (!rangs.length) console.log("Rien de publiable : il faut compléter des fiches (Statut Portfolio = Ajouté + lien + 60 caractères de matière).");
       return;
     }
@@ -743,6 +823,15 @@ async function main() {
     imageType: opt("type", "png"),
     content: contenuDe(cible.properties, auteur, lim),
   };
+  /* La rotation de palette suit la même règle qu'à l'automatique, sinon ce qu'on regarde ici ne
+     serait pas ce qui sera publié vendredi. `--palette nuit` force un nom pour comparer deux
+     rendus côte à côte ; le contrôle de contraste s'applique aussi à un choix manuel. */
+  const nomForcee = opt("palette", "");
+  const pal = nomForcee
+    ? { nom: nomForcee, ...paletteBrute(reglages, nomForcee) }
+    : palettePour(reglages, titre(cible.properties), sel(cible.properties, "Catégorie"), template);
+  if (pal.style) payload.style = pal.style;
+  else console.log(`Palette : ${pal.motif || "aucune"}.`);
   if (flag("carousel")) payload.slides = slidesDe(cible.properties, nombre, lim);
   /* La même fonction que l'automatique : ce qu'on regarde ici est bien ce qui sera publié. */
   if (flag("mosaique")) {
@@ -756,9 +845,11 @@ async function main() {
      `--mosaique --render` écrasait la carte unique du même projet sous le même nom. */
   const route = flag("mosaique") ? "/api/render-mosaic" : payload.slides ? "/api/render-carousel" : "/api/render";
   const suffixe = route === "/api/render-mosaic" ? "-mosaique" : route === "/api/render-carousel" ? "-carousel" : "";
-  const base = `postcraft-${slug(titre(cible.properties))}-${template}-${format}${suffixe}`;
+  /* La palette entre dans le nom local : deux essais côte à côte ne doivent pas s'écraser, c'est
+     comme ça qu'on compare réellement deux rendus au lieu de relire le dernier. */
+  const base = `postcraft-${slug(titre(cible.properties))}-${template}${pal.style ? `-${pal.nom}` : ""}-${format}${suffixe}`;
   writeFileSync(join(dir, `${base}.json`), JSON.stringify(payload, null, 2) + "\n");
-  console.log(`Fiche « ${titre(cible.properties)} » → template ${template}, format ${format}${payload.slides ? (flag("mosaique") ? `, mosaïque ${payload.slides.length} panneaux` : `, ${payload.slides.length} slides`) : ""}.`);
+  console.log(`Fiche « ${titre(cible.properties)} » → template ${template}${pal.style ? `, palette ${pal.nom}` : ""}, format ${format}${payload.slides ? (flag("mosaique") ? `, mosaïque ${payload.slides.length} panneaux` : `, ${payload.slides.length} slides`) : ""}.`);
   console.log(`Payload écrit : ${repertoire}/${base}.json`);
 
   if (!flag("render")) {

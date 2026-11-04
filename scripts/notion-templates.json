@@ -1,22 +1,35 @@
 {
-  "_commentaire": "Quel gabarit POSTCRAFT pour quelle fiche Notion. parProjet gagne sur parCategorie, qui gagne sur defaut. Le contenu vient toujours de Notion : ce fichier ne choisit que la mise en scène. Trois gabarits seulement, tous vérifiés sur un rendu réel en portrait le 26/10 (story, swiss, fieldnotes) ; minimal sert de dernier repli quand un texte déborde. defautCarrousel = le gabarit des séries de plusieurs images (une par slide). defautMosaique = celui des quatre panneaux recollés dans UNE image : story, mesuré le 28/10 le seul à remplir une cellule de 540x675 sans grand vide (swiss y laisse la moitié haute blanche).",
+  "_commentaire": "Quel gabarit POSTCRAFT, et quelle palette, pour quelle fiche Notion. parProjet gagne sur parCategorie, qui gagne sur defaut. Le contenu vient toujours de Notion : ce fichier ne choisit que la mise en scene. Trois gabarits seulement, tous verifies sur un rendu reel en portrait le 26/10 (story, swiss, fieldnotes) ; minimal sert de dernier repli quand un texte déborde. defautCarrousel = le gabarit des series de plusieurs images (une par slide). defautMosaique = celui des quatre panneaux recollés dans UNE image : story, mesure le 28/10 le seul a remplir une cellule de 540x675 sans grand vide (swiss y laisse la moitie haute blanche).",
+
+  "_commentairePalettes": "LA ROTATION COULEUR, ajoutée le 4/11. Le probleme mesure : la mosaïque force le gabarit story, story porte sa palette en dur (fond #193B36, un vert foret), donc les posts du lundi / mercredi / vendredi sortaient tous en vert, 4 d'affilée. La palette demandee ici remplace le fond, le texte et l'accent de ce seul gabarit. Regles : (1) une palette ne s'applique qu'au gabarit story (et a defautMosaique si on le change un jour), jamais aux autres : le rouge de swiss ou le bleu de blueprint sont la signature de leur design, les recolorer serait les casser ; (2) chaque entree de parCategorie ou parProjet peut porter une cle palette, le nom doit exister dans palettes ; (3) le script refuse une palette dont le contraste fond/texte est trop faible et rend la carte en vert foret, il ne publie jamais un visuel illisible ; (4) comme la file d'attente prend d'abord la categorie la moins publiee, les palettes tournent toute seules sans compteur a entretenir. Les 5 palettes sont reprises de gabarits deja dessines dans le studio (story, orbit, blueprint, magazine, et un ardoise neutre) : ce ne sont pas des couleurs inventees a la legere.",
+
   "defaut": "story",
   "defautCarrousel": "story",
   "defautMosaique": "story",
+  "defautPalette": "foret",
+
+  "palettes": {
+    "foret": { "bg": "#193B36", "fg": "#F5F1E7", "accent": "#E8B86D", "note": "Le vert forêt d'origine de story. Réservé à Pass'io (couleur de la maison) et à Mobile & Culture : après quatre posts verts, cette palette ne doit plus revenir sur une catégorie qui sort souvent." },
+    "nuit": { "bg": "#211A42", "fg": "#F7F2FF", "accent": "#FFCB70", "note": "Violet profond, repris du gabarit orbit." },
+    "azur": { "bg": "#143C91", "fg": "#F2F6FF", "accent": "#80F0FF", "note": "Bleu blueprint, pour ce qui est institutionnel ou chiffré." },
+    "terre": { "bg": "#E8DCD0", "fg": "#392B25", "accent": "#B24A34", "note": "Terracotta claire, reprise du gabarit magazine. Seule palette claire : elle casse la série des fonds sombres." },
+    "ardoise": { "bg": "#22262E", "fg": "#EAEDF2", "accent": "#D4A373", "note": "Ardoise neutre, pour le travail interne et outillé." }
+  },
+
   "parCategorie": {
-    "AgriTech": "fieldnotes",
-    "Fintech & Sim": "swiss",
-    "Mobilité": "story",
-    "IA & Data": "swiss",
-    "Streaming & Culture": "story",
-    "Mobile & Culture": "fieldnotes",
-    "E-Gov Web": "swiss",
-    "HR Tech": "story",
-    "Logiciel Interne": "fieldnotes"
+    "AgriTech": { "template": "fieldnotes", "palette": "terre" },
+    "Fintech & Sim": { "template": "swiss", "palette": "azur" },
+    "Mobilité": { "template": "story", "palette": "ardoise" },
+    "IA & Data": { "template": "swiss", "palette": "nuit" },
+    "Streaming & Culture": { "template": "story", "palette": "terre" },
+    "Mobile & Culture": { "template": "fieldnotes", "palette": "foret" },
+    "E-Gov Web": { "template": "swiss", "palette": "azur" },
+    "HR Tech": { "template": "story", "palette": "ardoise" },
+    "Logiciel Interne": { "template": "fieldnotes", "palette": "nuit" }
   },
   "parProjet": {
-    "Pass'io": { "template": "swiss" },
-    "Meshway": { "template": "story" },
-    "Bar-Ako": { "template": "fieldnotes" }
+    "Pass'io": { "template": "swiss", "palette": "foret" },
+    "Meshway": { "template": "story", "palette": "nuit" },
+    "Bar-Ako": { "template": "fieldnotes", "palette": "terre" }
   }
 }

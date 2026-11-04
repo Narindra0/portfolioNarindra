@@ -22,3 +22,8 @@ Thumbs.db
 # Cache de wrangler : une commande wrangler lancee depuis ce depot (tests de mesure) ecrit ici.
 # Jamais versionne, jamais publie.
 .wrangler/
+
+# Sorties des essais de visuels (scripts/notion-to-postcraft.mjs --render) : les payloads JSON
+# et les PNG compares entre deux palettes. Un rendu de test pese ~160 Ko et ne doit pas entrer
+# dans l'histoire du depot ; la carte publiee, elle, vit sur la branche donnees.
+sorties/
