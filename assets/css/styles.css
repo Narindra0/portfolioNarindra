@@ -96,6 +96,22 @@ body { font-family: 'Inter', sans-serif; }
   -webkit-backdrop-filter: blur(16px);
 }
 
+/* Version OS : pilule texte au repos, mini icône Windows dès que la navbar se compacte
+   (évite le retour à la ligne qui déformait la barre au scroll). */
+#nav-os-btn .os-icon { display: none; }
+#navbar.navbar-scrolled #nav-os-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  gap: 0;
+  justify-content: center;
+}
+#navbar.navbar-scrolled #nav-os-btn .os-label { display: none; }
+#navbar.navbar-scrolled #nav-os-btn .os-icon { display: inline-block; }
+@media (min-width: 768px) and (max-width: 860px) {
+  .navbar-scrolled .nav-link { padding-left: 0.75rem; padding-right: 0.75rem; }
+}
+
 /* --- HERO LOGO --- */
 #hero-logo { 
   top: 35%; 
@@ -233,16 +249,162 @@ body { font-family: 'Inter', sans-serif; }
 .project-number { transition: color 0.4s ease; }
 .project-row:hover .project-number { color: white; }
 
-/* --- TIMELINE --- */
-.timeline-dot {
-  box-shadow: 0 0 0 4px #0A0D1A, 0 0 20px rgba(255, 87, 34, 0.2);
+/* --- PARCOURS / TIMELINE « LIGNE DE VIE » ---
+   La spine centrale se remplit d'orange au scroll (le parcours se trace en descendant),
+   chaque node s'allume à l'entrée de sa carte, le rôle « en cours » pulse en permanence.
+   Panels navy + accent orange, numéros ghost en Playfair, chips Space Mono.
+   Tout est piloté par data/parcours.json (aucune expérience en dur). */
+#parcours-list:not(.loaded) { min-height: 480px; }
+#parcours-list { display: flex; flex-direction: column; gap: 3.5rem; }
+@media (min-width: 1024px) { #parcours-list { gap: 5.5rem; } }
+
+.parcours-timeline { position: relative; --spine: 0; }
+/* Halo chaud à l'extrémité « présent » de la spine. */
+.parcours-timeline::before {
+  content: ''; position: absolute; top: -5rem; left: 0; width: 360px; height: 360px;
+  transform: translateX(-50%); pointer-events: none; z-index: 0;
+  background: radial-gradient(circle, rgba(255,87,34,0.10) 0%, transparent 70%);
 }
-.experience-card {
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+@media (min-width: 1024px) { .parcours-timeline::before { left: 50%; } }
+
+/* Spine : piste + remplissage progressif + tête lumineuse. */
+.xp-spine { position: absolute; top: 0; bottom: 0; left: 0; width: 2px; transform: translateX(-1px); z-index: 1; }
+@media (min-width: 1024px) { .xp-spine { left: 50%; } }
+.xp-spine-track { position: absolute; inset: 0; border-radius: 2px; background: linear-gradient(to bottom, rgba(255,255,255,0.12), rgba(255,255,255,0.03)); }
+.xp-spine-fill {
+  position: absolute; inset: 0; border-radius: 2px; transform-origin: top; transform: scaleY(var(--spine, 0));
+  background: linear-gradient(to bottom, #FF5722 0%, #FF8A50 55%, rgba(255,138,80,0.12) 100%);
+  box-shadow: 0 0 12px rgba(255,87,34,0.45); transition: transform 0.12s linear;
 }
-.experience-card:hover .experience-title {
-  color: #FF5722;
-  transform: translateX(5px);
+.xp-spine-head {
+  position: absolute; left: 50%; top: calc(var(--spine, 0) * 100%); width: 9px; height: 9px;
+  transform: translate(-50%, -50%); border-radius: 50%; background: #FF8A50;
+  box-shadow: 0 0 16px 4px rgba(255,87,34,0.55); opacity: 0; transition: opacity 0.4s ease;
+}
+.parcours-timeline.is-active .xp-spine-head { opacity: 1; }
+
+/* Carte : reveal échelonné, alternance gauche/droite autour de la spine. */
+.xp-card {
+  position: relative; z-index: 2; padding-left: 2.75rem;
+  opacity: 0; transform: translateY(38px);
+  transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1);
+}
+.xp-card.is-lit { opacity: 1; transform: none; }
+@media (min-width: 1024px) {
+  .xp-card { padding-left: 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 5rem; align-items: center; }
+  .xp-meta { text-align: right; }
+  .xp-content { text-align: left; }
+  .xp-card.xp-inverted .xp-meta { order: 2; text-align: left; }
+  .xp-card.xp-inverted .xp-content { order: 1; text-align: right; }
+  .xp-card.xp-inverted .xp-tags { justify-content: flex-end; }
+  .xp-card.xp-inverted .xp-badges { justify-content: flex-start; }
+}
+
+/* Node sur la spine : s'allume (scale + anneau + cœur orange) quand la carte entre en vue. */
+.xp-node {
+  position: absolute; left: 0; top: 2.7rem; width: 18px; height: 18px; z-index: 3;
+  transform: translate(-50%, -50%) scale(0.35);
+  transition: transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+}
+@media (min-width: 1024px) { .xp-node { left: 50%; top: 50%; } }
+.xp-card.is-lit .xp-node { transform: translate(-50%, -50%) scale(1); }
+.xp-node-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(255,255,255,0.16); transition: border-color 0.45s ease; }
+.xp-card.is-lit .xp-node-ring { border-color: rgba(255,87,34,0.55); }
+.xp-node-core { position: absolute; inset: 4px; border-radius: 50%; background: #39405e; transition: background 0.45s ease, box-shadow 0.45s ease; }
+.xp-card.is-lit .xp-node-core { background: #FF5722; box-shadow: 0 0 14px rgba(255,87,34,0.75); }
+.xp-node-ping { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(255,87,34,0.6); opacity: 0; }
+.xp-card.is-lit[data-current="true"] .xp-node-ping { animation: xp-ping 2.6s cubic-bezier(0,0,0.2,1) infinite; }
+@keyframes xp-ping { 0% { transform: scale(1); opacity: 0.7; } 80%, 100% { transform: scale(2.5); opacity: 0; } }
+
+/* Connecteur spine → carte, se dessine à l'allumage. */
+.xp-connector {
+  position: absolute; left: 0; top: 2.7rem; height: 2px; width: 2.75rem; z-index: 2;
+  transform: translateY(-50%) scaleX(0); transform-origin: left;
+  background: linear-gradient(to right, rgba(255,87,34,0.65), rgba(255,87,34,0));
+  transition: transform 0.6s 0.12s cubic-bezier(0.16,1,0.3,1);
+}
+.xp-card.is-lit .xp-connector { transform: translateY(-50%) scaleX(1); }
+@media (min-width: 1024px) {
+  .xp-connector { left: 50%; top: 50%; width: 2.5rem; }
+  .xp-card.xp-inverted .xp-connector { left: auto; right: 50%; transform-origin: right; background: linear-gradient(to left, rgba(255,87,34,0.65), rgba(255,87,34,0)); }
+}
+
+/* Côté méta : ouvert (pas de boîte), numéro ghost en Playfair derrière. */
+.xp-meta { position: relative; }
+.xp-ghost {
+  position: absolute; top: -2.2rem; left: -0.5rem; z-index: 0; pointer-events: none; user-select: none;
+  font-family: 'Playfair Display', serif; font-size: 7rem; line-height: 1; color: rgba(255,87,34,0.07);
+}
+.xp-card.xp-inverted .xp-ghost { left: auto; right: -0.5rem; }
+@media (max-width: 1023px) { .xp-ghost { display: none; } }
+.xp-period {
+  position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 0.35rem 0.85rem; border-radius: 50px; border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.03);
+}
+.xp-card[data-current="true"] .xp-period { border-color: rgba(255,87,34,0.4); color: #FF8A50; background: rgba(255,87,34,0.08); }
+.xp-name {
+  position: relative; z-index: 1; font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: clamp(2.1rem, 4.2vw, 3.1rem); line-height: 1.04; color: #fff; margin: 0.95rem 0 0.9rem;
+  letter-spacing: -0.01em; transition: color 0.4s ease, transform 0.4s ease;
+}
+.xp-card:hover .xp-name { color: #FF5722; transform: translateX(4px); }
+.xp-card.xp-inverted:hover .xp-name { transform: translateX(-4px); }
+.xp-badges { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
+@media (max-width: 1023px) { .xp-badges { justify-content: flex-start; } }
+.xp-badge {
+  display: inline-flex; align-items: center; gap: 0.45rem; font-family: 'Space Mono', monospace;
+  font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.32rem 0.72rem;
+  border-radius: 7px; border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.55);
+}
+.xp-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); flex-shrink: 0; }
+.xp-card[data-current="true"] .xp-badge { border-color: rgba(255,87,34,0.35); color: #FF8A50; background: rgba(255,87,34,0.08); }
+.xp-card[data-current="true"] .xp-badge-dot { background: #FF5722; box-shadow: 0 0 8px #FF5722; }
+.xp-live {
+  display: inline-flex; align-items: center; gap: 0.45rem; font-family: 'Space Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: #FF8A50;
+  padding: 0.32rem 0.72rem; border-radius: 50px; background: rgba(255,87,34,0.1); border: 1px solid rgba(255,87,34,0.3);
+}
+.xp-live-dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #FF5722; flex-shrink: 0; }
+.xp-live-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #FF5722; animation: xp-ping 2.2s cubic-bezier(0,0,0.2,1) infinite; }
+
+/* Côté contenu : panel crafted, lift + halo au hover. */
+.xp-panel {
+  position: relative; padding: 1.8rem; border-radius: 18px;
+  background: linear-gradient(160deg, rgba(23,28,53,0.6) 0%, rgba(10,13,26,0.38) 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: border-color 0.45s ease, box-shadow 0.45s ease, transform 0.45s cubic-bezier(0.16,1,0.3,1);
+}
+.xp-panel::after { content: ''; position: absolute; left: 0; top: 1.6rem; bottom: 1.6rem; width: 3px; border-radius: 3px; background: linear-gradient(to bottom, #FF5722, #FF8A50); opacity: 0.55; transition: opacity 0.4s ease; }
+.xp-card:hover .xp-panel { border-color: rgba(255,87,34,0.28); box-shadow: 0 20px 55px -22px rgba(255,87,34,0.4); transform: translateY(-5px); }
+.xp-card:hover .xp-panel::after { opacity: 1; }
+.xp-poste { font-size: 1.32rem; font-weight: 600; color: rgba(255,255,255,0.93); margin-bottom: 0.85rem; letter-spacing: -0.01em; }
+.xp-desc { color: #8A94B5; font-weight: 300; line-height: 1.78; font-size: 1.02rem; margin-bottom: 1.3rem; }
+.xp-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.xp-tag {
+  font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.04em; padding: 0.32rem 0.72rem;
+  border-radius: 50px; background: rgba(255,87,34,0.07); border: 1px solid rgba(255,87,34,0.18); color: #FF8A50;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease; cursor: default;
+}
+.xp-tag:hover { background: rgba(255,87,34,0.16); color: #FF5722; transform: translateY(-2px); }
+
+/* Bandeau de synthèse (data-driven) sous le header. */
+.xp-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.4rem; margin-top: 1.6rem; font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+.xp-summary b { color: #FF8A50; font-weight: 400; }
+.xp-summary-sep { width: 1px; height: 14px; background: rgba(255,255,255,0.15); }
+.xp-legend { display: inline-flex; align-items: center; gap: 0.5rem; }
+.xp-legend-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: #FF5722; box-shadow: 0 0 8px #FF5722; }
+.xp-legend-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #FF5722; animation: xp-ping 2.4s cubic-bezier(0,0,0.2,1) infinite; }
+
+/* Accessibilité : mouvement réduit → tout visible, aucune animation. */
+@media (prefers-reduced-motion: reduce) {
+  .xp-card { opacity: 1 !important; transform: none !important; transition: none; }
+  .xp-node { transform: translate(-50%, -50%) scale(1) !important; transition: none; }
+  .xp-connector { transform: translateY(-50%) scaleX(1) !important; transition: none; }
+  .xp-spine-fill { transition: none; }
+  .xp-node-ping, .xp-live-dot::after, .xp-legend-dot::after { animation: none !important; }
+  .xp-panel, .xp-name, .xp-tag, .xp-spine-head { transition: none; }
 }
 
 /* --- MODALS --- */

@@ -159,12 +159,18 @@
       <div class="hidden md:flex items-center justify-end gap-1 flex-1">
         <a href="#projets" class="nav-link px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide text-white/70 hover:text-primary hover:bg-white/5 transition-all duration-300">Projets</a>
         <a href="#parcours" class="nav-link px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide text-white/70 hover:text-primary hover:bg-white/5 transition-all duration-300">Parcours</a>
+        <a href="os.html" id="nav-os-btn" title="Version alternative : Portfolio OS" aria-label="Ouvrir la version Portfolio OS" class="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold tracking-wide text-primary border border-primary/30 hover:bg-primary hover:text-white transition-all duration-300 whitespace-nowrap shrink-0"><i class="fa-brands fa-windows os-icon text-sm" aria-hidden="true"></i><span class="os-label">Version OS</span></a>
       </div>
 
-      <!-- Small Contact Icon (Mobile only) -->
-      <a href="mailto:Ranjalahy.narindraa@gmail.com" class="md:hidden w-10 h-10 flex items-center justify-center text-primary">
-        <i class="fa-solid fa-paper-plane"></i>
-      </a>
+      <!-- Small OS + Contact Icons (Mobile only) -->
+      <div class="md:hidden flex items-center gap-1">
+        <a href="os.html" title="Version alternative : Portfolio OS" aria-label="Ouvrir la version Portfolio OS" class="w-10 h-10 flex items-center justify-center text-primary hover:text-white active:scale-90 transition-all duration-300">
+          <i class="fa-brands fa-windows text-lg" aria-hidden="true"></i>
+        </a>
+        <a href="mailto:Ranjalahy.narindraa@gmail.com" aria-label="M'écrire un email" class="w-10 h-10 flex items-center justify-center text-primary hover:text-white active:scale-90 transition-all duration-300">
+          <i class="fa-solid fa-paper-plane"></i>
+        </a>
+      </div>
     </div>
   </nav>
 
@@ -180,6 +186,7 @@
       <a href="#projets" class="mobile-nav-link"><span>03.</span> Projets</a>
       <a href="#parcours" class="mobile-nav-link"><span>04.</span> Parcours</a>
       <a href="#contact" class="mobile-nav-link"><span>05.</span> Contact</a>
+      <a href="os.html" class="mobile-nav-link"><span>06.</span> Version OS</a>
       <a href="assets/files/CV-Narindra-Ranjalahy.pdf" download class="mt-4 px-6 py-3 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center gap-2">
         <i class="fa-solid fa-download"></i>
         Mon CV
@@ -437,154 +444,26 @@
   <section id="parcours" class="max-w-7xl mx-auto px-8 py-24 text-white overflow-hidden">
     <div class="reveal-up">
     <!-- Header Section -->
-    <div class="mb-32 flex flex-col md:flex-row md:items-end justify-between gap-12 border-b border-white/10 pb-6">
+    <div class="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-12 border-b border-white/10 pb-8">
       <div class="relative">
         <span class="text-primary font-mono text-sm tracking-widest uppercase mb-4 block">03 / Expériences</span>
         <h2 class="text-5xl md:text-7xl font-serif leading-none tracking-tight">Mon <span class="italic text-white/40">Parcours</span></h2>
-        <div class="absolute -bottom-6 left-0 w-24 h-[2px] bg-primary"></div>
+        <div class="absolute -bottom-8 left-0 w-24 h-[2px] bg-primary"></div>
       </div>
-      <p class="text-text max-w-sm text-lg font-light leading-relaxed border-l border-white/10 pl-8">
-        Une trajectoire forgée par la création de solutions concrètes, de l'optimisation agricole à l'innovation bancaire.
-      </p>
+      <div class="max-w-sm">
+        <p class="text-text text-lg font-light leading-relaxed border-l border-white/10 pl-8">
+          Une trajectoire forgée par la création de solutions concrètes, de l'optimisation agricole à l'innovation bancaire.
+        </p>
+        <!-- Synthèse calculée depuis data/parcours.json (années, nombre, légende « en cours ») -->
+        <div id="parcours-summary" class="xp-summary pl-8"></div>
+      </div>
     </div>
 
-    <!-- Timeline Layout -->
-    <div class="relative mt-20">
-      <!-- Ligne verticale (centrée sur desktop, gauche sur mobile) -->
-      <div class="absolute left-0 lg:left-1/2 top-0 bottom-0 w-[1px] bg-white/10 lg:-translate-x-1/2"></div>
-
-      <div class="space-y-32">
-
-        <!-- Expérience 0: Pass'io (Fondateur & CEO) -->
-        <div class="experience-card relative flex flex-col lg:flex-row items-center group">
-          <div class="lg:w-1/2 w-full lg:pr-24 lg:text-right mb-8 lg:mb-0">
-            <span class="font-mono text-primary text-sm mb-3 block tracking-tighter">Depuis 2025 — Présent</span>
-            <h3 class="experience-title text-4xl lg:text-5xl font-serif mb-4 transition-all duration-300">Pass'io</h3>
-            <div class="flex flex-wrap lg:justify-end gap-2">
-              <span class="text-[10px] font-mono border border-primary/30 bg-primary/20 px-3 py-1 uppercase text-primary rounded-sm">Fondateur & CEO</span>
-            </div>
-          </div>
-
-          <!-- Point central interactif -->
-          <div class="timeline-dot absolute left-[-8px] lg:left-1/2 w-4 h-4 bg-primary rounded-full lg:-translate-x-1/2 z-10 hidden lg:block border-[3px] border-dark group-hover:shadow-[0_0_15px_rgba(255,87,34,0.5)] transition-all duration-500"></div>
-          
-          <div class="lg:w-1/2 w-full lg:pl-24 border-l lg:border-none border-white/10 pl-8">
-            <h4 class="text-2xl font-medium text-white/90 mb-4">Plateforme de Streaming & Culture</h4>
-            <p class="text-text font-light leading-relaxed mb-6 text-lg">
-              <span class="text-white font-medium italic">Pass'io</span> est une plateforme numérique innovante dédiée à l'écosystème musical et culturel. Streaming haute qualité, sorties événementielles, produits dérivés et expériences live pour moderniser la diffusion musicale et offrir aux artistes des leviers d'engagement direct avec leur public.
-            </p>
-            <div class="flex flex-wrap gap-4 font-mono text-[11px] text-white/40 tracking-widest uppercase">
-              <span class="hover:text-primary cursor-default transition-colors">#Streaming</span>
-              <span class="hover:text-primary cursor-default transition-colors">#Startup_Founder</span>
-              <span class="hover:text-primary cursor-default transition-colors">#Music_Tech</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Expérience 1: Zanova -->
-        <div class="experience-card relative flex flex-col lg:flex-row items-center group">
-          <div class="lg:w-1/2 w-full lg:pr-24 lg:text-right mb-8 lg:mb-0">
-            <span class="font-mono text-primary text-sm mb-3 block tracking-tighter">Janvier 2026 — Juillet 2026</span>
-            <h3 class="experience-title text-4xl lg:text-5xl font-serif mb-4 transition-all duration-300">Zanova</h3>
-            <div class="flex flex-wrap lg:justify-end gap-2">
-              <span class="text-[10px] font-mono border border-primary/30 bg-primary/20 px-3 py-1 uppercase text-primary rounded-sm">CDD</span>
-            </div>
-          </div>
-
-          <!-- Point central interactif -->
-          <div class="timeline-dot absolute left-[-8px] lg:left-1/2 w-4 h-4 bg-primary rounded-full lg:-translate-x-1/2 z-10 hidden lg:block border-[3px] border-dark"></div>
-          
-          <div class="lg:w-1/2 w-full lg:pl-24 border-l lg:border-none border-white/10 pl-8">
-            <h4 class="text-2xl font-medium text-white/90 mb-4">Développeur FullStack</h4>
-            <p class="text-text font-light leading-relaxed mb-6 text-lg">
-              Conception et développement intégral d'un <span class="text-white font-medium italic">CRM</span> métier pour un call center. Développement backend avec API REST, gestion de la base de données et création d'une interface utilisateur dynamique et réactive.
-            </p>
-            <div class="flex flex-wrap gap-4 font-mono text-[11px] text-white/40 tracking-widest uppercase">
-              <span class="hover:text-primary cursor-default transition-colors">#FullStack_Dev</span>
-              <span class="hover:text-primary cursor-default transition-colors">#CRM_Solutions</span>
-              <span class="hover:text-primary cursor-default transition-colors">#API_REST</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Expérience 2: ApiNess -->
-        <div class="experience-card relative flex flex-col lg:flex-row items-center group">
-          <!-- Inversion visuelle -->
-          <div class="lg:w-1/2 w-full lg:pr-24 order-2 lg:order-1 border-l lg:border-none border-white/10 pl-8 lg:pl-0 lg:text-right">
-            <h4 class="text-2xl font-medium text-white/90 mb-4">Développeur & Designer</h4>
-            <p class="text-text font-light leading-relaxed mb-6 text-lg">
-              Architecture complète de <span class="text-white font-medium italic">RAVINA</span>. Un écosystème mêlant IA et agronomie pour optimiser le rendement des cultures via des données prédictives.
-            </p>
-            <div class="flex flex-wrap gap-4 font-mono text-[11px] text-white/40 lg:justify-end tracking-widest uppercase">
-              <span class="hover:text-primary cursor-default transition-colors">#Intelligence_Artificielle</span>
-              <span class="hover:text-primary cursor-default transition-colors">#Cloud_Compute</span>
-            </div>
-          </div>
-
-          <!-- Point central -->
-          <div class="timeline-dot absolute left-[-8px] lg:left-1/2 w-4 h-4 bg-white/20 rounded-full lg:-translate-x-1/2 z-10 hidden lg:block border-[3px] border-dark group-hover:bg-primary transition-colors duration-500"></div>
-
-          <div class="lg:w-1/2 w-full lg:pl-24 order-1 lg:order-2 mb-8 lg:mb-0">
-            <span class="font-mono text-white/50 text-sm mb-3 block tracking-tighter">Septembre — Décembre 2025</span>
-            <h3 class="experience-title text-4xl lg:text-5xl font-serif mb-4 transition-all duration-300">ApiNess</h3>
-            <div class="flex flex-wrap gap-2 lg:justify-start">
-              <span class="text-[10px] font-mono border border-white/20 px-3 py-1 uppercase text-white/50 rounded-sm">Stagiaire</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Expérience 3: Hackathon -->
-        <div class="experience-card relative flex flex-col lg:flex-row items-center group">
-          <div class="lg:w-1/2 w-full lg:pr-24 lg:text-right mb-8 lg:mb-0">
-            <span class="font-mono text-white/50 text-sm mb-3 block tracking-tighter">Octobre 2024</span>
-            <h3 class="experience-title text-4xl lg:text-5xl font-serif mb-4 transition-all duration-300">Hackathon</h3>
-            <div class="flex flex-wrap lg:justify-end gap-2">
-              <span class="text-[10px] font-mono border border-white/20 px-3 py-1 uppercase text-white/50 rounded-sm">Participant</span>
-            </div>
-          </div>
-
-          <!-- Point central -->
-          <div class="timeline-dot absolute left-[-8px] lg:left-1/2 w-4 h-4 bg-white/20 rounded-full lg:-translate-x-1/2 z-10 hidden lg:block border-[3px] border-dark group-hover:bg-primary transition-colors duration-500"></div>
-          
-          <div class="lg:w-1/2 w-full lg:pl-24 border-l lg:border-none border-white/10 pl-8">
-            <h4 class="text-2xl font-medium text-white/90 mb-4">Représentant Universitaire</h4>
-            <p class="text-text font-light leading-relaxed mb-6 text-lg">
-              Développement d'une solution numérique innovante sous contrainte de temps. Focus sur l'accessibilité et le prototypage rapide.
-            </p>
-            <div class="flex flex-wrap gap-4 font-mono text-[11px] text-white/40 tracking-widest uppercase">
-              <span class="hover:text-primary cursor-default transition-colors">#Innovation</span>
-              <span class="hover:text-primary cursor-default transition-colors">#Social_Impact</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Expérience 4: BOA Madagascar -->
-        <div class="experience-card relative flex flex-col lg:flex-row items-center group">
-          <!-- Inversion visuelle -->
-          <div class="lg:w-1/2 w-full lg:pr-24 order-2 lg:order-1 border-l lg:border-none border-white/10 pl-8 lg:pl-0 lg:text-right">
-            <h4 class="text-2xl font-medium text-white/90 mb-4">Développeur Web</h4>
-            <p class="text-text font-light leading-relaxed mb-6 text-lg">
-              Modernisation des processus internes. Conception d'un programme de suivi de projets centralisé pour le département informatique.
-            </p>
-            <div class="flex flex-wrap gap-4 font-mono text-[11px] text-white/40 lg:justify-end tracking-widest uppercase">
-              <span class="hover:text-primary cursor-default transition-colors">#Symfony</span>
-              <span class="hover:text-primary cursor-default transition-colors">#SEO_Strategy</span>
-            </div>
-          </div>
-
-          <!-- Point central -->
-          <div class="timeline-dot absolute left-[-8px] lg:left-1/2 w-4 h-4 bg-white/20 rounded-full lg:-translate-x-1/2 z-10 hidden lg:block border-[3px] border-dark group-hover:bg-primary transition-colors duration-500"></div>
-
-          <div class="lg:w-1/2 w-full lg:pl-24 order-1 lg:order-2 mb-8 lg:mb-0">
-            <span class="font-mono text-white/50 text-sm mb-3 block tracking-tighter">Août — Octobre 2024</span>
-            <h3 class="experience-title text-4xl lg:text-5xl font-serif mb-4 transition-all duration-300">BOA Madagascar</h3>
-            <div class="flex flex-wrap gap-2 lg:justify-start">
-              <span class="text-[10px] font-mono border border-white/20 px-3 py-1 uppercase text-white/50 rounded-sm">Stage Technique</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
+    <!-- Timeline « ligne de vie » rendue depuis data/parcours.json de la branche « donnees »
+         (base Notion « Parcours » -> GitHub Action, même flux que les projets) ; la copie
+         embarquee ne sert que de repli. La spine et les cartes sont construites par parcours.js. -->
+    <div class="parcours-timeline relative mt-16" id="parcours-timeline">
+      <div id="parcours-list"></div>
     </div>
     </div>
   </section>
@@ -645,6 +524,7 @@
           <a href="#a-propos" class="hover:text-primary transition-colors">À Propos</a>
           <a href="#projets" class="hover:text-primary transition-colors">Projets</a>
           <a href="#parcours" class="hover:text-primary transition-colors">Parcours</a>
+          <a href="os.html" class="hover:text-primary transition-colors">Version OS</a>
         </div>
 
         <div class="text-right">
@@ -665,6 +545,7 @@
   </div>
 
   <script src="assets/js/projects.js" defer></script>
+  <script src="assets/js/parcours.js" defer></script>
   <script src="assets/js/scripts.js" defer></script>
 </body>
 </html>

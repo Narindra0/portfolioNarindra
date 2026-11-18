@@ -5,11 +5,14 @@
 #     GitHub (publics, + privés grâce à REPO_SCAN_TOKEN) et créer les fiches Notion manquantes.
 #     Le scan est automatique, la publication reste humaine (statut Brouillon + porte de
 #     complétude dans la synthèse).
-#   « sync » (toutes les 15 minutes) — recalculer data/projects.json depuis Notion et le pousser
-#     sur la branche « donnees ». Le site le lit à l'adresse
+#   « sync » (toutes les 15 minutes) — recalculer data/projects.json ET data/parcours.json depuis
+#     Notion et les pousser sur la branche « donnees ». Le site les lit à l'adresse
 #     https://raw.githubusercontent.com/Narindra0/portfolioNarindra/donnees/data/projects.json
+#     (et …/data/parcours.json pour la timeline « Mon Parcours »)
 #     (réponse vérifiée : « Access-Control-Allow-Origin: * », « Cache-Control: max-age=300 »),
 #     donc une fiche modifiée sur Notion est en ligne en 1 à 5 minutes sans build.
+#     Le volet parcours ne s'active que lorsque la variable NOTION_DS_PARCOURS est posée ;
+#     sans elle, l'étape se saute proprement et le flux projets continue exactement comme avant.
 #   main n'est plus touché par le bot : un changement de contenu ne déclenche plus Netlify.
 #
 # Pourquoi ce montage : Netlify Free = 300 crédits/mois et UN DÉPLOIEMENT PRODUCTION COÛTE
@@ -36,6 +39,12 @@
 #                    All repositories, expiration 90 j
 #                    (facultatif : sans lui le scanner ne voit que les dépôts publics)
 # Et dans Settings -> Actions (pas Settings -> General) -> Workflow permissions : « Read and write ».
+# Variables (Settings -> Secrets and variables -> Actions -> Variables), pas des secrets :
+#   NOTION_DS           = source de données de la base Projets (déjà en place)
+#   NOTION_DS_PARCOURS  = source de données de la base Parcours (facultatif tant que la base
+#                         n'existe pas ; créée par scripts/creer-base-parcours.mjs, qui affiche
+#                         l'identifiant à poser ici). L'intégration NOTION_TOKEN doit avoir accès
+#                         à cette base (Share -> Connect to integration).
 name: Portfolio — synchro Notion
 
 on:
@@ -130,6 +139,23 @@ jobs:
           NOTION_DS: ${{ vars.NOTION_DS }}
         run: node scripts/notion-to-projects.mjs ${{ github.event.inputs.mode == 'verifier' && '--check' || '--publish' }}
 
+      # Volet parcours : même flux, base Notion séparée. Tant que NOTION_DS_PARCOURS n'est pas
+      # posée (base pas encore créée), l'étape se saute proprement : le site sert la copie
+      # embarquée de data/parcours.json et le flux projets n'est pas affecté.
+      - name: Régénérer data/parcours.json depuis Notion (si la base est configurée)
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DS_PARCOURS: ${{ vars.NOTION_DS_PARCOURS }}
+        run: |
+          if [ -z "${NOTION_DS_PARCOURS}" ]; then
+            echo "NOTION_DS_PARCOURS absent : parcours ignoré, la copie embarquée reste servie."
+            exit 0
+          fi
+          node scripts/notion-to-parcours.mjs ${{ github.event.inputs.mode == 'verifier' && '--check' || '--publish' }}
+          if [ "${{ github.event.inputs.mode }}" != "verifier" ]; then
+            echo "PARCOURS_REGENERE=1" >> "$GITHUB_ENV"
+          fi
+
       # Garde-fou : une base Notion mal lue ne doit pas vider le portfolio en ligne.
       # (Le « git diff » sur main n'a plus de valeur ici : la copie de main est gelée, celle
       # qui compte est « donnees » — la comparaison se fait une fois la branche changée.)
@@ -139,6 +165,11 @@ jobs:
             const j = JSON.parse(require("fs").readFileSync("data/projects.json", "utf8"));
             if (!Array.isArray(j) || j.length === 0) { console.error("projects.json vide -> abandon"); process.exit(1); }
             console.log("projets publiés :", j.length);
+            if (process.env.PARCOURS_REGENERE === "1") {
+              const p = JSON.parse(require("fs").readFileSync("data/parcours.json", "utf8"));
+              if (!Array.isArray(p) || p.length === 0) { console.error("parcours.json vide -> abandon"); process.exit(1); }
+              console.log("expériences publiées :", p.length);
+            }
           '
 
       # Le bot ne pousse PLUS sur main : il repose le JSON sur « donnees », que le site lit en
@@ -152,22 +183,30 @@ jobs:
           cp data/projects.json /tmp/projects.json
           # Tree vierge sur main avant de changer de branche : le bot ne commet jamais rien là.
           git restore -- data/projects.json
+          if [ "${PARCOURS_REGENERE}" = "1" ]; then
+            cp data/parcours.json /tmp/parcours.json
+            git restore -- data/parcours.json
+          fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch --no-tags origin donnees
           git checkout -B donnees FETCH_HEAD
           cp /tmp/projects.json data/projects.json
-          if git diff --quiet -- data/projects.json; then
+          if [ "${PARCOURS_REGENERE}" = "1" ]; then cp /tmp/parcours.json data/parcours.json; fi
+          # « git add » AVANT la comparaison : au premier run, parcours.json est NOUVEAU sur
+          # donnees, et un fichier non suivi ne se voit pas dans un simple « git diff ».
+          git add data/projects.json
+          if [ "${PARCOURS_REGENERE}" = "1" ]; then git add data/parcours.json; fi
+          if git diff --cached --quiet; then
             echo "donnees est deja a jour : rien a pousser."
             exit 0
           fi
-          git diff --stat -- data/projects.json
-          git add data/projects.json
+          git diff --cached --stat
           # Jamais la marque skip-ci entre crochets dans ce message (voir l'en-tête).
-          git commit -m "sync(portfolio) : projets régénérés depuis Notion"
+          git commit -m "sync(portfolio) : données régénérées depuis Notion"
           # Filet contre la course (deux runs qui se suivent, ou poussée humaine sur donnees) :
-          # si le push est refusé, on repart de l'état réel de la branche et on repose le JSON
-          # recalculé — le JSON régénéré est la source, il n'y a donc rien à fusionner.
+          # si le push est refusé, on repart de l'état réel de la branche et on repose les JSON
+          # recalculés — les JSON régénérés sont la source, il n'y a donc rien à fusionner.
           ok=""
           for tentative in 1 2 3; do
             if git push origin HEAD:donnees; then ok=1; break; fi
@@ -175,9 +214,11 @@ jobs:
             git fetch --no-tags origin donnees
             git reset --hard FETCH_HEAD
             cp /tmp/projects.json data/projects.json
+            if [ "${PARCOURS_REGENERE}" = "1" ]; then cp /tmp/parcours.json data/parcours.json; fi
             git add data/projects.json
+            if [ "${PARCOURS_REGENERE}" = "1" ]; then git add data/parcours.json; fi
             if git diff --cached --quiet; then echo "donnees etait deja a jour apres la course."; ok=1; break; fi
-            git commit -m "sync(portfolio) : projets régénérés depuis Notion"
+            git commit -m "sync(portfolio) : données régénérées depuis Notion"
           done
           if [ -z "$ok" ]; then echo "::error::3 tentatives de push sur donnees sans succes."; exit 1; fi
-          echo "donnees poussee — le site relit le JSON, Netlify ne construit rien."
+          echo "donnees poussee — le site relit les JSON, Netlify ne construit rien."

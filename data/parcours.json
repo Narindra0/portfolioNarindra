@@ -1,0 +1,67 @@
+[
+  {
+    "id": "seed-passio",
+    "nom": "Pass'io",
+    "poste": "Plateforme de Streaming & Culture",
+    "badge": "Fondateur & CEO",
+    "periode": "Depuis 2025 — Présent",
+    "debut": "2025-01-01",
+    "fin": "",
+    "en_cours": true,
+    "mise_en_avant": true,
+    "description": "Pass'io est une plateforme numérique innovante dédiée à l'écosystème musical et culturel. Streaming haute qualité, sorties événementielles, produits dérivés et expériences live pour moderniser la diffusion musicale et offrir aux artistes des leviers d'engagement direct avec leur public.",
+    "hashtags": ["Streaming", "Startup_Founder", "Music_Tech"]
+  },
+  {
+    "id": "seed-zanova",
+    "nom": "Zanova",
+    "poste": "Développeur FullStack",
+    "badge": "CDD",
+    "periode": "Janvier 2026 — Juillet 2026",
+    "debut": "2026-01-01",
+    "fin": "2026-07-31",
+    "en_cours": false,
+    "mise_en_avant": false,
+    "description": "Conception et développement intégral d'un CRM métier pour un call center. Développement backend avec API REST, gestion de la base de données et création d'une interface utilisateur dynamique et réactive.",
+    "hashtags": ["FullStack_Dev", "CRM_Solutions", "API_REST"]
+  },
+  {
+    "id": "seed-apiness",
+    "nom": "ApiNess",
+    "poste": "Développeur & Designer",
+    "badge": "Stagiaire",
+    "periode": "Septembre — Décembre 2025",
+    "debut": "2025-09-01",
+    "fin": "2025-12-31",
+    "en_cours": false,
+    "mise_en_avant": false,
+    "description": "Architecture complète de RAVINA. Un écosystème mêlant IA et agronomie pour optimiser le rendement des cultures via des données prédictives.",
+    "hashtags": ["Intelligence_Artificielle", "Cloud_Compute"]
+  },
+  {
+    "id": "seed-hackathon",
+    "nom": "Hackathon",
+    "poste": "Représentant Universitaire",
+    "badge": "Participant",
+    "periode": "Octobre 2024",
+    "debut": "2024-10-01",
+    "fin": "2024-10-31",
+    "en_cours": false,
+    "mise_en_avant": false,
+    "description": "Développement d'une solution numérique innovante sous contrainte de temps. Focus sur l'accessibilité et le prototypage rapide.",
+    "hashtags": ["Innovation", "Social_Impact"]
+  },
+  {
+    "id": "seed-boa",
+    "nom": "BOA Madagascar",
+    "poste": "Développeur Web",
+    "badge": "Stage Technique",
+    "periode": "Août — Octobre 2024",
+    "debut": "2024-08-01",
+    "fin": "2024-10-31",
+    "en_cours": false,
+    "mise_en_avant": false,
+    "description": "Modernisation des processus internes. Conception d'un programme de suivi de projets centralisé pour le département informatique.",
+    "hashtags": ["Symfony", "SEO_Strategy"]
+  }
+]
