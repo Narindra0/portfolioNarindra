@@ -1,0 +1,77 @@
+[
+  {
+    "name": "mobile : icône Windows visible dans la barre",
+    "pass": true,
+    "info": "{\"x\":278,\"y\":25,\"w\":40,\"h\":40}"
+  },
+  {
+    "name": "mobile : pilule desktop masquée",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "mobile : burger + email présents",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "mobile scrollé : icône toujours intacte, pas de débordement",
+    "pass": true,
+    "info": "h=58"
+  },
+  {
+    "name": "mobile : clic icône → Portfolio OS ouvert",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "desktop haut de page : pilule texte « Version OS »",
+    "pass": true,
+    "info": "{\"x\":1121,\"y\":25,\"w\":102,\"h\":38}"
+  },
+  {
+    "name": "desktop haut de page : pilule sur une seule ligne",
+    "pass": true,
+    "info": "h=38"
+  },
+  {
+    "name": "desktop scrollé : navbar compacte active",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "desktop scrollé : bouton devenu mini icône Windows",
+    "pass": true,
+    "info": "{\"x\":947,\"y\":25,\"w\":36,\"h\":36}"
+  },
+  {
+    "name": "desktop scrollé : navbar non déformée (hauteur stable, sans débordement)",
+    "pass": true,
+    "info": "h=54 vs 56"
+  },
+  {
+    "name": "desktop scrollé : clic mini icône → Portfolio OS ouvert",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "retour en haut : pilule texte restaurée",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "800px haut de page : pilule sans retour à la ligne",
+    "pass": true,
+    "info": "h=38"
+  },
+  {
+    "name": "800px scrollé : mini icône + navbar sans débordement",
+    "pass": true,
+    "info": "{\"x\":627,\"y\":25,\"w\":36,\"h\":36} h=54"
+  },
+  {
+    "name": "aucune erreur JS runtime",
+    "pass": true,
+    "info": "aucune"
+  }
+]

@@ -1,0 +1,282 @@
+[
+  {
+    "name": "boot terminé, bureau visible",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "thème sombre par défaut",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "explorateur ouvert au démarrage",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "fond explorateur sombre",
+    "pass": true,
+    "info": "rgba(17, 18, 23, 0.94)"
+  },
+  {
+    "name": "bouton thème défini (toggleSystemTheme)",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "bouton thème état initial inactif",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "ordre DOM du bureau groupé par famille",
+    "pass": true,
+    "info": "this-pc-shortcut,system-explorer,documents-shortcut,images-shortcut,app-about,app-projects,app-skills,app-resume,app-terminal,app-contact,link-classic"
+  },
+  {
+    "name": "colonnes visuelles : système / portfolio / outils",
+    "pass": true,
+    "info": "[[\"this-pc-shortcut\",\"system-explorer\",\"documents-shortcut\",\"images-shortcut\"],[\"app-about\",\"app-projects\",\"app-skills\",\"app-resume\"],[\"app-terminal\",\"app-contact\",\"link-classic\"]]"
+  },
+  {
+    "name": "Récents Accueil : projets triés comme le dossier Projets",
+    "pass": true,
+    "info": "Curriculum_Vitae_Narindra.pdf | Portrait.png | BOA Manager · Présentation | BusNaka · Présentation | DigiKaratra · Présentation | FJKMGestionnaire · Présentation"
+  },
+  {
+    "name": "app about rendue (sombre)",
+    "pass": true,
+    "info": "6485 caractères"
+  },
+  {
+    "name": "app projects rendue (sombre)",
+    "pass": true,
+    "info": "39721 caractères"
+  },
+  {
+    "name": "app skills rendue (sombre)",
+    "pass": true,
+    "info": "10183 caractères"
+  },
+  {
+    "name": "app resume rendue (sombre)",
+    "pass": true,
+    "info": "8846 caractères"
+  },
+  {
+    "name": "app terminal rendue (sombre)",
+    "pass": true,
+    "info": "1364 caractères"
+  },
+  {
+    "name": "app contact rendue (sombre)",
+    "pass": true,
+    "info": "4040 caractères"
+  },
+  {
+    "name": "attribut data-theme=light posé",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "thème persisté dans localStorage",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "bouton thème actif synchronisé",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "menu contextuel synchronisé",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "fond explorateur clair",
+    "pass": true,
+    "info": "rgba(248, 250, 253, 0.97)"
+  },
+  {
+    "name": "texte du bureau sombre sur fond clair",
+    "pass": true,
+    "info": "rgb(15, 23, 42)"
+  },
+  {
+    "name": "libellés icônes bureau lisibles",
+    "pass": true,
+    "info": "rgb(30, 41, 59)"
+  },
+  {
+    "name": "menu Démarrer visible (clair)",
+    "pass": true,
+    "info": "rgba(244, 247, 252, 0.86)"
+  },
+  {
+    "name": "glyphes des tuiles Démarrer blancs sur dégradé",
+    "pass": true,
+    "info": "rgb(255, 255, 255)"
+  },
+  {
+    "name": "paramètres rapides visibles (clair)",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "bouton thème actif bleu/blanc (clair)",
+    "pass": true,
+    "info": "{\"visible\":true,\"btnBg\":\"rgb(37, 99, 235)\",\"btnColor\":\"rgb(255, 255, 255)\"}"
+  },
+  {
+    "name": "app about rendue (clair)",
+    "pass": true,
+    "info": "6485 caractères"
+  },
+  {
+    "name": "app about : .text-white assombri",
+    "pass": true,
+    "info": "rgb(15, 23, 42)"
+  },
+  {
+    "name": "app projects rendue (clair)",
+    "pass": true,
+    "info": "39721 caractères"
+  },
+  {
+    "name": "app projects : .text-white assombri",
+    "pass": true,
+    "info": "rgb(15, 23, 42)"
+  },
+  {
+    "name": "app skills rendue (clair)",
+    "pass": true,
+    "info": "10183 caractères"
+  },
+  {
+    "name": "app resume rendue (clair)",
+    "pass": true,
+    "info": "8846 caractères"
+  },
+  {
+    "name": "app resume : .text-white assombri",
+    "pass": true,
+    "info": "rgb(15, 23, 42)"
+  },
+  {
+    "name": "app contact rendue (clair)",
+    "pass": true,
+    "info": "4040 caractères"
+  },
+  {
+    "name": "app contact : .text-white assombri",
+    "pass": true,
+    "info": "rgb(15, 23, 42)"
+  },
+  {
+    "name": "terminal présent avec theme-keep-dark",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "terminal reste sombre en mode clair",
+    "pass": true,
+    "info": "{\"bg\":\"rgba(9, 11, 16, 0.97)\",\"color\":\"rgb(255, 255, 255)\"}"
+  },
+  {
+    "name": "commande terminal \"dark\"",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "commande terminal \"light\"",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "aide terminal mentionne light/dark",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "navigation Projets (clair)",
+    "pass": true,
+    "info": "14 éléments"
+  },
+  {
+    "name": "ouverture dossier projet (clair)",
+    "pass": true,
+    "info": "Projets/boa-manager"
+  },
+  {
+    "name": "mode clair persistant après rechargement",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "bouton thème resynchronisé après rechargement",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "color-scheme light",
+    "pass": true,
+    "info": "light"
+  },
+  {
+    "name": "retour au mode sombre",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "mode sombre persistant après rechargement",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "glisser-déposer : nouvel ordre persisté",
+    "pass": true,
+    "info": "[\"system-explorer\",\"documents-shortcut\",\"images-shortcut\",\"app-about\",\"this-pc-shortcut\",\"app-projects\",\"app-skills\",\"app-resume\",\"app-terminal\",\"app-contact\",\"link-classic\"]"
+  },
+  {
+    "name": "ordre personnalisé restauré après rechargement",
+    "pass": true,
+    "info": "system-explorer,documents-shortcut,images-shortcut,app-about,this-pc-shortcut,app-projects,app-skills,app-resume,app-terminal,app-contact,link-classic"
+  },
+  {
+    "name": "ordre par défaut propre après réinitialisation",
+    "pass": true,
+    "info": "this-pc-shortcut,system-explorer,documents-shortcut,images-shortcut,app-about,app-projects,app-skills,app-resume,app-terminal,app-contact,link-classic"
+  },
+  {
+    "name": "mode clair appliqué dès le boot mobile",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "fenêtre explorateur cadrée dans le viewport mobile",
+    "pass": true,
+    "info": "{\"left\":12,\"right\":378,\"top\":12,\"bottom\":776,\"vw\":390,\"vh\":844}"
+  },
+  {
+    "name": "pas de débordement horizontal (mobile clair)",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "barre des tâches visible (mobile)",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "console terminal sombre en mode clair",
+    "pass": true,
+    "info": "rgba(9, 11, 16, 0.97)"
+  },
+  {
+    "name": "aucune erreur JS runtime",
+    "pass": true,
+    "info": "aucune"
+  }
+]

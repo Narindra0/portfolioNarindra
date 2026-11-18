@@ -1,0 +1,97 @@
+[
+  {
+    "name": "aperçu d’ancrage visible pendant le drag",
+    "pass": true,
+    "info": "{\"x\":6,\"y\":6,\"w\":708,\"h\":840}"
+  },
+  {
+    "name": "drag bord gauche → moitié gauche",
+    "pass": true,
+    "info": "{\"x\":0,\"y\":0,\"w\":720,\"h\":852}"
+  },
+  {
+    "name": "état snap mémorisé",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "snap assist propose la fenêtre voisine",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "choix assist → ancrage moitié droite",
+    "pass": true,
+    "info": "{\"x\":720,\"y\":0,\"w\":720,\"h\":852}"
+  },
+  {
+    "name": "assist refermé après choix",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "popover dispositions au survol du bouton Agrandir",
+    "pass": true,
+    "info": "{\"visible\":true,\"zones\":11,\"layouts\":4}"
+  },
+  {
+    "name": "clic zone → ancrage coin bas droit",
+    "pass": true,
+    "info": "{\"x\":720,\"y\":426,\"w\":720,\"h\":426}"
+  },
+  {
+    "name": "popover refermé après ancrage",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "Ctrl+Alt+Gauche → moitié gauche",
+    "pass": true,
+    "info": "{\"x\":0,\"y\":0,\"w\":720,\"h\":852}"
+  },
+  {
+    "name": "Ctrl+Alt+Haut → plein écran",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "Ctrl+Alt+Bas → restauration",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "drag depuis ancrage → taille d’origine restituée",
+    "pass": true,
+    "info": "990px vs 990px"
+  },
+  {
+    "name": "resize manuel → désancrage",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "fenêtre ancrée recadrée au resize viewport",
+    "pass": true,
+    "info": "{\"x\":0,\"y\":0,\"w\":600,\"h\":752}"
+  },
+  {
+    "name": "assist visible en mode clair",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "popover lisible en mode clair",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "mobile : aucun ancrage au drag",
+    "pass": true,
+    "info": ""
+  },
+  {
+    "name": "aucune erreur JS runtime",
+    "pass": true,
+    "info": "aucune"
+  }
+]

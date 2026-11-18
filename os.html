@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Narindra Ranjalahy — Portfolio OS | Version alternative</title>
+    <meta name="description" content="Version alternative du portfolio de Narindra Ranjalahy, Fondateur & CEO de Pass'io, développeur Fullstack et passionné d'IA : un bureau interactif façon Windows 11 pour explorer les projets, compétences et le parcours.">
+    <meta name="author" content="Narindra Ranjalahy">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://narindraportfolio.netlify.app/os.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://narindraportfolio.netlify.app/os.html">
+    <meta property="og:title" content="Narindra Ranjalahy — Portfolio OS">
+    <meta property="og:description" content="Un bureau interactif façon Windows 11 pour explorer les projets, compétences et le parcours de Narindra Ranjalahy.">
+    <meta property="og:image" content="https://narindraportfolio.netlify.app/assets/img/seo-preview.png">
+
+    <link rel="icon" type="image/gif" href="assets/img/favicon.gif">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons (chrome du système) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Font Awesome (icônes des fiches projets, comme la version classique) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/os-explorer.css">
+    <link rel="stylesheet" href="assets/css/os-theme.css">
+    <link rel="stylesheet" href="assets/css/os-snap.css">
+    <script defer src="assets/js/os-explorer.js"></script>
+    <script defer src="assets/js/os-snap.js"></script>
+    <script>
+        /* Applique le thème mémorisé avant le premier rendu pour éviter tout flash */
+        try {
+            if (localStorage.getItem('portfolio-os-theme-v1') === 'light') {
+                document.documentElement.dataset.theme = 'light';
+            }
+        } catch (_) { /* stockage indisponible : thème sombre par défaut */ }
+    </script>
+
+    <style>
+        /* Styles personnalisés pour l'ambiance Windows 11 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            user-select: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Fond Windows 11 Bloom fourni par l'utilisateur */
+        .wallpaper {
+            background-color: #0f172a;
+            background-image: linear-gradient(rgba(3, 10, 26, .16), rgba(3, 10, 26, .16)), url('assets/img/windows-11-wallpaper.jpg');
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            animation: none;
+        }
+
+        .wallpaper-purple {
+            background: radial-gradient(circle at 25% 25%, #581c87 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, #db2777 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, #1e1b4b 0%, #090d16 100%);
+            background-size: 200% 200%;
+            animation: gradientMove 20s ease infinite;
+        }
+
+        .wallpaper-emerald {
+            background: radial-gradient(circle at 30% 20%, #065f46 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, #0d9488 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, #022c22 0%, #030712 100%);
+            background-size: 200% 200%;
+            animation: gradientMove 20s ease infinite;
+        }
+
+        /* Rappel de l'identité du portfolio : orange Pass'io */
+        .wallpaper-ember {
+            background: radial-gradient(circle at 25% 25%, #7c2d12 0%, transparent 50%),
+                        radial-gradient(circle at 75% 70%, #ea580c 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, #1c1917 0%, #0c0a09 100%);
+            background-size: 200% 200%;
+            animation: gradientMove 20s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Effet Acrylique / Mica Windows 11 */
+        .mica-dark {
+            background: rgba(28, 28, 30, 0.82);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .mica-window {
+            background: rgba(24, 24, 27, 0.92);
+            backdrop-filter: blur(32px) saturate(160%);
+            -webkit-backdrop-filter: blur(32px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .mica-window.window-focused {
+            border-color: rgba(96, 165, 250, 0.4);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(96, 165, 250, 0.22);
+        }
+
+        /* Transitions fluides pour les fenêtres */
+        .window-transition {
+            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                        width 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                        height 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                        top 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                        left 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-radius 0.22s ease;
+        }
+
+        .window-opening {
+            animation: winOpen 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes winOpen {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Poignée de redimensionnement Windows */
+        .resize-handle {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 14px;
+            height: 14px;
+            cursor: nwse-resize;
+            z-index: 20;
+        }
+        .resize-handle::after {
+            content: '';
+            position: absolute;
+            right: 4px;
+            bottom: 4px;
+            width: 6px;
+            height: 6px;
+            border-right: 2px solid rgba(255, 255, 255, 0.25);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.25);
+            border-bottom-right-radius: 2px;
+        }
+
+        /* Barre de défilement personnalisée */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        /* Icône du bureau style Windows 11 */
+        .desktop-icon {
+            border: 1px solid transparent;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+        .desktop-icon:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+        .desktop-icon.selected {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: rgba(96, 165, 250, 0.45);
+        }
+
+        /* Rectangle de sélection sur le bureau */
+        #selection-box {
+            position: absolute;
+            border: 1px solid rgba(96, 165, 250, 0.8);
+            background: rgba(59, 130, 246, 0.2);
+            pointer-events: none;
+            z-index: 5;
+            display: none;
+        }
+
+        /* Menu contextuel & Quick Settings */
+        #context-menu, #quick-settings, #start-menu {
+            animation: menuFade 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes menuFade {
+            from { opacity: 0; transform: translateY(8px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</head>
+<body class="text-white wallpaper relative overflow-hidden">
+
+    <!-- Filtre de luminosité globale -->
+    <div id="brightness-overlay" class="fixed inset-0 bg-black pointer-events-none z-[9998] opacity-0 transition-opacity duration-150"></div>
+
+    <!-- Écran de démarrage rapide -->
+    <div id="boot-screen" class="fixed inset-0 z-[9999] bg-slate-950 flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="w-16 h-16 grid grid-cols-2 gap-1.5 mb-8 animate-pulse">
+            <div class="bg-blue-500 rounded-tl-sm"></div>
+            <div class="bg-blue-400 rounded-tr-sm"></div>
+            <div class="bg-blue-400 rounded-bl-sm"></div>
+            <div class="bg-blue-600 rounded-br-sm"></div>
+        </div>
+        <div class="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-slate-400 text-sm tracking-wide">Chargement de Portfolio OS…</p>
+    </div>
+
+    <!-- Notification Toast (Style Centre de notifications Windows 11) -->
+    <div id="notification-toast" class="fixed bottom-16 right-4 z-[950] mica-dark rounded-xl p-4 w-80 shadow-2xl transform translate-x-[120%] transition-transform duration-300 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+            <i class="ph-fill ph-sparkle text-lg"></i>
+        </div>
+        <div class="flex-1">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-semibold text-blue-400">Portfolio OS</span>
+                <button onclick="hideToast()" class="text-slate-400 hover:text-white" aria-label="Fermer la notification"><i class="ph ph-x text-xs"></i></button>
+            </div>
+            <p id="toast-message" class="text-xs text-slate-200 leading-relaxed">Bienvenue sur mon portfolio interactif !</p>
+        </div>
+    </div>
+
+    <!-- Menu Contextuel (Clic droit sur le bureau) -->
+    <div id="context-menu" class="fixed z-[960] mica-dark rounded-xl p-1.5 w-60 shadow-2xl hidden text-xs">
+        <button onclick="openApp('projects'); hideContextMenu()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2.5 transition-colors">
+            <i class="ph ph-folder-open text-amber-400 text-base"></i> Ouvrir Mes Projets
+        </button>
+        <button onclick="openApp('terminal'); hideContextMenu()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2.5 transition-colors">
+            <i class="ph ph-terminal-window text-emerald-400 text-base"></i> Ouvrir dans le Terminal
+        </button>
+        <div class="my-1 border-t border-white/10"></div>
+        <button onclick="changeWallpaper(); hideContextMenu()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2.5 transition-colors">
+            <i class="ph ph-paint-brush-broad text-purple-400 text-base"></i> Changer le fond d'écran
+        </button>
+        <button onclick="toggleSystemTheme(); hideContextMenu()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2.5 transition-colors">
+            <i id="context-theme-icon" class="ph ph-sun text-amber-400 text-base"></i> <span id="context-theme-label">Passer en mode clair</span>
+        </button>
+        <button onclick="minimizeAllWindows(); hideContextMenu()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2.5 transition-colors">
+            <i class="ph ph-browsers text-blue-400 text-base"></i> Afficher le bureau
+        </button>
+        <div class="my-1 border-t border-white/10"></div>
+        <a href="index.html" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2.5 transition-colors">
+            <i class="ph ph-globe text-sky-400 text-base"></i> Version classique
+        </a>
+        <button onclick="openApp('about'); hideContextMenu()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2.5 transition-colors">
+            <i class="ph ph-info text-slate-300 text-base"></i> À propos du système
+        </button>
+    </div>
+
+    <!-- Espace de travail principal (Bureau) -->
+    <main id="desktop" class="relative w-full h-[calc(100vh-48px)] p-4 overflow-hidden" oncontextmenu="showContextMenu(event)">
+
+        <!-- Rectangle de sélection souris sur le bureau -->
+        <div id="selection-box"></div>
+
+        <!-- Grille d'icônes sur le bureau -->
+        <div id="desktop-icons-grid" class="grid grid-flow-col grid-rows-[repeat(4,6.5rem)] gap-2 w-fit content-start relative z-10">
+
+            <!-- Icône : À propos de moi -->
+            <button onclick="selectDesktopIcon(event, this)" ondblclick="openApp('about')" data-desktop-key="app-about" class="desktop-icon w-24 h-24 rounded-lg flex flex-col items-center justify-center p-2 group cursor-pointer focus:outline-none">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg mb-1.5 group-hover:scale-105 transition-transform">
+                    <i class="ph-fill ph-user-circle text-2xl text-white"></i>
+                </div>
+                <span class="text-xs text-center font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight line-clamp-2">À propos de moi</span>
+            </button>
+
+            <!-- Icône : Mes Projets -->
+            <button onclick="selectDesktopIcon(event, this)" ondblclick="openApp('projects')" data-desktop-key="app-projects" class="desktop-icon w-24 h-24 rounded-lg flex flex-col items-center justify-center p-2 group cursor-pointer focus:outline-none">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg mb-1.5 group-hover:scale-105 transition-transform">
+                    <i class="ph-fill ph-folder-open text-2xl text-white"></i>
+                </div>
+                <span class="text-xs text-center font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight line-clamp-2">Mes Projets</span>
+            </button>
+
+            <!-- Icône : Compétences & Stack -->
+            <button onclick="selectDesktopIcon(event, this)" ondblclick="openApp('skills')" data-desktop-key="app-skills" class="desktop-icon w-24 h-24 rounded-lg flex flex-col items-center justify-center p-2 group cursor-pointer focus:outline-none">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-lg mb-1.5 group-hover:scale-105 transition-transform">
+                    <i class="ph-fill ph-cpu text-2xl text-white"></i>
+                </div>
+                <span class="text-xs text-center font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight line-clamp-2">Compétences</span>
+            </button>
+
+            <!-- Icône : Mon CV -->
+            <button onclick="selectDesktopIcon(event, this)" ondblclick="openApp('resume')" data-desktop-key="app-resume" class="desktop-icon w-24 h-24 rounded-lg flex flex-col items-center justify-center p-2 group cursor-pointer focus:outline-none">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg mb-1.5 group-hover:scale-105 transition-transform">
+                    <i class="ph-fill ph-file-pdf text-2xl text-white"></i>
+                </div>
+                <span class="text-xs text-center font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight line-clamp-2">Curriculum Vitae</span>
+            </button>
+
+            <!-- Icône : Terminal Dev -->
+            <button onclick="selectDesktopIcon(event, this)" ondblclick="openApp('terminal')" data-desktop-key="app-terminal" class="desktop-icon w-24 h-24 rounded-lg flex flex-col items-center justify-center p-2 group cursor-pointer focus:outline-none">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 border border-slate-600 flex items-center justify-center shadow-lg mb-1.5 group-hover:scale-105 transition-transform">
+                    <i class="ph-bold ph-terminal-window text-2xl text-emerald-400"></i>
+                </div>
+                <span class="text-xs text-center font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight line-clamp-2">Terminal</span>
+            </button>
+
+            <!-- Icône : Contact -->
+            <button onclick="selectDesktopIcon(event, this)" ondblclick="openApp('contact')" data-desktop-key="app-contact" class="desktop-icon w-24 h-24 rounded-lg flex flex-col items-center justify-center p-2 group cursor-pointer focus:outline-none">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center shadow-lg mb-1.5 group-hover:scale-105 transition-transform">
+                    <i class="ph-fill ph-paper-plane-tilt text-2xl text-white"></i>
+                </div>
+                <span class="text-xs text-center font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight line-clamp-2">Me Contacter</span>
+            </button>
+
+            <!-- Raccourci : version classique du portfolio -->
+            <a href="index.html" data-desktop-key="link-classic" class="desktop-icon w-24 h-24 rounded-lg flex flex-col items-center justify-center p-2 group cursor-pointer focus:outline-none" title="Revenir au portfolio d'origine">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-rose-600 flex items-center justify-center shadow-lg mb-1.5 group-hover:scale-105 transition-transform">
+                    <i class="ph-fill ph-globe-hemisphere-west text-2xl text-white"></i>
+                </div>
+                <span class="text-xs text-center font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight line-clamp-2">Version classique</span>
+            </a>
+
+        </div>
+
+        <!-- Widget discret sur le bureau (En haut à droite) -->
+        <div class="hidden md:flex flex-col items-end absolute top-6 right-6 z-0">
+            <div class="mica-dark px-4 py-3 rounded-2xl text-right pointer-events-none">
+                <p class="text-[11px] uppercase tracking-widest text-blue-400 font-semibold">Portfolio OS • Windows 11 Edition</p>
+                <h1 class="text-lg font-bold text-white mt-0.5">Narindra Ranjalahy — Fullstack &amp; IA</h1>
+                <p class="text-xs text-slate-400 mt-1">Double-cliquez sur une icône (ou simple tap sur mobile)</p>
+            </div>
+            <a href="index.html" class="mt-2 text-[11px] text-slate-300 hover:text-white bg-black/30 hover:bg-black/50 border border-white/10 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5">
+                <i class="ph ph-arrow-left"></i> Revenir à la version classique
+            </a>
+        </div>
+
+        <!-- Conteneur où les fenêtres seront générées dynamiquement -->
+        <div id="windows-container" class="absolute inset-0 pointer-events-none z-20"></div>
+
+    </main>
+
+    <!-- Menu Démarrer (Start Menu Windows 11) -->
+    <div id="start-menu" class="fixed bottom-14 left-1/2 -translate-x-1/2 w-[92%] max-w-[540px] max-h-[80vh] overflow-y-auto mica-dark rounded-2xl p-6 shadow-2xl z-[900] hidden border border-white/15">
+        <!-- Barre de recherche -->
+        <div class="relative mb-6">
+            <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="start-search" onkeyup="filterStartApps()" placeholder="Rechercher une application, un projet…" class="w-full bg-black/40 border border-white/10 border-b-2 border-b-blue-500 rounded-full py-2 pl-10 pr-4 text-sm text-white placeholder-slate-400 focus:outline-none">
+        </div>
+
+        <!-- Applications épinglées -->
+        <div class="mb-5">
+            <div class="flex justify-between items-center mb-3 px-1">
+                <span class="text-xs font-semibold text-slate-300">Épinglé</span>
+                <button onclick="openApp('projects'); toggleStartMenu()" class="text-[11px] bg-white/10 hover:bg-white/15 px-2.5 py-1 rounded-md text-slate-200 transition-colors">Tous les projets &gt;</button>
+            </div>
+            <div id="start-apps-grid" class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                <button onclick="openApp('about'); toggleStartMenu()" class="start-app-item flex flex-col items-center p-2.5 rounded-xl hover:bg-white/10 transition-colors">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-1.5 shadow">
+                        <i class="ph-fill ph-user-circle text-xl"></i>
+                    </div>
+                    <span class="text-[11px] text-center">Profil</span>
+                </button>
+                <button onclick="openApp('projects'); toggleStartMenu()" class="start-app-item flex flex-col items-center p-2.5 rounded-xl hover:bg-white/10 transition-colors">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mb-1.5 shadow">
+                        <i class="ph-fill ph-folder-open text-xl"></i>
+                    </div>
+                    <span class="text-[11px] text-center">Projets</span>
+                </button>
+                <button onclick="openApp('skills'); toggleStartMenu()" class="start-app-item flex flex-col items-center p-2.5 rounded-xl hover:bg-white/10 transition-colors">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center mb-1.5 shadow">
+                        <i class="ph-fill ph-cpu text-xl"></i>
+                    </div>
+                    <span class="text-[11px] text-center">Skills</span>
+                </button>
+                <button onclick="openApp('resume'); toggleStartMenu()" class="start-app-item flex flex-col items-center p-2.5 rounded-xl hover:bg-white/10 transition-colors">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center mb-1.5 shadow">
+                        <i class="ph-fill ph-file-pdf text-xl"></i>
+                    </div>
+                    <span class="text-[11px] text-center">CV</span>
+                </button>
+                <button onclick="openApp('terminal'); toggleStartMenu()" class="start-app-item flex flex-col items-center p-2.5 rounded-xl hover:bg-white/10 transition-colors">
+                    <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-600 flex items-center justify-center mb-1.5 shadow">
+                        <i class="ph-bold ph-terminal-window text-xl text-emerald-400"></i>
+                    </div>
+                    <span class="text-[11px] text-center">Terminal</span>
+                </button>
+                <button onclick="openApp('contact'); toggleStartMenu()" class="start-app-item flex flex-col items-center p-2.5 rounded-xl hover:bg-white/10 transition-colors">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center mb-1.5 shadow">
+                        <i class="ph-fill ph-paper-plane-tilt text-xl"></i>
+                    </div>
+                    <span class="text-[11px] text-center">Contact</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Projets mis en avant -->
+        <div class="mb-4">
+            <span class="text-xs font-semibold text-slate-300 block mb-2.5 px-1">Mes recommandations</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button onclick="openApp('projects', 'pass-io'); toggleStartMenu()" class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 text-left transition-colors">
+                    <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center">
+                        <i class="fa-solid fa-headphones"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium">Pass'io</p>
+                        <p class="text-[10px] text-slate-400">Projet phare — streaming</p>
+                    </div>
+                </button>
+                <button onclick="openApp('projects', 'busnaka'); toggleStartMenu()" class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 text-left transition-colors">
+                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                        <i class="fa-solid fa-bus"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium">BusNaka</p>
+                        <p class="text-[10px] text-slate-400">Récemment mis en ligne</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Accès à la version classique -->
+        <a href="index.html" class="mb-4 flex items-center gap-2.5 p-2 rounded-lg hover:bg-white/10 text-left transition-colors border border-white/10">
+            <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center">
+                <i class="ph-fill ph-globe-hemisphere-west"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium">Version portfolio classique</p>
+                <p class="text-[10px] text-slate-400">Une seule page, défilement vertical</p>
+            </div>
+        </a>
+
+        <!-- Pied du menu Démarrer (Profil utilisateur & Bouton Alimentation) -->
+        <div class="pt-3 border-t border-white/10 flex items-center justify-between px-1">
+            <button onclick="openApp('about'); toggleStartMenu()" class="flex items-center gap-2.5 hover:bg-white/10 px-2.5 py-1.5 rounded-lg transition-colors">
+                <img src="assets/img/Portrait.png" alt="Portrait de Narindra Ranjalahy" class="w-7 h-7 rounded-full object-cover object-top border border-white/20">
+                <span class="text-xs font-medium">Narindra Ranjalahy</span>
+            </button>
+            <button onclick="restartOS()" title="Redémarrer la session" class="p-2 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition-colors">
+                <i class="ph ph-power text-base"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Panneau Paramètres Rapides Windows 11 (Wi-Fi, Son, Luminosité, Thème) -->
+    <div id="quick-settings" class="fixed bottom-14 right-3 w-80 mica-dark rounded-2xl p-4 shadow-2xl z-[920] hidden border border-white/15">
+        <div class="grid grid-cols-2 gap-2 mb-4">
+            <button onclick="toggleQuickBtn(this)" class="quick-toggle active bg-blue-600 text-white p-2.5 rounded-xl flex flex-col items-center gap-1.5 transition-colors">
+                <i class="ph-bold ph-wifi-high text-base"></i>
+                <span class="text-[11px] font-medium">Wi-Fi</span>
+            </button>
+            <button onclick="toggleQuickBtn(this)" class="quick-toggle active bg-blue-600 text-white p-2.5 rounded-xl flex flex-col items-center gap-1.5 transition-colors">
+                <i class="ph-bold ph-bluetooth text-base"></i>
+                <span class="text-[11px] font-medium">Bluetooth</span>
+            </button>
+            <button type="button" onclick="changeWallpaper()" class="bg-white/10 hover:bg-white/15 text-slate-200 p-2.5 rounded-xl flex flex-col items-center gap-1.5 transition-colors" title="Changer le fond d’écran">
+                <i class="ph-bold ph-palette text-base text-purple-400"></i>
+                <span class="text-[11px] font-medium">Fond d’écran</span>
+            </button>
+            <button id="theme-toggle" type="button" onclick="toggleSystemTheme()" class="quick-toggle bg-white/10 hover:bg-white/15 text-slate-300 p-2.5 rounded-xl flex flex-col items-center gap-1.5 transition-colors" title="Activer le mode clair" aria-label="Activer le mode clair" aria-pressed="false">
+                <i id="theme-toggle-icon" class="ph ph-moon text-base"></i>
+                <span id="theme-toggle-label" class="text-[11px] font-medium">Mode clair</span>
+            </button>
+        </div>
+
+        <!-- Sliders Luminosité & Volume -->
+        <div class="space-y-3 pt-2 border-t border-white/10">
+            <div class="flex items-center gap-3">
+                <i class="ph ph-sun text-slate-300 text-base"></i>
+                <input type="range" min="30" max="100" value="100" oninput="adjustBrightness(this.value)" class="w-full accent-blue-500 h-1 bg-white/20 rounded-lg cursor-pointer" aria-label="Luminosité">
+            </div>
+            <div class="flex items-center gap-3">
+                <i class="ph ph-speaker-high text-slate-300 text-base"></i>
+                <input type="range" min="0" max="100" value="80" class="w-full accent-blue-500 h-1 bg-white/20 rounded-lg cursor-pointer" aria-label="Volume">
+            </div>
+        </div>
+
+        <div class="mt-4 pt-2.5 border-t border-white/10 flex justify-between items-center text-[11px] text-slate-400">
+            <span class="flex items-center gap-1.5"><i class="ph-fill ph-map-pin text-emerald-400 text-sm"></i> Antananarivo • UTC+3</span>
+            <button onclick="openApp('about'); toggleQuickSettings()" class="hover:text-white transition-colors" aria-label="À propos du système"><i class="ph ph-gear text-sm"></i></button>
+        </div>
+    </div>
+
+    <!-- Barre des tâches (Taskbar Windows 11) -->
+    <footer class="fixed bottom-0 left-0 right-0 h-12 mica-dark border-t border-white/10 z-[1000] px-3 flex items-center justify-between">
+
+        <!-- Widget localisation / version à gauche -->
+        <div class="hidden sm:flex items-center gap-2.5 px-2.5 py-1 rounded-lg hover:bg-white/10 cursor-pointer transition-colors" onclick="openApp('about')">
+            <i class="ph-fill ph-map-pin text-amber-400 text-xl"></i>
+            <div class="leading-tight">
+                <p class="text-[11px] font-medium">Antananarivo, Madagascar</p>
+                <p class="text-[10px] text-slate-400">Portfolio OS v2.1</p>
+            </div>
+        </div>
+
+        <!-- Icônes centrées (Bouton Démarrer + Applications ouvertes/épinglées) -->
+        <div class="flex items-center gap-1.5 mx-auto sm:mx-0">
+            <!-- Bouton Windows Démarrer -->
+            <button id="start-btn" onclick="toggleStartMenu()" class="w-9 h-9 rounded-lg hover:bg-white/10 active:scale-95 flex items-center justify-center transition-all group" title="Démarrer" aria-label="Démarrer">
+                <div class="w-4 h-4 grid grid-cols-2 gap-0.5 group-hover:scale-105 transition-transform">
+                    <div class="bg-blue-400 rounded-tl-[1px]"></div>
+                    <div class="bg-blue-300 rounded-tr-[1px]"></div>
+                    <div class="bg-blue-300 rounded-bl-[1px]"></div>
+                    <div class="bg-blue-500 rounded-br-[1px]"></div>
+                </div>
+            </button>
+
+            <div class="h-5 w-[1px] bg-white/15 mx-1"></div>
+
+            <!-- Conteneur des icônes d'applications dans la barre des tâches -->
+            <div id="taskbar-apps" class="flex items-center gap-1"></div>
+        </div>
+
+        <!-- Zone de notification et Horloge à droite -->
+        <div class="flex items-center gap-1">
+            <!-- Bouton Paramètres Rapides -->
+            <button id="quick-settings-btn" onclick="toggleQuickSettings()" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-white/10 text-slate-200 text-xs cursor-pointer transition-colors" title="Paramètres rapides" aria-label="Paramètres rapides">
+                <i class="ph ph-wifi-high"></i>
+                <i class="ph ph-speaker-high"></i>
+                <i class="ph ph-battery-high hidden md:inline"></i>
+            </button>
+
+            <!-- Horloge et Date -->
+            <div class="px-2.5 py-1 rounded-lg hover:bg-white/10 text-right cursor-pointer transition-colors" onclick="toggleNotificationToast('Aucune nouvelle notification. Système à jour.')">
+                <p id="clock-time" class="text-xs font-medium leading-tight">12:00</p>
+                <p id="clock-date" class="text-[10px] text-slate-400 leading-tight">17/11/2026</p>
+            </div>
+
+            <!-- Bouton Afficher le bureau -->
+            <button onclick="minimizeAllWindows()" title="Afficher le bureau" aria-label="Afficher le bureau" class="w-1.5 h-8 border-l border-white/20 hover:bg-white/25 ml-1 transition-colors"></button>
+        </div>
+    </footer>
+
+    <script>
+        // ==========================================
+        // DONNÉES DU PORTFOLIO
+        // Les fiches projets ne sont pas écrites ici : elles viennent de
+        // data/projects.json (flux Notion -> GitHub Action -> branche « donnees »),
+        // comme sur la version classique.
+        // ==========================================
+        const DATA_URL = 'https://raw.githubusercontent.com/Narindra0/portfolioNarindra/donnees/data/projects.json';
+        const DATA_REPLI = 'data/projects.json';
+
+        const portfolioData = {
+            name: "Narindra Ranjalahy",
+            role: "Fondateur & CEO de Pass'io — Développeur Fullstack & IA",
+            location: "Antananarivo, Madagascar (UTC+3)",
+            email: "Ranjalahy.narindraa@gmail.com",
+            whatsapp: "https://wa.me/261328814081",
+            github: "https://github.com/Narindra0",
+            portfolio: "https://narindraportfolio.netlify.app",
+            cv: "assets/files/CV-Narindra-Ranjalahy.pdf",
+            availability: "Disponible pour de nouvelles collaborations",
+            bio: "Fondateur & CEO de Pass'io, je conçois des produits numériques complets : du backend aux interfaces, en passant par l'IA et la direction artistique. Ma détermination n'a d'égale que ma soif d'apprendre et de bâtir l'exceptionnel.",
+            stats: [
+                { value: "11", label: "Projets en ligne" },
+                { value: "3", label: "Années d'exp." },
+                { value: "300", label: "Artistes sur Pass'io" },
+                { value: "2000", label: "Cafés bus ☕" }
+            ],
+            skills: [
+                {
+                    group: "Développement Fullstack",
+                    icon: "ph-code",
+                    accent: "text-blue-400",
+                    desc: "Architectures scalables, du backend complexe aux interfaces réactives.",
+                    items: ["Symfony", "Python", "JavaScript", "API REST", "Bases de données", "React"]
+                },
+                {
+                    group: "Intelligence Artificielle & Data",
+                    icon: "ph-brain",
+                    accent: "text-emerald-400",
+                    desc: "Modèles prédictifs et automatisation intelligente en production.",
+                    items: ["Machine Learning", "Predictive Data", "Reinforcement", "Gemini", "Automatisation"]
+                },
+                {
+                    group: "Design & Direction Artistique",
+                    icon: "ph-pen-nib",
+                    accent: "text-rose-400",
+                    desc: "Identités visuelles et interfaces qui servent l'usage, pas seulement l'esthétique.",
+                    items: ["Figma", "UI/UX Design", "Branding"]
+                },
+                {
+                    group: "Systèmes, Cloud & Automatisation",
+                    icon: "ph-hard-drives",
+                    accent: "text-amber-400",
+                    desc: "Déploiements continus, jetons d'API, quotas et surveillance des échecs.",
+                    items: ["Linux", "Cloud Compute", "GitHub Actions", "Notion API", "Make.com", "Netlify / Cloudflare / Render"]
+                }
+            ],
+            experiences: [
+                {
+                    period: "Depuis janvier 2025",
+                    title: "Pass'io",
+                    role: "Fondateur & CEO",
+                    desc: "Plateforme de streaming musical et culturel à Madagascar : streaming haute qualité, sorties événementielles et produits dérivés. Paiements Mobile Money, 80 % des revenus reversés aux artistes, environ 300 artistes actifs.",
+                    tech: ["Fullstack", "Product Strategy", "UI/UX Design"]
+                },
+                {
+                    period: "Janvier — Juillet 2026",
+                    title: "Zanova",
+                    role: "Développeur Fullstack (CDD)",
+                    desc: "CRM métier développé en équipe, du cahier des charges à la mise en production, utilisé par un centre d'appels d'environ 100 agents.",
+                    tech: ["API REST", "Frontend", "CRM"]
+                },
+                {
+                    period: "Septembre — Décembre 2025",
+                    title: "ApiNess",
+                    role: "Développeur & Designer",
+                    desc: "RAVINA, assistant agricole d'optimisation des plantations : conception UI/UX et mise en production sur serveur.",
+                    tech: ["Python", "UI/UX", "Cloud"]
+                },
+                {
+                    period: "Août — Octobre 2024",
+                    title: "BOA Madagascar",
+                    role: "Stagiaire développeur web",
+                    desc: "Logiciel interne de gestion de projets pour le département informatique, design web et référencement.",
+                    tech: ["Symfony", "Design web", "SEO"]
+                },
+                {
+                    period: "Octobre 2024",
+                    title: "Hackathon",
+                    role: "Participant — représentant universitaire",
+                    desc: "Solution numérique développée sous contrainte de temps, axée sur l'accessibilité et le prototypage rapide.",
+                    tech: ["Innovation", "Prototypage"]
+                }
+            ],
+            formation: [
+                { year: "2024 — 2025", title: "Licence en génie logiciel et systèmes", school: "Université Advancea, Antananarivo" },
+                { year: "2023 — 2024", title: "Diplôme de technicien supérieur", school: "Université Advancea, Antananarivo" },
+                { year: "2022", title: "Baccalauréat série D, mention", school: "Lycée privé CPE, Andoharanofotsy" }
+            ]
+        };
+
+        // ==========================================
+        // CONFIGURATION DES APPLICATIONS
+        // ==========================================
+        const appsConfig = {
+            about: {
+                id: 'about',
+                title: 'À propos de moi',
+                icon: 'ph-user-circle',
+                color: 'from-blue-500 to-indigo-600',
+                defaultWidth: 700,
+                defaultHeight: 500
+            },
+            projects: {
+                id: 'projects',
+                title: 'Explorateur — Mes Projets',
+                icon: 'ph-folder-open',
+                color: 'from-amber-400 to-orange-500',
+                defaultWidth: 880,
+                defaultHeight: 600
+            },
+            skills: {
+                id: 'skills',
+                title: 'Moniteur Système — Compétences',
+                icon: 'ph-cpu',
+                color: 'from-emerald-400 to-teal-600',
+                defaultWidth: 760,
+                defaultHeight: 520
+            },
+            resume: {
+                id: 'resume',
+                title: 'Curriculum_Vitae_Narindra.pdf',
+                icon: 'ph-file-pdf',
+                color: 'from-rose-500 to-pink-600',
+                defaultWidth: 700,
+                defaultHeight: 560
+            },
+            terminal: {
+                id: 'terminal',
+                title: 'Windows PowerShell — Portfolio CLI',
+                icon: 'ph-terminal-window',
+                color: 'from-slate-700 to-slate-900',
+                defaultWidth: 660,
+                defaultHeight: 440
+            },
+            contact: {
+                id: 'contact',
+                title: 'Courrier — Me Contacter',
+                icon: 'ph-paper-plane-tilt',
+                color: 'from-sky-400 to-blue-600',
+                defaultWidth: 580,
+                defaultHeight: 520
+            }
+        };
+
+        // ==========================================
+        // GESTION DE L'ÉTAT DES FENÊTRES & SYSTÈME
+        // ==========================================
+        let zIndexCounter = 100;
+        let windowStates = {};
+        let activeWindow = null;
+        let currentWallpaperIdx = 0;
+        const wallpapers = ['wallpaper', 'wallpaper-purple', 'wallpaper-ember', 'wallpaper-emerald'];
+
+        // Initialisation au chargement de la page
+        window.addEventListener('load', function () {
+            setTimeout(() => {
+                const boot = document.getElementById('boot-screen');
+                if (boot) {
+                    boot.style.opacity = '0';
+                    setTimeout(() => boot.remove(), 700);
+                }
+                openApp('explorer');
+                toggleNotificationToast("Bienvenue sur Windows Portfolio. Double-cliquez sur « Ce PC » pour parcourir l’arborescence.");
+            }, 900);
+
+            updateClock();
+            setInterval(updateClock, 1000);
+            renderTaskbar();
+            initDesktopSelection();
+            initMobileIconTap();
+            ensureProjects();
+        });
+
+        // Support simple tap sur mobile pour les icônes du bureau
+        function initMobileIconTap() {
+            const icons = document.querySelectorAll('.desktop-icon');
+            icons.forEach(icon => {
+                icon.addEventListener('touchend', (e) => {
+                    const dblClickAttr = icon.getAttribute('ondblclick');
+                    if (!dblClickAttr) return;
+                    e.preventDefault();
+                    const match = dblClickAttr.match(/openApp\(['"]([^'"]+)['"]\)/);
+                    if (match && match[1]) {
+                        window.openApp(match[1]);
+                    }
+                });
+            });
+        }
+
+        // Sélection visuelle d'une icône sur le bureau
+        window.selectDesktopIcon = function (e, el) {
+            if (e) e.stopPropagation();
+            document.querySelectorAll('.desktop-icon').forEach(ic => ic.classList.remove('selected'));
+            if (el) el.classList.add('selected');
+        };
+
+        // Rectangle de sélection Windows sur le bureau
+        function initDesktopSelection() {
+            const desktop = document.getElementById('desktop');
+            const box = document.getElementById('selection-box');
+            if (!desktop || !box) return;
+
+            let isSelecting = false;
+            let startX = 0, startY = 0;
+
+            desktop.addEventListener('mousedown', (e) => {
+                if (e.target.id !== 'desktop' && e.target.id !== 'desktop-icons-grid') return;
+                if (e.button !== 0) return;
+
+                document.querySelectorAll('.desktop-icon').forEach(ic => ic.classList.remove('selected'));
+                isSelecting = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                box.style.left = `${startX}px`;
+                box.style.top = `${startY}px`;
+                box.style.width = '0px';
+                box.style.height = '0px';
+                box.style.display = 'block';
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isSelecting) return;
+                const currentX = e.clientX;
+                const currentY = e.clientY;
+                const left = Math.min(startX, currentX);
+                const top = Math.min(startY, currentY);
+
+                box.style.left = `${left}px`;
+                box.style.top = `${top}px`;
+                box.style.width = `${Math.abs(currentX - startX)}px`;
+                box.style.height = `${Math.abs(currentY - startY)}px`;
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (isSelecting) {
+                    isSelecting = false;
+                    box.style.display = 'none';
+                }
+            });
+        }
+
+        // ==========================================
+        // GESTIONNAIRE DE FENÊTRES (OUVRIR, FERMER, MAXIMISER)
+        // ==========================================
+        window.openApp = function (appId, param = null) {
+            const config = appsConfig[appId];
+            if (!config) return;
+
+            if (windowStates[appId]) {
+                const winEl = document.getElementById(`window-${appId}`);
+                if (winEl) {
+                    if (windowStates[appId].minimized) {
+                        winEl.classList.remove('hidden');
+                        windowStates[appId].minimized = false;
+                    }
+                    focusWindow(appId);
+                    renderTaskbar();
+                    if (appId === 'projects' && param) {
+                        ensureProjects().then(() => {
+                            if (param === 'all') { renderProjectsList('all'); return; }
+                            openProjectDetail(param);
+                        });
+                    }
+                    return;
+                }
+                delete windowStates[appId];
+            }
+
+            const openCount = Object.keys(windowStates).length;
+            const offset = (openCount % 5) * 28;
+
+            const isMobile = window.innerWidth < 768;
+            const width = isMobile ? window.innerWidth - 24 : Math.min(config.defaultWidth, window.innerWidth - 60);
+            const height = isMobile ? window.innerHeight - 80 : Math.min(config.defaultHeight, window.innerHeight - 90);
+            const left = isMobile ? 12 : Math.max(40, (window.innerWidth - width) / 2 + offset - 40);
+            const top = isMobile ? 12 : Math.max(24, (window.innerHeight - 48 - height) / 2 + offset - 30);
+
+            windowStates[appId] = {
+                id: appId,
+                minimized: false,
+                maximized: false,
+                prevBounds: { left, top, width, height }
+            };
+
+            const winDiv = document.createElement('div');
+            winDiv.id = `window-${appId}`;
+            winDiv.className = 'mica-window window-opening rounded-xl flex flex-col overflow-hidden pointer-events-auto absolute';
+            winDiv.style.width = `${width}px`;
+            winDiv.style.height = `${height}px`;
+            winDiv.style.left = `${left}px`;
+            winDiv.style.top = `${top}px`;
+            winDiv.onmousedown = () => focusWindow(appId);
+
+            winDiv.innerHTML = `
+                <div class="window-header h-10 px-3.5 flex items-center justify-between bg-white/[0.03] border-b border-white/10 cursor-grab active:cursor-grabbing shrink-0" ondblclick="toggleMaximize('${appId}')">
+                    <div class="flex items-center gap-2.5 pointer-events-none">
+                        <div class="w-5 h-5 rounded-md bg-gradient-to-br ${config.color} flex items-center justify-center">
+                            <i class="ph-fill ${config.icon} text-xs text-white"></i>
+                        </div>
+                        <span class="text-xs font-medium text-slate-200">${config.title}</span>
+                    </div>
+                    <div class="flex items-center gap-1" onmousedown="event.stopPropagation()">
+                        <button onclick="minimizeWindow('${appId}')" class="w-8 h-7 rounded-md hover:bg-white/10 flex items-center justify-center text-slate-300 transition-colors" title="Réduire" aria-label="Réduire">
+                            <i class="ph ph-minus text-xs"></i>
+                        </button>
+                        <button onclick="toggleMaximize('${appId}')" class="w-8 h-7 rounded-md hover:bg-white/10 flex items-center justify-center text-slate-300 transition-colors" title="Agrandir" aria-label="Agrandir">
+                            <i class="ph ph-square text-xs"></i>
+                        </button>
+                        <button onclick="closeWindow('${appId}')" class="w-8 h-7 rounded-md hover:bg-red-500 hover:text-white flex items-center justify-center text-slate-300 transition-colors" title="Fermer" aria-label="Fermer">
+                            <i class="ph ph-x text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="window-body flex-1 overflow-y-auto p-5 select-text">
+                    ${getAppContent(appId, param)}
+                </div>
+                <div class="resize-handle" title="Redimensionner"></div>
+            `;
+
+            document.getElementById('windows-container').appendChild(winDiv);
+            makeDraggable(winDiv, appId);
+            makeResizable(winDiv, appId);
+            focusWindow(appId);
+            renderTaskbar();
+
+            if (appId === 'terminal') {
+                setTimeout(() => {
+                    const input = document.getElementById('terminal-input');
+                    if (input) input.focus();
+                }, 100);
+            }
+
+            if (appId === 'projects') {
+                ensureProjects().then(() => {
+                    rebuildProjectsWindow();
+                    if (param && param !== 'all') openProjectDetail(param);
+                });
+            }
+        };
+
+        function focusWindow(appId) {
+            zIndexCounter++;
+            document.querySelectorAll('.mica-window').forEach(w => w.classList.remove('window-focused'));
+
+            const winEl = document.getElementById(`window-${appId}`);
+            if (winEl) {
+                winEl.style.zIndex = zIndexCounter;
+                winEl.classList.add('window-focused');
+                activeWindow = appId;
+                renderTaskbar();
+            }
+        }
+
+        function closeWindow(appId) {
+            const winEl = document.getElementById(`window-${appId}`);
+            if (winEl) {
+                winEl.style.opacity = '0';
+                winEl.style.transform = 'scale(0.95)';
+                winEl.style.transition = 'all 0.15s ease';
+                setTimeout(() => {
+                    winEl.remove();
+                    delete windowStates[appId];
+                    if (activeWindow === appId) activeWindow = null;
+                    renderTaskbar();
+                }, 150);
+            }
+        }
+
+        function minimizeWindow(appId) {
+            const winEl = document.getElementById(`window-${appId}`);
+            if (winEl && windowStates[appId]) {
+                winEl.classList.add('hidden');
+                windowStates[appId].minimized = true;
+                if (activeWindow === appId) activeWindow = null;
+                renderTaskbar();
+            }
+        }
+
+        function minimizeAllWindows() {
+            Object.keys(windowStates).forEach(id => minimizeWindow(id));
+        }
+
+        function toggleMaximize(appId) {
+            const winEl = document.getElementById(`window-${appId}`);
+            const state = windowStates[appId];
+            if (!winEl || !state) return;
+
+            winEl.classList.add('window-transition');
+
+            if (!state.maximized) {
+                state.prevBounds = {
+                    left: winEl.offsetLeft,
+                    top: winEl.offsetTop,
+                    width: winEl.offsetWidth,
+                    height: winEl.offsetHeight
+                };
+                winEl.style.left = '0px';
+                winEl.style.top = '0px';
+                winEl.style.width = '100%';
+                winEl.style.height = 'calc(100vh - 48px)';
+                winEl.classList.remove('rounded-xl');
+                state.maximized = true;
+            } else {
+                winEl.style.left = `${state.prevBounds.left}px`;
+                winEl.style.top = `${state.prevBounds.top}px`;
+                winEl.style.width = `${state.prevBounds.width}px`;
+                winEl.style.height = `${state.prevBounds.height}px`;
+                winEl.classList.add('rounded-xl');
+                state.maximized = false;
+            }
+
+            setTimeout(() => winEl.classList.remove('window-transition'), 250);
+            focusWindow(appId);
+        }
+
+        // Déplacement des fenêtres (Souris & Tactile)
+        function makeDraggable(winEl, appId) {
+            const header = winEl.querySelector('.window-header');
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            const startDrag = (clientX, clientY) => {
+                if (windowStates[appId]?.maximized) return;
+                window.dispatchEvent(new CustomEvent('os-snap-dragstart', { detail: { appId, x: clientX, y: clientY } }));
+                isDragging = true;
+                startX = clientX;
+                startY = clientY;
+                initialLeft = winEl.offsetLeft;
+                initialTop = winEl.offsetTop;
+                focusWindow(appId);
+            };
+
+            const onDrag = (clientX, clientY) => {
+                if (!isDragging) return;
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+                const newTop = Math.max(0, Math.min(initialTop + dy, window.innerHeight - 85));
+                const newLeft = Math.max(-winEl.offsetWidth + 100, Math.min(initialLeft + dx, window.innerWidth - 100));
+                winEl.style.left = `${newLeft}px`;
+                winEl.style.top = `${newTop}px`;
+                window.dispatchEvent(new CustomEvent('os-snap-drag', { detail: { appId, x: clientX, y: clientY } }));
+            };
+
+            const stopDrag = (e) => {
+                isDragging = false;
+                const touch = e && e.changedTouches && e.changedTouches[0];
+                window.dispatchEvent(new CustomEvent('os-snap-dragend', { detail: { appId, x: touch ? touch.clientX : (e ? e.clientX : 0), y: touch ? touch.clientY : (e ? e.clientY : 0) } }));
+            };
+
+            header.addEventListener('mousedown', (e) => {
+                if (e.button === 0) startDrag(e.clientX, e.clientY);
+            });
+            window.addEventListener('mousemove', (e) => onDrag(e.clientX, e.clientY));
+            window.addEventListener('mouseup', stopDrag);
+
+            header.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) startDrag(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+            window.addEventListener('touchmove', (e) => {
+                if (isDragging && e.touches.length === 1) onDrag(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+            window.addEventListener('touchend', stopDrag);
+        }
+
+        // Redimensionnement des fenêtres
+        function makeResizable(winEl, appId) {
+            const handle = winEl.querySelector('.resize-handle');
+            if (!handle) return;
+
+            let isResizing = false;
+            let startX, startY, startWidth, startHeight;
+
+            handle.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                if (windowStates[appId]?.maximized) return;
+                isResizing = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = winEl.offsetWidth;
+                startHeight = winEl.offsetHeight;
+                focusWindow(appId);
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                const newWidth = Math.max(360, Math.min(startWidth + (e.clientX - startX), window.innerWidth - winEl.offsetLeft));
+                const newHeight = Math.max(280, Math.min(startHeight + (e.clientY - startY), window.innerHeight - 48 - winEl.offsetTop));
+                winEl.style.width = `${newWidth}px`;
+                winEl.style.height = `${newHeight}px`;
+                window.dispatchEvent(new CustomEvent('os-snap-resize', { detail: { appId } }));
+            });
+
+            window.addEventListener('mouseup', () => { isResizing = false; });
+        }
+
+        // ==========================================
+        // BARRE DES TÂCHES & MENU DÉMARRER
+        // ==========================================
+        function renderTaskbar() {
+            const container = document.getElementById('taskbar-apps');
+            if (!container) return;
+            const pinnedIds = ['about', 'projects', 'skills', 'terminal', 'contact'];
+            const allIds = Array.from(new Set([...pinnedIds, ...Object.keys(windowStates)]));
+
+            container.innerHTML = allIds.map(id => {
+                const cfg = appsConfig[id];
+                const state = windowStates[id];
+                const isOpen = !!state;
+                const isFocused = activeWindow === id && state && !state.minimized;
+
+                return `
+                    <button onclick="handleTaskbarClick('${id}')" title="${cfg.title}"
+                        class="relative w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:bg-white/10 active:scale-95 ${isFocused ? 'bg-white/15' : ''}">
+                        <div class="w-6 h-6 rounded-md bg-gradient-to-br ${cfg.color} flex items-center justify-center shadow-sm">
+                            <i class="ph-fill ${cfg.icon} text-sm text-white"></i>
+                        </div>
+                        ${isOpen ? `<span class="absolute bottom-0.5 h-1 rounded-full transition-all ${isFocused ? 'w-4 bg-blue-400' : 'w-1.5 bg-slate-400'}"></span>` : ''}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function handleTaskbarClick(appId) {
+            const state = windowStates[appId];
+            if (!state) {
+                openApp(appId);
+            } else if (state.minimized) {
+                openApp(appId);
+            } else if (activeWindow === appId) {
+                minimizeWindow(appId);
+            } else {
+                focusWindow(appId);
+            }
+        }
+
+        function toggleStartMenu() {
+            const menu = document.getElementById('start-menu');
+            document.getElementById('quick-settings').classList.add('hidden');
+            menu.classList.toggle('hidden');
+            if (!menu.classList.contains('hidden')) {
+                document.getElementById('start-search').value = '';
+                filterStartApps();
+                document.getElementById('start-search').focus();
+            }
+        }
+
+        function toggleQuickSettings() {
+            const panel = document.getElementById('quick-settings');
+            document.getElementById('start-menu').classList.add('hidden');
+            panel.classList.toggle('hidden');
+        }
+
+        function toggleQuickBtn(btn) {
+            btn.classList.toggle('bg-blue-600');
+            btn.classList.toggle('text-white');
+            btn.classList.toggle('bg-white/10');
+            btn.classList.toggle('text-slate-300');
+        }
+
+        function adjustBrightness(val) {
+            const overlay = document.getElementById('brightness-overlay');
+            overlay.style.opacity = (100 - val) / 100 * 0.85;
+        }
+
+        function filterStartApps() {
+            const query = document.getElementById('start-search').value.toLowerCase();
+            document.querySelectorAll('.start-app-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            const startMenu = document.getElementById('start-menu');
+            const startBtn = document.getElementById('start-btn');
+            if (startMenu && startBtn && !startMenu.contains(e.target) && !startBtn.contains(e.target)) {
+                startMenu.classList.add('hidden');
+            }
+
+            const quickPanel = document.getElementById('quick-settings');
+            const quickBtn = document.getElementById('quick-settings-btn');
+            if (quickPanel && quickBtn && !quickPanel.contains(e.target) && !quickBtn.contains(e.target)) {
+                quickPanel.classList.add('hidden');
+            }
+
+            hideContextMenu();
+        });
+
+        // ==========================================
+        // CHARGEMENT DES PROJETS (data/projects.json)
+        // ==========================================
+        let projects = [];
+        let projectsPromise = null;
+        let currentFilter = 'all';
+
+        function esc(value) {
+            return String(value === undefined || value === null ? '' : value).replace(/[&<>"']/g, function (m) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+            });
+        }
+
+        function slugify(value) {
+            return String(value || '')
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
+        function yearOf(date) {
+            return String(date || '').slice(0, 4);
+        }
+
+        function normalizeProject(p) {
+            return {
+                id: slugify(p.nom),
+                nom: p.nom || 'Projet',
+                categorie: p.categorie || 'Projet',
+                accroche: p.accroche || '',
+                role: p.role || p.label_court || '',
+                sousTitre: p.sous_titre || p.categorie || '',
+                mission: p.mission || '',
+                description: p.description || p.accroche || '',
+                badge: p.badge || p.role || '',
+                fonctionnalites: Array.isArray(p.fonctionnalites) ? p.fonctionnalites.filter(f => f && f.nom) : [],
+                technologies: Array.isArray(p.technologies) ? p.technologies.filter(Boolean) : [],
+                couleur: p.couleur || '#FF5722',
+                couleur2: p.couleur_secondaire || '#FF8A50',
+                icone: p.icone || 'fa-cube',
+                lien: (p.lien && typeof p.lien === 'object') ? p.lien : { type: 'Aucun', url: '', libelle: '', note: '' },
+                annee: yearOf(p.date)
+            };
+        }
+
+        function readJson(url) {
+            return fetch(url, { cache: 'no-store' })
+                .then(response => {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    if (!Array.isArray(data)) throw new Error('format inattendu');
+                    return data;
+                });
+        }
+
+        function ensureProjects() {
+            if (projects.length) return Promise.resolve(projects);
+            if (projectsPromise) return projectsPromise;
+
+            projectsPromise = readJson(DATA_URL)
+                .catch(() => readJson(DATA_REPLI))
+                .then(data => {
+                    projects = data.map(normalizeProject);
+                    return projects;
+                })
+                .catch(() => {
+                    projectsPromise = null;
+                    return projects;
+                });
+
+            return projectsPromise;
+        }
+
+        function rebuildProjectsWindow() {
+            const body = document.querySelector('#window-projects .window-body');
+            if (!body) return;
+            body.innerHTML = getAppContent('projects');
+            renderProjectsList(currentFilter);
+        }
+
+        // ==========================================
+        // CONTENU HTML DE CHAQUE APPLICATION
+        // ==========================================
+        function getAppContent(appId, param) {
+            switch (appId) {
+                case 'about':
+                    return `
+                        <div class="space-y-6">
+                            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 bg-white/5 p-5 rounded-2xl border border-white/10">
+                                <img src="assets/img/Portrait.png" alt="Portrait de Narindra Ranjalahy" class="w-20 h-24 rounded-2xl object-cover object-top border border-white/10 shadow-xl shrink-0">
+                                <div class="text-center sm:text-left">
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-medium mb-2">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                        ${esc(portfolioData.availability)}
+                                    </div>
+                                    <h2 class="text-2xl font-bold text-white">${esc(portfolioData.name)}</h2>
+                                    <p class="text-sm text-blue-400 font-medium">${esc(portfolioData.role)}</p>
+                                    <p class="text-xs text-slate-400 mt-1 flex items-center justify-center sm:justify-start gap-1">
+                                        <i class="ph-fill ph-map-pin"></i> ${esc(portfolioData.location)}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2">Présentation</h3>
+                                <p class="text-sm text-slate-200 leading-relaxed bg-white/[0.03] p-4 rounded-xl border border-white/5">
+                                    ${esc(portfolioData.bio)}
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                ${portfolioData.stats.map(stat => `
+                                    <div class="bg-white/5 p-3.5 rounded-xl border border-white/10 text-center">
+                                        <p class="text-xl font-bold text-blue-400">${esc(stat.value)}</p>
+                                        <p class="text-[11px] text-slate-400 mt-0.5">${esc(stat.label)}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div class="bg-white/[0.03] border border-white/5 rounded-xl p-3.5">
+                                    <p class="text-xs font-semibold text-white mb-1"><i class="ph-fill ph-code text-blue-400 mr-1.5"></i>Fullstack</p>
+                                    <p class="text-[11px] text-slate-400 leading-relaxed">Produits complets, du backend à l'interface, en production.</p>
+                                </div>
+                                <div class="bg-white/[0.03] border border-white/5 rounded-xl p-3.5">
+                                    <p class="text-xs font-semibold text-white mb-1"><i class="ph-fill ph-brain text-emerald-400 mr-1.5"></i>IA &amp; Data</p>
+                                    <p class="text-[11px] text-slate-400 leading-relaxed">Modèles prédictifs et génération assistée, sans invention.</p>
+                                </div>
+                                <div class="bg-white/[0.03] border border-white/5 rounded-xl p-3.5">
+                                    <p class="text-xs font-semibold text-white mb-1"><i class="ph-fill ph-pen-nib text-rose-400 mr-1.5"></i>Design</p>
+                                    <p class="text-[11px] text-slate-400 leading-relaxed">Identités visuelles et interfaces pensées pour l'usage.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2.5 pt-2">
+                                <button onclick="openApp('projects')" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold transition-colors flex items-center gap-2">
+                                    <i class="ph-bold ph-folder-open"></i> Explorer mes projets
+                                </button>
+                                <button onclick="openApp('contact')" class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-semibold transition-colors flex items-center gap-2">
+                                    <i class="ph-bold ph-paper-plane-tilt"></i> Me contacter
+                                </button>
+                                <a href="${portfolioData.cv}" download class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-semibold transition-colors flex items-center gap-2">
+                                    <i class="ph-bold ph-download-simple"></i> Télécharger le CV
+                                </a>
+                            </div>
+                        </div>
+                    `;
+
+                case 'projects':
+                    return `
+                        <div class="flex flex-col h-full">
+                            <div class="flex flex-col gap-3 pb-4 mb-4 border-b border-white/10">
+                                <div class="flex items-center justify-between gap-3 min-w-0">
+                                    <div class="flex items-center gap-2 text-xs text-slate-400 bg-black/30 px-3 py-1.5 rounded-lg border border-white/10 min-w-0">
+                                        <button onclick="renderProjectsList('all')" class="hover:text-white flex items-center gap-1.5 transition-colors shrink-0">
+                                            <i class="ph-fill ph-hard-drives text-blue-400"></i>
+                                            <span>Ce PC</span>
+                                        </button>
+                                        <i class="ph ph-caret-right text-[10px] shrink-0"></i>
+                                        <button onclick="renderProjectsList('all')" class="text-white font-medium hover:underline shrink-0">Mes Projets</button>
+                                        <span id="proj-breadcrumb-detail" class="hidden items-center gap-2 min-w-0">
+                                            <i class="ph ph-caret-right text-[10px] shrink-0"></i>
+                                            <span id="proj-breadcrumb-name" class="text-blue-400 font-medium truncate"></span>
+                                        </span>
+                                    </div>
+                                    <span id="proj-count" class="text-[11px] font-mono text-slate-500 shrink-0">${projects.length ? projects.length + ' projets' : ''}</span>
+                                </div>
+                                <div id="proj-filter-bar" class="flex flex-wrap items-center gap-1.5">
+                                    ${projects.length ? projectsFiltersMarkup() : ''}
+                                </div>
+                            </div>
+
+                            <div id="projects-view-container" class="flex-1">
+                                ${projects.length ? getProjectsGridHTML(currentFilter) : `
+                                    <div class="flex flex-col items-center justify-center py-16 text-slate-400 gap-3">
+                                        <div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                        <p class="text-xs">Lecture de data/projects.json…</p>
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    `;
+
+                case 'skills':
+                    return `
+                        <div class="space-y-5">
+                            <div class="flex flex-wrap items-center justify-between gap-3 bg-white/5 p-4 rounded-xl border border-white/10">
+                                <div>
+                                    <h3 class="text-sm font-bold">Composants &amp; modules installés</h3>
+                                    <p class="text-xs text-slate-400">Stack réelle, utilisée sur les projets en production</p>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 text-xs font-mono">Système opérationnel</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                ${portfolioData.skills.map(skill => `
+                                    <div class="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+                                        <div class="flex items-center gap-2 mb-1.5">
+                                            <i class="ph-fill ${skill.icon} ${skill.accent} text-base"></i>
+                                            <h4 class="text-xs font-bold uppercase tracking-wider ${skill.accent}">${esc(skill.group)}</h4>
+                                        </div>
+                                        <p class="text-[11px] text-slate-400 leading-relaxed mb-3">${esc(skill.desc)}</p>
+                                        <div class="flex flex-wrap gap-1.5">
+                                            ${skill.items.map(item => `
+                                                <span class="text-[11px] px-2 py-1 rounded-md bg-black/40 border border-white/10 text-slate-200">${esc(item)}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
+                                    <p class="text-lg font-bold text-blue-400">11</p>
+                                    <p class="text-[11px] text-slate-400">Projets en ligne</p>
+                                </div>
+                                <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
+                                    <p class="text-lg font-bold text-amber-400">3 ans</p>
+                                    <p class="text-[11px] text-slate-400">Pratique</p>
+                                </div>
+                                <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
+                                    <p class="text-lg font-bold text-emerald-400">300</p>
+                                    <p class="text-[11px] text-slate-400">Artistes (Pass'io)</p>
+                                </div>
+                                <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
+                                    <p class="text-lg font-bold text-rose-400">100</p>
+                                    <p class="text-[11px] text-slate-400">Agents (CRM Zanova)</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                case 'resume':
+                    return `
+                        <div class="space-y-5">
+                            <div class="flex flex-wrap items-center justify-between gap-2 bg-white/5 p-3 rounded-xl border border-white/10">
+                                <span class="text-xs text-slate-300 flex items-center gap-2">
+                                    <i class="ph-fill ph-file-pdf text-rose-400 text-lg"></i>
+                                    Aperçu du Curriculum Vitae
+                                </span>
+                                <a href="${portfolioData.cv}" download class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                                    <i class="ph-bold ph-download-simple"></i> Télécharger le PDF
+                                </a>
+                            </div>
+
+                            <div class="bg-slate-900/90 border border-white/10 rounded-xl p-6 space-y-5 text-slate-200">
+                                <div class="border-b border-white/10 pb-4 flex flex-col sm:flex-row justify-between gap-2">
+                                    <div>
+                                        <h2 class="text-xl font-bold text-white">${esc(portfolioData.name)}</h2>
+                                        <p class="text-xs text-blue-400 font-medium">${esc(portfolioData.role)}</p>
+                                    </div>
+                                    <div class="text-xs text-slate-400 sm:text-right">
+                                        <p>${esc(portfolioData.email)}</p>
+                                        <p>${esc(portfolioData.location)}</p>
+                                        <p class="text-slate-500">github.com/Narindra0</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-blue-400 mb-3">Expériences</h3>
+                                    <div class="space-y-4">
+                                        ${portfolioData.experiences.map((exp, index) => `
+                                            <div class="relative pl-4 ${index === 0 ? 'border-l-2 border-blue-500' : 'border-l-2 border-slate-600'}">
+                                                <div class="flex flex-wrap justify-between items-center gap-2">
+                                                    <h4 class="text-sm font-semibold text-white">${esc(exp.role)} — ${esc(exp.title)}</h4>
+                                                    <span class="text-[11px] text-slate-400">${esc(exp.period)}</span>
+                                                </div>
+                                                <p class="text-xs text-slate-300 mt-1 leading-relaxed">${esc(exp.desc)}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-blue-400 mb-2">Formation</h3>
+                                    <div class="space-y-1.5">
+                                        ${portfolioData.formation.map(item => `
+                                            <div class="flex flex-wrap justify-between gap-2 text-xs">
+                                                <span class="text-slate-200 font-medium">${esc(item.title)} <span class="text-slate-400 font-normal">— ${esc(item.school)}</span></span>
+                                                <span class="text-slate-500">${esc(item.year)}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-blue-400 mb-2">Langues</h3>
+                                    <p class="text-xs text-slate-300">Malagasy (langue maternelle) • Français (courant)</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                case 'terminal':
+                    return `
+                        <div class="theme-keep-dark h-full flex flex-col font-['JetBrains_Mono'] text-xs bg-black/60 rounded-xl p-4 border border-white/10" onclick="document.getElementById('terminal-input').focus()">
+                            <div id="terminal-output" class="flex-1 overflow-y-auto space-y-1.5 text-slate-300 mb-2">
+                                <p class="text-blue-400">Portfolio OS [Version 11.0.26100]</p>
+                                <p class="text-slate-400">(c) 2026 Narindra Ranjalahy. Tous droits réservés.</p>
+                                <p class="mt-2">Tapez <span class="text-emerald-400 font-semibold">'help'</span> pour afficher la liste des commandes disponibles.</p>
+                            </div>
+                            <div class="flex items-center gap-2 pt-2 border-t border-white/10">
+                                <span class="text-emerald-400 font-semibold shrink-0">PS C:\\Users\\Narindra&gt;</span>
+                                <input type="text" id="terminal-input" onkeydown="handleTerminalCommand(event)" class="flex-1 bg-transparent text-white focus:outline-none" autocomplete="off" spellcheck="false" placeholder="Entrez une commande…" aria-label="Commande du terminal">
+                            </div>
+                        </div>
+                    `;
+
+                case 'contact':
+                    return `
+                        <div class="space-y-4">
+                            <div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3.5 flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <i class="ph-fill ph-envelope-simple text-blue-400 text-xl shrink-0"></i>
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-medium text-white truncate">${esc(portfolioData.email)}</p>
+                                        <p class="text-[10px] text-slate-400">Réponse moyenne sous 24h</p>
+                                    </div>
+                                </div>
+                                <button onclick="copyEmail()" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium transition-colors flex items-center gap-1">
+                                    <i class="ph ph-copy"></i> Copier
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <a href="${portfolioData.whatsapp}" target="_blank" rel="noopener noreferrer" class="py-2 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors">
+                                    <i class="fa-brands fa-whatsapp text-emerald-400"></i> WhatsApp
+                                </a>
+                                <a href="${portfolioData.github}" target="_blank" rel="noopener noreferrer" class="py-2 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors">
+                                    <i class="fa-brands fa-github"></i> GitHub
+                                </a>
+                            </div>
+
+                            <form onsubmit="sendMail(event)" class="space-y-3">
+                                <div>
+                                    <label class="block text-xs text-slate-300 mb-1" for="contact-name">Votre nom</label>
+                                    <input id="contact-name" type="text" required placeholder="Ex : Marie Laurent" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-300 mb-1" for="contact-email">Votre email</label>
+                                    <input id="contact-email" type="email" required placeholder="marie@entreprise.com" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-300 mb-1" for="contact-message">Message</label>
+                                    <textarea id="contact-message" rows="4" required placeholder="Parlez-moi de votre projet ou opportunité…" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 resize-none"></textarea>
+                                </div>
+                                <button type="submit" class="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold transition-colors flex items-center justify-center gap-2">
+                                    <i class="ph-bold ph-paper-plane-right"></i> Envoyer le message
+                                </button>
+                                <p class="text-[10px] text-slate-500 text-center">Ouvre votre logiciel de messagerie avec le message pré-rempli.</p>
+                            </form>
+                        </div>
+                    `;
+            }
+        }
+
+        // ==========================================
+        // LOGIQUE SPÉCIFIQUE AUX PROJETS
+        // ==========================================
+        function projectsFiltersMarkup() {
+            const categories = Array.from(new Set(projects.map(p => p.categorie).filter(Boolean)));
+            return [
+                `<button onclick="filterProjects('all')" data-cat="all" class="proj-filter-btn shrink-0 px-2.5 py-1 rounded-md text-xs bg-blue-600 text-white font-medium transition-colors">Tous</button>`,
+                ...categories.map(cat => `
+                    <button onclick="filterProjects(this.dataset.cat)" data-cat="${esc(cat)}" class="proj-filter-btn shrink-0 whitespace-nowrap px-2.5 py-1 rounded-md text-xs bg-white/10 hover:bg-white/15 text-slate-300 transition-colors">${esc(cat)}</button>
+                `)
+            ].join('');
+        }
+
+        function getProjectsGridHTML(filter = 'all') {
+            if (!projects.length) {
+                return '<p class="text-xs text-slate-400 py-8">Aucun projet chargé pour le moment. Vérifiez votre connexion puis rouvrez cette fenêtre.</p>';
+            }
+
+            const filtered = projects.filter(p => filter === 'all' || p.categorie === filter);
+
+            if (!filtered.length) {
+                return '<p class="text-xs text-slate-400 py-8">Aucun projet dans cette catégorie.</p>';
+            }
+
+            return `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${filtered.map(proj => `
+                        <div class="project-card bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl overflow-hidden transition-all flex flex-col justify-between group">
+                            <div>
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between gap-3 mb-3">
+                                        <div class="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg shrink-0" style="background: linear-gradient(135deg, ${proj.couleur}, ${proj.couleur2})">
+                                            <i class="fa-solid ${esc(proj.icone)} text-xl text-white"></i>
+                                        </div>
+                                        <span class="text-[11px] bg-white/10 px-2 py-0.5 rounded-md text-slate-300">${esc(proj.annee)}</span>
+                                    </div>
+                                    <h3 class="text-base font-bold text-white group-hover:text-blue-400 transition-colors">${esc(proj.nom)}</h3>
+                                    <p class="text-[11px] text-blue-400 font-medium mb-2">${esc(proj.categorie)}</p>
+                                    <p class="text-xs text-slate-300 leading-relaxed mb-4">${esc(proj.accroche)}</p>
+                                </div>
+                            </div>
+                            <div class="px-4 pb-4">
+                                <div class="flex flex-wrap gap-1.5 mb-3">
+                                    ${proj.technologies.slice(0, 4).map(t => `<span class="text-[10px] px-2 py-0.5 rounded bg-black/40 border border-white/10 text-slate-300">${esc(t)}</span>`).join('')}
+                                </div>
+                                <button onclick="openProjectDetail('${esc(proj.id)}')" class="w-full py-1.5 rounded-lg bg-white/10 hover:bg-blue-600 text-xs font-medium transition-colors flex items-center justify-center gap-1.5">
+                                    <span>Explorer le projet</span>
+                                    <i class="ph-bold ph-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getProjectDetailHTML(projId) {
+            const proj = projects.find(p => p.id === projId);
+            if (!proj) return '<p class="text-xs text-slate-400 py-8">Projet introuvable.</p>';
+
+            const link = proj.lien || {};
+            const hasLink = !!(link.url && link.type !== 'Aucun');
+            const isGithub = link.type === 'GitHub';
+            const linkLabel = link.libelle || (isGithub ? 'Code Source' : 'Démo Live');
+
+            return `
+                <div class="bg-white/5 border border-white/10 rounded-xl p-5 animate-[menuFade_0.2s_ease]">
+                    <button onclick="renderProjectsList('all')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 mb-4 transition-colors">
+                        <i class="ph-bold ph-arrow-left"></i> Retour aux projets
+                    </button>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-white/10">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shrink-0" style="background: linear-gradient(135deg, ${proj.couleur}, ${proj.couleur2})">
+                                <i class="fa-solid ${esc(proj.icone)} text-2xl text-white"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-xl font-bold text-white">${esc(proj.nom)}</h2>
+                                    <span class="text-[11px] bg-white/10 px-2 py-0.5 rounded text-slate-300">${esc(proj.annee)}</span>
+                                </div>
+                                <p class="text-xs text-blue-400 font-medium mt-0.5">${esc(proj.sousTitre)}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            ${hasLink ? `
+                                <a href="${esc(link.url)}" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg ${isGithub ? 'bg-white/10 hover:bg-white/15 text-slate-100' : 'bg-blue-600 hover:bg-blue-500 text-white'} text-xs font-medium flex items-center gap-1.5 transition-colors shrink-0">
+                                    <i class="ph-bold ${isGithub ? 'ph-github-logo' : 'ph-globe'}"></i> ${esc(linkLabel)}
+                                </a>
+                            ` : `
+                                <span class="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-slate-400 text-xs font-medium flex items-center gap-1.5">
+                                    <i class="ph ph-lock-simple"></i> Projet interne
+                                </span>
+                            `}
+                        </div>
+                    </div>
+
+                    <div class="py-4 space-y-4">
+                        <div>
+                            <h4 class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1.5">À propos du projet</h4>
+                            <p class="text-xs text-slate-200 leading-relaxed">${esc(proj.description)}</p>
+                            ${proj.mission && proj.mission !== proj.description ? `<p class="text-xs text-slate-400 leading-relaxed mt-2">${esc(proj.mission)}</p>` : ''}
+                        </div>
+
+                        ${proj.fonctionnalites.length ? `
+                            <div>
+                                <h4 class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2">Points clés & Réalisations</h4>
+                                <ul class="space-y-1.5">
+                                    ${proj.fonctionnalites.map(f => `
+                                        <li class="text-xs text-slate-300 flex items-start gap-2">
+                                            <i class="ph-fill ph-check-circle text-emerald-400 mt-0.5 shrink-0"></i>
+                                            <span><span class="text-white font-medium">${esc(f.nom)}</span>${f.description ? ' — ' + esc(f.description) : ''}</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+
+                        ${proj.technologies.length ? `
+                            <div>
+                                <h4 class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2">Technologies utilisées</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    ${proj.technologies.map(t => `<span class="text-xs px-2.5 py-1 rounded-md bg-black/40 border border-white/10 text-blue-300 font-medium">${esc(t)}</span>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${(!hasLink && link.note) ? `<p class="text-[11px] text-slate-400 leading-relaxed">${esc(link.note)}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        window.filterProjects = function (filter) {
+            renderProjectsList(filter);
+        };
+
+        function renderProjectsList(filter = 'all') {
+            currentFilter = filter || 'all';
+            const container = document.getElementById('projects-view-container');
+            const breadcrumb = document.getElementById('proj-breadcrumb-detail');
+            const filterBar = document.getElementById('proj-filter-bar');
+            const count = document.getElementById('proj-count');
+            if (!container) return;
+
+            if (breadcrumb) {
+                breadcrumb.classList.add('hidden');
+                breadcrumb.classList.remove('flex');
+            }
+            if (filterBar) {
+                filterBar.classList.remove('hidden');
+                filterBar.classList.add('flex');
+            }
+            if (count) count.classList.remove('hidden');
+
+            container.innerHTML = getProjectsGridHTML(currentFilter);
+
+            document.querySelectorAll('.proj-filter-btn').forEach(btn => {
+                const active = btn.dataset.cat === currentFilter;
+                btn.classList.toggle('bg-blue-600', active);
+                btn.classList.toggle('text-white', active);
+                btn.classList.toggle('font-medium', active);
+                btn.classList.toggle('bg-white/10', !active);
+                btn.classList.toggle('text-slate-300', !active);
+            });
+        }
+
+        window.openProjectDetail = function (projId) {
+            const proj = projects.find(p => p.id === projId);
+            const container = document.getElementById('projects-view-container');
+            const breadcrumb = document.getElementById('proj-breadcrumb-detail');
+            const breadcrumbName = document.getElementById('proj-breadcrumb-name');
+            const filterBar = document.getElementById('proj-filter-bar');
+            const count = document.getElementById('proj-count');
+
+            if (!proj || !container) return;
+
+            if (breadcrumb && breadcrumbName) {
+                breadcrumbName.textContent = proj.nom;
+                breadcrumb.classList.remove('hidden');
+                breadcrumb.classList.add('flex');
+            }
+            if (filterBar) {
+                filterBar.classList.add('hidden');
+                filterBar.classList.remove('flex');
+            }
+            if (count) count.classList.add('hidden');
+
+            container.innerHTML = getProjectDetailHTML(projId);
+            container.scrollTop = 0;
+        };
+
+        // ==========================================
+        // TERMINAL
+        // ==========================================
+        function handleTerminalCommand(e) {
+            if (e.key !== 'Enter') return;
+            const input = e.target;
+            const raw = input.value;
+            const cmd = raw.trim().toLowerCase();
+            const output = document.getElementById('terminal-output');
+
+            const cmdLine = document.createElement('p');
+            const prompt = document.createElement('span');
+            prompt.className = 'text-emerald-400';
+            prompt.textContent = 'PS C:\\Users\\Narindra>';
+            const typed = document.createElement('span');
+            typed.className = 'text-white';
+            typed.textContent = ' ' + raw;
+            cmdLine.append(prompt, typed);
+            output.appendChild(cmdLine);
+
+            const response = document.createElement('div');
+            response.className = 'mb-2 text-slate-300 whitespace-pre-line';
+
+            switch (cmd) {
+                case 'help':
+                    response.innerHTML = `
+                        Commandes disponibles :<br>
+                        • <span class="text-blue-400">about</span>     - Afficher mon profil<br>
+                        • <span class="text-blue-400">projects</span>  - Ouvrir l'explorateur de projets<br>
+                        • <span class="text-blue-400">skills</span>    - Lister mes compétences<br>
+                        • <span class="text-blue-400">cv</span>        - Télécharger mon CV<br>
+                        • <span class="text-blue-400">contact</span>   - Ouvrir le formulaire de contact<br>
+                        • <span class="text-blue-400">passio</span>    - Ouvrir Pass'io<br>
+                        • <span class="text-blue-400">theme</span>     - Changer le fond d'écran<br>
+                        • <span class="text-blue-400">light</span>     - Activer le mode clair<br>
+                        • <span class="text-blue-400">dark</span>      - Activer le mode sombre<br>
+                        • <span class="text-blue-400">classic</span>   - Version classique du portfolio<br>
+                        • <span class="text-blue-400">clear</span>     - Effacer le terminal
+                    `;
+                    break;
+                case 'about':
+                    response.textContent = `${portfolioData.name} — ${portfolioData.role}. Ouverture de la fenêtre Profil…`;
+                    openApp('about');
+                    break;
+                case 'whoami':
+                    response.textContent = `${portfolioData.name} — Fondateur & CEO de Pass'io, développeur fullstack.`;
+                    break;
+                case 'projects':
+                    response.textContent = projects.length ? `Chargement de ${projects.length} projets…` : 'Chargement des projets…';
+                    openApp('projects');
+                    break;
+                case 'skills':
+                    response.textContent = "Stack : Symfony, Python, JavaScript, API REST, Machine Learning, Figma, Linux.";
+                    openApp('skills');
+                    break;
+                case 'cv':
+                    response.innerHTML = `<a href="${portfolioData.cv}" download class="text-blue-400 underline">Télécharger Curriculum_Vitae_Narindra.pdf</a>`;
+                    break;
+                case 'contact':
+                    response.textContent = `Email : ${portfolioData.email}`;
+                    openApp('contact');
+                    break;
+                case 'passio':
+                    response.textContent = "Ouverture de Pass'io (passiio.shop)…";
+                    window.open('https://passiio.shop', '_blank', 'noopener');
+                    break;
+                case 'theme':
+                    changeWallpaper();
+                    response.textContent = "Thème visuel mis à jour !";
+                    break;
+                case 'light':
+                case 'theme light':
+                    applySystemTheme('light');
+                    response.textContent = 'Mode clair activé. Tapez \'dark\' pour revenir au mode sombre.';
+                    break;
+                case 'dark':
+                case 'theme dark':
+                    applySystemTheme('dark');
+                    response.textContent = 'Mode sombre activé. Tapez \'light\' pour passer au mode clair.';
+                    break;
+                case 'classic':
+                    response.textContent = 'Retour à la version classique du portfolio…';
+                    setTimeout(() => { location.href = 'index.html'; }, 400);
+                    break;
+                case 'clear':
+                    output.innerHTML = '';
+                    input.value = '';
+                    return;
+                case '':
+                    break;
+                default:
+                    response.textContent = `Commande non reconnue : '${cmd}'. Tapez 'help' pour l'aide.`;
+                    response.classList.add('text-rose-400');
+            }
+
+            output.appendChild(response);
+            input.value = '';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // ==========================================
+        // CONTACT
+        // ==========================================
+        function copyEmail() {
+            const email = portfolioData.email;
+            const done = () => toggleNotificationToast("Adresse email copiée dans le presse-papiers !");
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(email).then(done).catch(() => fallbackCopy(email, done));
+            } else {
+                fallbackCopy(email, done);
+            }
+        }
+
+        function fallbackCopy(text, done) {
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            done();
+        }
+
+        function sendMail(e) {
+            e.preventDefault();
+            const name = document.getElementById('contact-name').value.trim();
+            const email = document.getElementById('contact-email').value.trim();
+            const message = document.getElementById('contact-message').value.trim();
+            const subject = `Contact portfolio — ${name}`;
+            const body = `${message}\n\n— ${name} (${email})`;
+            window.location.href = `mailto:${portfolioData.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            toggleNotificationToast('Votre logiciel de messagerie va s’ouvrir avec le message pré-rempli.');
+        }
+
+        // ==========================================
+        // UTILITAIRES SYSTÈME (HORLOGE, THÈME, MENU CONTEXTUEL)
+        // ==========================================
+        function updateClock() {
+            const now = new Date();
+            const timeEl = document.getElementById('clock-time');
+            const dateEl = document.getElementById('clock-date');
+            if (timeEl) timeEl.textContent = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            if (dateEl) dateEl.textContent = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function changeWallpaper() {
+            document.body.classList.remove(...wallpapers);
+            currentWallpaperIdx = (currentWallpaperIdx + 1) % wallpapers.length;
+            document.body.classList.add(wallpapers[currentWallpaperIdx]);
+        }
+
+        // ---- Mode clair / sombre (persistant, appliqué avant le premier rendu) ----
+        const THEME_KEY = 'portfolio-os-theme-v1';
+
+        function syncThemeControls(theme) {
+            const light = theme === 'light';
+            const btn = document.getElementById('theme-toggle');
+            const icon = document.getElementById('theme-toggle-icon');
+            const label = document.getElementById('theme-toggle-label');
+            if (btn) {
+                btn.classList.toggle('active', light);
+                btn.classList.toggle('bg-blue-600', light);
+                btn.classList.toggle('text-white', light);
+                btn.classList.toggle('bg-white/10', !light);
+                btn.classList.toggle('hover:bg-white/15', !light);
+                btn.classList.toggle('text-slate-300', !light);
+                btn.setAttribute('aria-pressed', String(light));
+                btn.setAttribute('aria-label', light ? 'Passer en mode sombre' : 'Activer le mode clair');
+                btn.title = light ? 'Passer en mode sombre' : 'Activer le mode clair';
+            }
+            if (icon) icon.className = light ? 'ph-fill ph-sun text-base text-amber-300' : 'ph ph-moon text-base';
+            if (label) label.textContent = light ? 'Clair' : 'Mode clair';
+            const ctxIcon = document.getElementById('context-theme-icon');
+            const ctxLabel = document.getElementById('context-theme-label');
+            if (ctxIcon) ctxIcon.className = light ? 'ph ph-moon text-blue-400 text-base' : 'ph ph-sun text-amber-400 text-base';
+            if (ctxLabel) ctxLabel.textContent = light ? 'Passer en mode sombre' : 'Passer en mode clair';
+        }
+
+        function applySystemTheme(theme) {
+            const light = theme === 'light';
+            if (light) document.documentElement.dataset.theme = 'light';
+            else delete document.documentElement.dataset.theme;
+            try { localStorage.setItem(THEME_KEY, light ? 'light' : 'dark'); } catch (_) { /* stockage indisponible */ }
+            syncThemeControls(light ? 'light' : 'dark');
+        }
+
+        function toggleSystemTheme() {
+            const light = document.documentElement.dataset.theme !== 'light';
+            applySystemTheme(light ? 'light' : 'dark');
+            toggleNotificationToast(light
+                ? 'Mode clair activé. Votre choix est mémorisé pour la prochaine visite.'
+                : 'Mode sombre activé. Retour à l’ambiance Windows 11 d’origine.');
+        }
+
+        // Synchronise les contrôles avec le thème appliqué par le script d'amorçage
+        syncThemeControls(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
+
+        function showContextMenu(e) {
+            if (e.target.closest('.mica-window')) return;
+            e.preventDefault();
+            const menu = document.getElementById('context-menu');
+            menu.classList.remove('hidden');
+            const x = Math.min(e.clientX, window.innerWidth - 250);
+            const y = Math.min(e.clientY, window.innerHeight - 300);
+            menu.style.left = `${x}px`;
+            menu.style.top = `${y}px`;
+        }
+
+        function hideContextMenu() {
+            const menu = document.getElementById('context-menu');
+            if (menu) menu.classList.add('hidden');
+        }
+
+        let toastTimeout;
+        function toggleNotificationToast(msg) {
+            const toast = document.getElementById('notification-toast');
+            const msgEl = document.getElementById('toast-message');
+            if (!toast || !msgEl) return;
+            msgEl.textContent = msg;
+            toast.classList.remove('translate-x-[120%]');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(hideToast, 4500);
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('notification-toast');
+            if (toast) toast.classList.add('translate-x-[120%]');
+        }
+
+        function restartOS() {
+            toggleStartMenu();
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => location.reload(), 500);
+        }
+    </script>
+</body>
+</html>

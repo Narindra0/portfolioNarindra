@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "projectId": "wdp_45f7090acc1d3e9b700d6b6c",
+  "description": "Portfolio de Narindra Ranjalahy présentant ses projets, son parcours et ses compétences à travers un bureau interactif OS avec explorateur de fichiers, visionneuses et raccourcis adaptés au portfolio.",
+  "managedGit": {
+    "baseCommit": "282397308af2972595248aa79d6c67567bc0c7bd"
+  }
+}
