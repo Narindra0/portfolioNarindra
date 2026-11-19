@@ -734,7 +734,10 @@ async function armer() {
 }
 
 async function main() {
-  const auteur = opt("auteur", "Nxrxone");
+  /* Signature portée par le pied de chaque carte. Le nom réel, pas le pseudo du studio :
+     le post part sur le profil personnel de Narindra, la carte doit dire la même chose.
+     `--auteur "..."` reste disponible pour un visuel de marque. */
+  const auteur = opt("auteur", "Narindra Ranjalahy");
   const format = opt("format", "portrait");
   const nombre = Math.max(3, Math.min(10, Number(opt("slides", 5)) || 5));
   const repertoire = opt("out", "sorties");
